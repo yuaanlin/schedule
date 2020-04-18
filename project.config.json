@@ -1,0 +1,17 @@
+{
+	"miniprogramRoot": "dist/",
+	"cloudfunctionRoot": "cloudFunctions/",
+	"projectname": "schedule",
+	"description": "",
+	"appid": "wx7dcc7b1b1c003da7",
+	"setting": {
+		"urlCheck": true,
+		"es6": false,
+		"postcss": false,
+		"minified": false
+	},
+	"compileType": "miniprogram",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
+	"condition": {}
+}
