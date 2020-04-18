@@ -1,6 +1,6 @@
 import { SET_USER_DATA } from "../constants/userData";
-import User from "src/classes/user";
-import { UserDataActions } from "src/actions/userData";
+import User from "../classes/user";
+import { UserDataActions } from "../actions/userData";
 
 /** 当前用户的数据 */
 export default function userData(state = new User(), action: UserDataActions) {

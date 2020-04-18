@@ -1,6 +1,6 @@
-import Taro, { Component, Config } from '@tarojs/taro'
+import Taro, { Component, Config, login } from '@tarojs/taro'
 import { Provider } from '@tarojs/redux'
-
+import {View,Button} from '@tarojs/components'
 import Index from './pages/index'
 
 import configStore from './store'
@@ -38,11 +38,51 @@ class App extends Component {
 
   componentDidMount () {}
 
-  componentDidShow () {}
+  componentDidShow () {
+  }
 
   componentDidHide () {}
 
   componentDidCatchError () {}
+
+  login () {
+    console.log("!")
+    Taro.cloud
+        .callFunction({
+          name:'login',
+        })
+        .then(res=>{
+          console.log('User\'s information:',res)
+          // this.setState({
+          //   userInfo:res.result
+          // })
+        })
+        .catch(console.log)
+  }
+  getUserInfo(e) {
+    console.log(e)
+    const { detail } = e
+    if (detail.errMsg.endsWith('ok')) {
+      const userInfo = JSON.parse(detail.rawData)
+      const { nickName, gender, avatarUrl } = userInfo
+      Taro.cloud
+        .callFunction({
+          name: 'postUserInfo',
+          data: {
+            name: nickName,
+            gender: gender,
+            avatarUrl: avatarUrl,
+          },
+        })
+        .then(res => {
+          this.setState({
+            context: res.result,
+          })
+          this.login()
+        })
+    }
+  }
+
 
   // 在 App 类中的 render() 函数没有实际作用
   // 请勿修改此函数
@@ -50,7 +90,17 @@ class App extends Component {
     return (
       <Provider store={store}>
         <Index />
+        <View className="index">
+        <Button
+          openType="getUserInfo"
+          onGetUserInfo={this.getUserInfo}
+        >
+          授权
+        </Button>
+
+      </View>
       </Provider>
+
     )
   }
 }

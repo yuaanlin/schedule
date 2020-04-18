@@ -1,6 +1,6 @@
-import Schedule from "src/classes/schedule";
-import { ScheduleDataActions } from "src/actions/scheduleData";
-import { SET_SCHEDULE_DATA } from "src/constants/scheduleData";
+import Schedule from "../classes/schedule";
+import { ScheduleDataActions } from "../actions/scheduleData";
+import { SET_SCHEDULE_DATA } from "../constants/scheduleData";
 
 /** 当前查看的班表数据 */
 export default function scheduleData(state = new Schedule(), action: ScheduleDataActions) {

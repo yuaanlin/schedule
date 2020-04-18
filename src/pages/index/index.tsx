@@ -1,12 +1,49 @@
 import { ComponentClass } from "react";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text } from "@tarojs/components";
+import { View, Text ,Button} from "@tarojs/components";
 
 class Index extends Component {
     config: Config = {
         navigationBarTitleText: "首页"
     };
-
+    login () {
+      Taro.cloud.init()
+      console.log("!")
+      Taro.cloud
+          .callFunction({
+            name:'login',
+          })
+          .then(res=>{
+            console.log('User\'s information:',res)
+            // this.setState({
+            //   userInfo:res.result
+            // })
+          })
+          .catch(console.log)
+    }
+    getUserInfo(e) {
+      console.log(e)
+      Taro.cloud.init()
+      const { detail } = e
+      if (detail.errMsg.endsWith('ok')) {
+        const userInfo = JSON.parse(detail.rawData)
+        const { nickName, gender, avatarUrl } = userInfo
+        Taro.cloud
+          .callFunction({
+            name: 'postUserInfo',
+            data: {
+              name: nickName,
+              gender: gender,
+              avatarUrl: avatarUrl,
+            },
+          })
+          .then(res => {
+            console.log(res)
+            this.login()
+          })
+      }
+    }
+    componentDidMount () {}
     render() {
         return (
             <View className="index">
@@ -23,8 +60,15 @@ class Index extends Component {
                     <Text>1. 点击进入自己创建的班表</Text>
                     <Text>2. 点击进入自己参加的班表</Text>
                     <Text>3. 创建新的班表</Text>
+                    <Button
+                      openType="getUserInfo"
+                      onGetUserInfo={this.getUserInfo}
+                    >
+                      授权
+                    </Button>
                 </View>
             </View>
+
         );
     }
 }
