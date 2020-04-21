@@ -8,7 +8,7 @@ const config = {
         "828": 1.81 / 2
     },
     sourceRoot: "src",
-    outputRoot: "./static/dist",
+    outputRoot: "./dist",
     babel: {
         sourceMap: true,
         presets: [
@@ -64,6 +64,7 @@ const config = {
     },
     h5: {
         publicPath: "/",
+        esnextModules: ['taro-ui'],
         staticDirectory: "static",
         postcss: {
             autoprefixer: {
