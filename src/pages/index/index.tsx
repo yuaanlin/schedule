@@ -8,14 +8,14 @@ class Index extends Component {
         navigationBarTitleText: "首页"
     };
     login () {
-      Taro.cloud.init()
-      console.log("!")
+      // Taro.cloud.init()
+      // console.log("!")
       Taro.cloud
           .callFunction({
             name:'login',
           })
           .then(res=>{
-            console.log('User\'s information:',res)
+            console.log('User\'s information:',res.result)
             // this.setState({
             //   userInfo:res.result
             // })
@@ -82,6 +82,7 @@ class Index extends Component {
                 title='活动title'
                 extraText=''
                 onClick={this.handleClick}
+                islist
               />
             </AtList>
             <Button

@@ -11,8 +11,8 @@ class CreateSchedule extends Component {
       this.state = {
         Title: '',
         description:'',
-        selector:['不重复','日循环','周循环','月循环'],
-        selectorChecked:'不重复',
+        selectrepeat:['不重复','日循环','周循环','月循环'],
+        repeattype:'不重复',
         count:0,
         startact:'2018-01-01',
         endact:'2018-05-05',
@@ -42,17 +42,36 @@ class CreateSchedule extends Component {
         [inputName]:e,
       })
     }
-    onSubmit (e) {
+    onSubmit () {
 
-      console.log(e)
+      // console.log(e)
       Taro.cloud.init()
       console.log(this.state)
+      const title=this.state.Title
+      const description=this.state.description
+      const count=this.state.count
+      const startact=this.state.startact
+      const repeattype=this.state.repeattype
+      const endact=this.state.endact
+      const startdate = this.state.startdate
+      const enddate=this.state.enddate
+      const bancistart=this.state.bancistart
+      const banciend=this.state.banciend
+
         Taro.cloud
           .callFunction({
-            name: 'createsche',
+            name: 'newsche',
             data: {
-              title: this.state.title,
-              description:this.state.description
+              title: title,
+              description:description,
+              count:count,
+              startact:startact,
+              repeattype:repeattype,
+              endact:endact,
+              startdate:startdate,
+              enddate:enddate,
+              bancistart:bancistart,
+              banciend:banciend
             },
           })
           .then(res => {
@@ -62,7 +81,15 @@ class CreateSchedule extends Component {
     onReset (event) {
       this.setState({
         Title: '',
-        description:''
+        description:'',
+        count:'',
+        startact:'',
+        repeattype:'',
+        endact:'',
+        startdate:'',
+        enddate:'',
+        bancistart:'',
+        banciend:''
       })
     }
 
@@ -91,9 +118,9 @@ class CreateSchedule extends Component {
             <View className='page-section'>
               <Text>重复模式</Text>
               <View>
-                <Picker mode='selector' range={this.state.selector} onChange={this.onChange}>
+                <Picker mode='selector' range={this.state.selectrepeat} onChange={this.onChange}>
                   <View className='picker'>
-                    当前选择：{this.state.selectorChecked}
+                    当前选择：{this.state.repeattype}
                   </View>
                 </Picker>
               </View>
