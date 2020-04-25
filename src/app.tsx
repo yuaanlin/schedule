@@ -38,7 +38,9 @@ class App extends Component {
     }
   }
 
-  componentDidMount () {}
+  componentDidMount () {
+    Taro.cloud.init()
+  }
 
   componentDidShow () {}
 
