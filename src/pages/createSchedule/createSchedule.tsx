@@ -1,204 +1,229 @@
 import { ComponentClass } from "react";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text,Picker,Button } from "@tarojs/components";
-import {AtForm,AtInput,AtButton,AtInputNumber} from 'taro-ui'
-class CreateSchedule extends Component {
+import { View, Text, Picker } from "@tarojs/components";
+import { AtForm, AtInput, AtButton, AtFab } from "taro-ui";
+
+import "./createSchedule.scss";
+
+interface State {
+    Title: string;
+    description: string;
+    startact: Date;
+    endact: Date;
+    bancis: Array<BanciOptions>;
+}
+
+interface BanciOptions {
+    repeattype: string;
+    repeatStart: Date;
+    repeatEnd: Date;
+    startTime: Date;
+    endTime: Date;
+}
+
+class CreateSchedule extends Component<Readonly<{}>, State> {
     config: Config = {
         navigationBarTitleText: "首页"
     };
-    constructor () {
-      super(...arguments)
-      this.state = {
-        Title: '',
-        description:'',
-        selectrepeat:['不重复','日循环','周循环','月循环'],
-        repeattype:'不重复',
-        count:0,
-        startact:'2018-01-01',
-        endact:'2018-05-05',
-        bancistart: '00:00',
-        banciend: '00:00',
-        startdate: '2018-04-22',
-        enddate:'2018-04-22'
-      }
-    }
-    onChange=e=>{
-      this.setState({
-        selectorChecked:this.state.selector[e.detail.value]
-      })
-    }
-    onTimeChange =(Timemode,e)  => {
-      this.setState({
-        [Timemode]: e.detail.value
-      })
-    }
-    onDateChange = (Datemode,e) => {
-      this.setState({
-        [Datemode]: e.detail.value
-      })
-    }
-    handleChange (inputName,e) {
-      this.setState({
-        [inputName]:e,
-      })
-    }
-    onSubmit () {
 
-      // console.log(e)
-      Taro.cloud.init()
-      console.log(this.state)
-      const title=this.state.Title
-      const description=this.state.description
-      const count=this.state.count
-      const startact=this.state.startact
-      const repeattype=this.state.repeattype
-      const endact=this.state.endact
-      const startdate = this.state.startdate
-      const enddate=this.state.enddate
-      const bancistart=this.state.bancistart
-      const banciend=this.state.banciend
+    constructor() {
+        super();
+        this.state = {
+            Title: "",
+            description: "",
+            startact: new Date(),
+            endact: new Date(),
+            bancis: []
+        };
+        this.handleBanciChange = this.handleBanciChange.bind(this);
+    }
+
+    handleTitleChange(v: string) {
+        this.setState({ Title: v });
+    }
+
+    handleDescriptionChange(v: string) {
+        this.setState({ description: v });
+    }
+
+    handleStartactChange(e: any) {
+        const year = +e.detail.value.split("-")[0];
+        const month = +e.detail.value.split("-")[1];
+        const date = +e.detail.value.split("-")[2];
+        var newDate = new Date();
+        newDate.setTime(this.state.startact.getTime());
+        newDate.setFullYear(year);
+        newDate.setMonth(month - 1);
+        newDate.setDate(date);
+        this.setState({ startact: newDate });
+    }
+
+    handleEndactChange(e: any) {
+        const year = +e.detail.value.split("-")[0];
+        const month = +e.detail.value.split("-")[1];
+        const date = +e.detail.value.split("-")[2];
+        var newDate = new Date();
+        newDate.setTime(this.state.endact.getTime());
+        newDate.setFullYear(year);
+        newDate.setMonth(month - 1);
+        newDate.setDate(date);
+        this.setState({ endact: newDate });
+    }
+
+    handleBanciChange(e: any, index: number, key: "RepeatType" | "RepeatStart" | "RepeatEnd" | "StartTime" | "EndTime") {
+        var newBancis = this.state.bancis;
+        var newDate = new Date();
+        if (key === "RepeatStart" || key === "RepeatEnd" || key === "StartTime" || key === "EndTime") {
+            const year = +e.detail.value.split("-")[0];
+            const month = +e.detail.value.split("-")[1];
+            const date = +e.detail.value.split("-")[2];
+            var newDate = new Date();
+            newDate.setTime(this.state.endact.getTime());
+            newDate.setFullYear(year);
+            newDate.setMonth(month - 1);
+            newDate.setDate(date);
+        }
+        switch (key) {
+            case "RepeatType":
+                const repeatTypes = ["不重复", "日循环", "周循环", "月循环"];
+                newBancis[index].repeattype = repeatTypes[e.detail.value];
+                break;
+            case "RepeatStart":
+                newBancis[index].repeatStart = newDate;
+                break;
+            case "RepeatEnd":
+                newBancis[index].repeatEnd = newDate;
+                break;
+            case "StartTime":
+                newBancis[index].startTime = newDate;
+                break;
+            case "EndTime":
+                newBancis[index].endTime = newDate;
+                break;
+        }
+        this.setState({ bancis: newBancis });
+    }
+
+    createBanci() {
+        var newBancis = this.state.bancis;
+        newBancis.push({
+            repeattype: "不重复",
+            repeatStart: new Date(),
+            repeatEnd: new Date(),
+            startTime: new Date(),
+            endTime: new Date()
+        });
+        this.setState({ bancis: newBancis });
+    }
+
+    onSubmit() {
+        Taro.cloud.init();
+        const title = this.state.Title;
+        const description = this.state.description;
+        const startact = this.state.startact;
+        const endact = this.state.endact;
 
         Taro.cloud
-          .callFunction({
-            name: 'newsche',
-            data: {
-              title: title,
-              description:description,
-              count:count,
-              startact:startact,
-              repeattype:repeattype,
-              endact:endact,
-              startdate:startdate,
-              enddate:enddate,
-              bancistart:bancistart,
-              banciend:banciend
-            },
-          })
-          .then(res => {
-            console.log(res)
-          })
+            .callFunction({
+                name: "newsche",
+                data: {
+                    title: title,
+                    description: description,
+                    startact: startact,
+                    endact: endact
+                }
+            })
+            .then(res => {
+                console.log(res);
+            });
     }
-    onReset (event) {
-      this.setState({
-        Title: '',
-        description:'',
-        count:'',
-        startact:'',
-        repeattype:'',
-        endact:'',
-        startdate:'',
-        enddate:'',
-        bancistart:'',
-        banciend:''
-      })
+
+    onReset() {
+        this.setState({
+            Title: "",
+            description: "",
+            startact: new Date(),
+            endact: new Date()
+        });
     }
 
     render() {
         return (
-          <AtForm
-            onSubmit={this.onSubmit.bind(this)}
-            onReset={this.onReset.bind(this)}
-          >
-            <AtInput
-              name='title'
-              title='活动标题'
-              type='text'
-              placeholder='请输入活动标题'
-              value={this.state.Title}
-              onChange={this.handleChange.bind(this,'Title')}
-            />
-            <AtInput
-              name='description'
-              title='活动描述'
-              type='text'
-              placeholder='请输入活动描述'
-              value={this.state.description}
-              onChange={this.handleChange.bind(this,'description')}
-            />
-            <View className='page-section'>
-              <Text>重复模式</Text>
-              <View>
-                <Picker mode='selector' range={this.state.selectrepeat} onChange={this.onChange}>
-                  <View className='picker'>
-                    当前选择：{this.state.repeattype}
-                  </View>
-                </Picker>
-              </View>
-            </View>
-            <AtInputNumber
-              min={0}
-              max={10}
-              step={1}
-              value={this.state.count}
-              onChange={this.handleChange.bind(this,'count')}
-            />
-            <View className='page-section'>
-              <Text>活动时间开始</Text>
-              <View>
-                <Picker mode='date' onChange={this.onDateChange.bind(this,'startact')}>
-                  <View className='picker'>
-                    {this.state.startact}
-                  </View>
-                </Picker>
-              </View>
-              <Text>活动时间结束</Text>
-              <View>
-                <Picker mode='date' onChange={this.onDateChange.bind(this,'endact')}>
-                  <View className='picker'>
-                    {this.state.endact}
-                  </View>
-                </Picker>
-              </View>
-            </View>
-            <View className='page-section'>
-              <Text>班次时间开始</Text>
-              <View>
-                <Picker mode='date' onChange={this.onDateChange.bind(this,'startdate')}>
-                  <View className='picker'>
-                    当前选择：{this.state.startdate}
-                  </View>
-                </Picker>
-              </View>
-              <View>
-                <Picker mode='time' onChange={this.onTimeChange.bind(this,'bancistart')}>
-                  <View className='picker'>
-                    {this.state.bancistart}
-                  </View>
-                </Picker>
-              </View>
-            </View>
-            <View className='page-section'>
-              <Text>班次时间结束</Text>
-              <View>
-                <Picker mode='date' onChange={this.onDateChange.bind(this,'enddate')}>
-                  <View className='picker'>
-                    当前选择：{this.state.enddate}
-                  </View>
-                </Picker>
-              </View>
-              <View>
-                <Picker mode='time'  onChange={this.onTimeChange.bind(this,'banciend')}>
-                  <View className='picker'>
-                    {this.state.banciend}
-                  </View>
-                </Picker>
-              </View>
-            </View>
+            <AtForm onSubmit={this.onSubmit.bind(this)} onReset={this.onReset.bind(this)}>
+                <AtInput
+                    name="title"
+                    title="活动标题"
+                    type="text"
+                    placeholder="请输入活动标题"
+                    value={this.state.Title}
+                    onChange={this.handleTitleChange.bind(this)}
+                />
+                <AtInput
+                    name="description"
+                    title="活动描述"
+                    type="text"
+                    placeholder="请输入活动描述"
+                    value={this.state.description}
+                    onChange={this.handleDescriptionChange.bind(this)}
+                />
+                <Text>活动时间开始</Text>
+                <View>
+                    <Picker mode="date" onChange={this.handleStartactChange.bind(this)}>
+                        <View className="picker">{this.state.startact.toISOString()}</View>
+                    </Picker>
+                </View>
+                <Text>活动时间结束</Text>
+                <View>
+                    <Picker mode="date" onChange={this.handleEndactChange.bind(this)}>
+                        <View className="picker">{this.state.endact.toISOString()}</View>
+                    </Picker>
+                </View>
 
-            <AtButton formType='submit' >提交</AtButton>
-            <AtButton formType='reset'>重置</AtButton>
-          </AtForm>
-            // <View className="index">
-            //     <View>
-            //         <Text>这里是创建班表页面</Text>
-            //         <Text>用户进到这里的时候 store 的 userData 应该已经有东西了</Text>
-            //         <Text>保险起见还是做一个检查，若没有的话还是帮他先做个登入</Text>
-            //     </View>
-            //     <View>
-            //         <Text>用户从这个页面可以做这些事情</Text>
-            //         <Text>1. 创建新的班表</Text>
-            //     </View>
-            // </View>
+                {this.state.bancis.map((banci, index) => (
+                    <View style={{ backgroundColor: "rgb(240,240,240)", margin: "18px", padding: "18px" }}>
+                        <Picker
+                            mode="selector"
+                            range={["不重复", "日循环", "周循环", "月循环"]}
+                            onChange={e => this.handleBanciChange(e, index, "RepeatType")}
+                        >
+                            <View className="picker">{banci.repeattype}</View>
+                        </Picker>
+                        <Text>班次重複起點</Text>
+                        <View>
+                            <Picker mode="date" onChange={e => this.handleBanciChange(e, index, "RepeatStart")}>
+                                <View className="picker">{banci.repeatStart.toISOString()}</View>
+                            </Picker>
+                        </View>
+                        <Text>班次重複終點</Text>
+                        <View>
+                            <Picker mode="date" onChange={e => this.handleBanciChange(e, index, "RepeatEnd")}>
+                                <View className="picker">{banci.repeatEnd.toISOString()}</View>
+                            </Picker>
+                        </View>
+                        <Text>班次開始時間</Text>
+                        <View>
+                            <Picker mode="date" onChange={e => this.handleBanciChange(e, index, "StartTime")}>
+                                <View className="picker">{banci.startTime.toISOString()}</View>
+                            </Picker>
+                        </View>
+                        <Text>班次結束時間</Text>
+                        <View>
+                            <Picker mode="date" onChange={e => this.handleBanciChange(e, index, "EndTime")}>
+                                <View className="picker">{banci.endTime.toISOString()}</View>
+                            </Picker>
+                        </View>
+                    </View>
+                ))}
+
+                <View className="post-button">
+                    <AtFab onClick={this.createBanci.bind(this)}>
+                        <Text className="at-fab__icon at-icon at-icon-add"></Text>
+                    </AtFab>
+                </View>
+
+                <AtButton formType="submit">提交</AtButton>
+                <AtButton formType="reset">重置</AtButton>
+            </AtForm>
         );
     }
 }

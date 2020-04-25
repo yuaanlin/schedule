@@ -1,5 +1,3 @@
-// Todo: 用户类别还需要存哪些信息？
-
 /** 用户 */
 export default class User {
     // 用户的唯一识别码
