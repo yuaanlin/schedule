@@ -3,7 +3,7 @@ import Banci from "./banci";
 
 /** 班表 */
 export default class Schedule {
-    /** // 班表 id
+    // 班表 id
     id: string;
 
     /** 创建者的唯一识别码 */
