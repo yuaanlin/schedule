@@ -20,7 +20,7 @@ type States = {
 /** 把 Store 里面这个页面需要的 States 和 Actions 放入 Props */
 @connect(
     ({ user, setUserData }) => ({
-        user: user,
+        user,
         setUserData
     }),
     dispatch => ({
@@ -34,20 +34,35 @@ class Index extends Component<Props, States> {
         navigationBarTitleText: "首页"
     };
 
+    componentDidMount() {
+        Taro.cloud.init();
+        Taro.cloud
+            .callFunction({
+                name: "login"
+            })
+            .then(res => {
+                var resdata = (res.result as unknown) as getUserDataResponse;
+                if (resdata.code === 200) this.props.setUserData(new User(resdata.data));
+            });
+    }
+
     getUserInfo(e: any) {
         Taro.cloud.init();
         const { detail } = e;
-        if (detail.errMsg.endsWith("ok")) {
-            Taro.cloud
-                .callFunction({
-                    name: "postUserInfo"
-                })
-                .then(res => {
-                    var resdata = (res as unknown) as getUserDataResponse;
-                    Taro.showToast({ title: "登入成功", icon: "success", duration: 2000 });
-                    this.props.setUserData(new User(resdata.result.openid));
-                });
-        }
+        Taro.cloud
+            .callFunction({
+                name: "postUserInfo",
+                data: {
+                    name: detail.userInfo.nickName,
+                    avatarUrl: detail.userInfo.avatarUrl,
+                    gender: detail.userInfo.gender
+                }
+            })
+            .then(res => {
+                var resdata = (res.result as unknown) as getUserDataResponse;
+                Taro.showToast({ title: "登入成功", icon: "success", duration: 2000 });
+                this.props.setUserData(new User(resdata.data));
+            });
     }
 
     constructor() {
@@ -81,7 +96,7 @@ class Index extends Component<Props, States> {
     }
     render() {
         /** 尚未登入 */
-        if (this.props.user.id === "") {
+        if (this.props.user._id === "") {
             return (
                 <View style={{ textAlign: "center", padding: "36px" }}>
                     <Text>请先登入才能使用小程序的完整功能哦！</Text>
@@ -118,12 +133,8 @@ class Index extends Component<Props, States> {
 }
 
 interface getUserDataResponse {
-    errMsg: string;
-    requestID: string;
-    result: {
-        appid: string;
-        openid: string;
-    };
+    code: number;
+    data: User;
 }
 
 export default Index as ComponentClass;
