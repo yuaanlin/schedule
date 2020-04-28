@@ -49,8 +49,17 @@ export default class Banci:{
 ```typescript
 export default class User:{
 
-    // openid
-    id:string;
+    // openID
+    _id: string;
+
+    // 头像 url
+    avatarUrl: string;
+
+    // 性别
+    gender: number;
+    
+    // 名称
+    name: string;
 }
 ```
 
