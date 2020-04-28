@@ -3,45 +3,49 @@ import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Button } from "@tarojs/components";
 import { AtTabs, AtTabsPane, AtList, AtListItem, AtFab } from "taro-ui";
 import "./index.scss";
+import User from "../../classes/user";
+import { connect } from "@tarojs/redux";
+import { setUserData } from "../../redux/actions/user";
 
-interface States {
+/** 定义这个页面的 Props 和 States */
+type Props = {
+    user: User;
+    setUserData: (user: User) => void;
+};
+
+type States = {
     current: number;
-}
+};
 
-class Index extends Component<Readonly<{}>, States> {
+/** 把 Store 里面这个页面需要的 States 和 Actions 放入 Props */
+@connect(
+    ({ user, setUserData }) => ({
+        user: user,
+        setUserData
+    }),
+    dispatch => ({
+        setUserData: (user: User) => dispatch(setUserData(user))
+    })
+)
+
+/** 首页 */
+class Index extends Component<Props, States> {
     config: Config = {
         navigationBarTitleText: "首页"
     };
 
-    login() {
-        Taro.cloud
-            .callFunction({
-                name: "login"
-            })
-            .then(res => {
-                console.log("User's information:", res.result);
-            })
-            .catch(console.log);
-    }
-
-    getUserInfo(e) {
+    getUserInfo(e: any) {
         Taro.cloud.init();
         const { detail } = e;
         if (detail.errMsg.endsWith("ok")) {
-            const userInfo = JSON.parse(detail.rawData);
-            const { nickName, gender, avatarUrl } = userInfo;
             Taro.cloud
                 .callFunction({
-                    name: "postUserInfo",
-                    data: {
-                        name: nickName,
-                        gender: gender,
-                        avatarUrl: avatarUrl
-                    }
+                    name: "postUserInfo"
                 })
                 .then(res => {
-                    console.log(res);
-                    this.login();
+                    var resdata = (res as unknown) as getUserDataResponse;
+                    Taro.showToast({ title: "登入成功", icon: "success", duration: 2000 });
+                    this.props.setUserData(new User(resdata.result.openid));
                 });
         }
     }
@@ -65,29 +69,52 @@ class Index extends Component<Readonly<{}>, States> {
         });
     }
     render() {
+        /** 尚未登入 */
+        if (this.props.user.id === "") {
+            return (
+                <View style={{ textAlign: "center", padding: "36px" }}>
+                    <Text>请先登入才能使用小程序的完整功能哦！</Text>
+                    <Button style={{ marginTop: "60px" }} openType="getUserInfo" onGetUserInfo={this.getUserInfo}>
+                        透过微信授权登入
+                    </Button>
+                </View>
+            );
+        }
+
+        /** 已经登入 */
         const tabList = [{ title: "我组织的" }, { title: "我参与的" }];
         return (
-            <AtTabs current={this.state.current} tabList={tabList} onClick={this.handleClick.bind(this)}>
-                <AtTabsPane current={this.state.current} index={0}>
-                    <AtList>
-                        <AtListItem arrow="right" note="description" title="活动title" extraText="" />
-                    </AtList>
-                    <Button openType="getUserInfo" onGetUserInfo={this.getUserInfo}>
-                        授权
-                    </Button>
-                    <View className="post-button">
-                        <AtFab onClick={this.createsche}>
-                            <Text className="at-fab__icon at-icon at-icon-add"></Text>
-                        </AtFab>
-                    </View>
-                </AtTabsPane>
+            <View>
+                <AtTabs current={this.state.current} tabList={tabList} onClick={this.handleClick.bind(this)}>
+                    <AtTabsPane current={this.state.current} index={0}>
+                        <View style={{ paddingBottom: "160px" }}>
+                            <AtList>
+                                <AtListItem arrow="right" note="description" title="活动title" extraText="" />
+                            </AtList>
+                            <View className="post-button">
+                                <AtFab onClick={this.createsche}>
+                                    <Text className="at-fab__icon at-icon at-icon-add"></Text>
+                                </AtFab>
+                            </View>
+                        </View>
+                    </AtTabsPane>
 
-                <AtTabsPane current={this.state.current} index={1}>
-                    <View style="padding: 100px 50px;background-color: #FAFBFC;text-align: center;">标签页二的内容</View>
-                </AtTabsPane>
-            </AtTabs>
+                    <AtTabsPane current={this.state.current} index={1}>
+                        <View style="padding: 100px 50px;background-color: #FAFBFC;text-align: center;">标签页二的内容</View>
+                    </AtTabsPane>
+                </AtTabs>
+            </View>
         );
     }
+}
+
+interface getUserDataResponse {
+    errMsg: string;
+    requestID: string;
+    result: {
+        appid: string;
+        openid: string;
+    };
 }
 
 export default Index as ComponentClass;

@@ -1,7 +1,10 @@
 import User from "./user";
 import Banci from "./banci";
 
-/** 班表 */
+/**
+ * 班表 Schedule
+ *
+ * 对应数据库的 schedules 集合 */
 export default class Schedule {
     // 班表 id
     id: string;

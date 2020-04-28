@@ -1,3 +1,8 @@
+$themeColor_darker: rgb(31, 78, 95);
+$themeColor: rgb(121, 168, 170);
+$themeColor_brighter: rgb(171, 208, 208);
+$themeColor_bg: rgb(245, 247, 247);
+
 .post-button {
     position: fixed;
     right: 60px;
@@ -5,6 +10,13 @@
     z-index: 2000;
 }
 
-Text {
-    font-size: 36px;
+.form-lable {
+    border-left: 18px solid $themeColor;
+    padding-left: 24px;
+}
+
+.form-value {
+    margin: 36px;
+    color: rgb(30, 30, 30);
+    font-size: 32px;
 }

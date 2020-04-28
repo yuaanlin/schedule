@@ -2,11 +2,8 @@ import Taro, { Component, Config } from "@tarojs/taro";
 import { Provider } from "@tarojs/redux";
 import Index from "./pages/index";
 
-import configStore from "./store";
-
 import "./app.scss";
-
-const store = configStore();
+import store from "./redux/store";
 
 class App extends Component {
     /**

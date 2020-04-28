@@ -23,7 +23,7 @@ interface BanciOptions {
 
 class CreateSchedule extends Component<Readonly<{}>, State> {
     config: Config = {
-        navigationBarTitleText: "首页"
+        navigationBarTitleText: "创建新班表"
     };
 
     constructor() {
@@ -143,87 +143,119 @@ class CreateSchedule extends Component<Readonly<{}>, State> {
             Title: "",
             description: "",
             startact: new Date(),
-            endact: new Date()
+            endact: new Date(),
+            bancis: []
         });
     }
 
     render() {
         return (
-            <AtForm onSubmit={this.onSubmit.bind(this)} onReset={this.onReset.bind(this)}>
-                <AtInput
-                    name="title"
-                    title="活动标题"
-                    type="text"
-                    placeholder="请输入活动标题"
-                    value={this.state.Title}
-                    onChange={this.handleTitleChange.bind(this)}
-                />
-                <AtInput
-                    name="description"
-                    title="活动描述"
-                    type="text"
-                    placeholder="请输入活动描述"
-                    value={this.state.description}
-                    onChange={this.handleDescriptionChange.bind(this)}
-                />
-                <Text>活动时间开始</Text>
-                <View>
-                    <Picker mode="date" onChange={this.handleStartactChange.bind(this)}>
-                        <View className="picker">{this.state.startact.toISOString()}</View>
-                    </Picker>
-                </View>
-                <Text>活动时间结束</Text>
-                <View>
-                    <Picker mode="date" onChange={this.handleEndactChange.bind(this)}>
-                        <View className="picker">{this.state.endact.toISOString()}</View>
-                    </Picker>
-                </View>
-
-                {this.state.bancis.map((banci, index) => (
-                    <View style={{ backgroundColor: "rgb(240,240,240)", margin: "18px", padding: "18px" }}>
-                        <Picker
-                            mode="selector"
-                            range={["不重复", "日循环", "周循环", "月循环"]}
-                            onChange={e => this.handleBanciChange(e, index, "RepeatType")}
-                        >
-                            <View className="picker">{banci.repeattype}</View>
+            <View style={{ margin: "24px" }}>
+                <AtForm onSubmit={this.onSubmit.bind(this)} onReset={this.onReset.bind(this)}>
+                    <View className="form-lable">班表标题</View>
+                    <AtInput
+                        name="title"
+                        type="text"
+                        placeholder="请输入班表标题"
+                        value={this.state.Title}
+                        onChange={this.handleTitleChange.bind(this)}
+                    />
+                    <View className="form-lable">班表描述</View>
+                    <AtInput
+                        name="description"
+                        type="text"
+                        placeholder="请输入班表描述"
+                        value={this.state.description}
+                        onChange={this.handleDescriptionChange.bind(this)}
+                    />
+                    <View className="form-lable">班表开始时间</View>
+                    <View>
+                        <Picker value={"0"} mode="date" onChange={this.handleStartactChange.bind(this)}>
+                            <View className="picker form-value">{this.state.startact.toISOString()}</View>
                         </Picker>
-                        <Text>班次重複起點</Text>
-                        <View>
-                            <Picker mode="date" onChange={e => this.handleBanciChange(e, index, "RepeatStart")}>
-                                <View className="picker">{banci.repeatStart.toISOString()}</View>
-                            </Picker>
-                        </View>
-                        <Text>班次重複終點</Text>
-                        <View>
-                            <Picker mode="date" onChange={e => this.handleBanciChange(e, index, "RepeatEnd")}>
-                                <View className="picker">{banci.repeatEnd.toISOString()}</View>
-                            </Picker>
-                        </View>
-                        <Text>班次開始時間</Text>
-                        <View>
-                            <Picker mode="date" onChange={e => this.handleBanciChange(e, index, "StartTime")}>
-                                <View className="picker">{banci.startTime.toISOString()}</View>
-                            </Picker>
-                        </View>
-                        <Text>班次結束時間</Text>
-                        <View>
-                            <Picker mode="date" onChange={e => this.handleBanciChange(e, index, "EndTime")}>
-                                <View className="picker">{banci.endTime.toISOString()}</View>
-                            </Picker>
-                        </View>
                     </View>
-                ))}
+                    <Text className="form-lable">班表结束时间</Text>
+                    <View>
+                        <Picker value={"0"} mode="date" onChange={this.handleEndactChange.bind(this)}>
+                            <View className="picker form-value">{this.state.endact.toISOString()}</View>
+                        </Picker>
+                    </View>
 
-                <View className="post-button">
-                    <AtFab onClick={this.createBanci.bind(this)}>
-                        <Text className="at-fab__icon at-icon at-icon-add"></Text>
-                    </AtFab>
-                </View>
+                    {this.state.bancis.map((banci, index) => (
+                        <View style={{ paddingBottom: "36px" }}>
+                            <Text>班次 #{index + 1}</Text>
+                            <View style={{ backgroundColor: "rgb(240,240,240)", padding: "18px" }}>
+                                <Text className="form-lable">循環模式</Text>
+                                <Picker
+                                    value={0}
+                                    mode="selector"
+                                    range={["不重复", "日循环", "周循环", "月循环"]}
+                                    onChange={e => this.handleBanciChange(e, index, "RepeatType")}
+                                >
+                                    <View className="picker form-value">{banci.repeattype}</View>
+                                </Picker>
+                                {banci.repeattype === "不重复" ? null : (
+                                    <View>
+                                        <Text className="form-lable">班次重複起點</Text>
+                                        <View>
+                                            <Picker
+                                                style={{ margin: "12px" }}
+                                                value={"0"}
+                                                mode="date"
+                                                onChange={e => this.handleBanciChange(e, index, "RepeatStart")}
+                                            >
+                                                <View className="picker form-value">{banci.repeatStart.toISOString()}</View>
+                                            </Picker>
+                                        </View>
+                                        <Text className="form-lable">班次重複終點</Text>
+                                        <View>
+                                            <Picker
+                                                style={{ margin: "12px" }}
+                                                value={"0"}
+                                                mode="date"
+                                                onChange={e => this.handleBanciChange(e, index, "RepeatEnd")}
+                                            >
+                                                <View className="picker form-value">{banci.repeatEnd.toISOString()}</View>
+                                            </Picker>
+                                        </View>
+                                    </View>
+                                )}
+                                <Text className="form-lable">班次開始時間</Text>
+                                <View>
+                                    <Picker
+                                        style={{ margin: "12px" }}
+                                        value={"0"}
+                                        mode="date"
+                                        onChange={e => this.handleBanciChange(e, index, "StartTime")}
+                                    >
+                                        <View className="picker form-value">{banci.startTime.toISOString()}</View>
+                                    </Picker>
+                                </View>
+                                <Text className="form-lable">班次結束時間</Text>
+                                <View>
+                                    <Picker
+                                        style={{ margin: "12px" }}
+                                        value={"0"}
+                                        mode="date"
+                                        onChange={e => this.handleBanciChange(e, index, "EndTime")}
+                                    >
+                                        <View className="picker form-value">{banci.endTime.toISOString()}</View>
+                                    </Picker>
+                                </View>
+                            </View>
+                        </View>
+                    ))}
 
-                <AtButton formType="submit">提交</AtButton>
-                <AtButton formType="reset">重置</AtButton>
-            </AtForm>
+                    <View className="post-button">
+                        <AtFab onClick={this.createBanci.bind(this)}>
+                            <Text className="at-fab__icon at-icon at-icon-add" />
+                        </AtFab>
+                    </View>
+
+                    <AtButton formType="submit">提交</AtButton>
+                    <AtButton formType="reset">重置</AtButton>
+                </AtForm>
+            </View>
         );
     }
 }

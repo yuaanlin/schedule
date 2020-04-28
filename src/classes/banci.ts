@@ -1,35 +1,36 @@
-import User from "./user";
-
-/** 班表上的特定班次 */
+/**
+ * 班次 Banci
+ *
+ * 对应数据库的 Banci 集合 */
 export default class Banci {
     // 班次 id
     id: string;
 
-    // 需要排几人
+    // 对应班表
+    scheid: string;
+
+    // 需要人数
     count: number;
 
     // 班次开始时间
     startTime: Date;
 
-    // 班次截止时间
+    // 班次结束时间
     endTime: Date;
-
-    // 该班次的参加者
-    attenders: Array<User>;
 
     constructor(banci: Banci = defaultBanci) {
         this.id = banci.id;
         this.count = banci.count;
+        this.scheid = banci.scheid;
         this.startTime = banci.startTime;
         this.endTime = banci.endTime;
-        this.attenders = banci.attenders;
     }
 }
 
 const defaultBanci = {
     id: "",
+    scheid: "",
     count: 0,
     startTime: new Date(),
-    endTime: new Date(),
-    attenders: []
+    endTime: new Date()
 };
