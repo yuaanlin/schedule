@@ -68,17 +68,16 @@ class Index extends Component<Props, States> {
             current: value
         });
     }
-    getDetail(){
-      Taro.cloud
-          .callFunction({
-            name:'getschedule',
-            data:{
-              scheid:'17b0c7775e9dbba4008c8f8d6a8cf2c1',
-            },
-          })
-          Taro.navigateTo({
-            url:'../scheduleDetail/scheduleDetail'
-          })
+    getDetail() {
+        Taro.cloud.callFunction({
+            name: "getschedule",
+            data: {
+                scheid: "17b0c7775e9dbba4008c8f8d6a8cf2c1"
+            }
+        });
+        Taro.navigateTo({
+            url: "../scheduleDetail/scheduleDetail"
+        });
     }
     render() {
         /** 尚未登入 */
@@ -98,24 +97,22 @@ class Index extends Component<Props, States> {
         return (
             <AtTabs current={this.state.current} tabList={tabList} onClick={this.handleClick.bind(this)}>
                 <AtTabsPane current={this.state.current} index={0}>
-                    <AtList>
-                        <AtListItem arrow="right" note="description" title="活动title" extraText="" onClick={this.getDetail} />
-                    </AtList>
-                    <Button openType="getUserInfo" onGetUserInfo={this.getUserInfo}>
-                        授权
-                    </Button>
-                    <View className="post-button">
-                        <AtFab onClick={this.createsche}>
-                            <Text className="at-fab__icon at-icon at-icon-add"></Text>
-                        </AtFab>
+                    <View style={{ paddingBottom: "80px" }}>
+                        <AtList>
+                            <AtListItem arrow="right" note="description" title="活动title" extraText="" onClick={this.getDetail} />
+                        </AtList>
+                        <View className="post-button">
+                            <AtFab onClick={this.createsche}>
+                                <Text className="at-fab__icon at-icon at-icon-add"></Text>
+                            </AtFab>
+                        </View>
                     </View>
                 </AtTabsPane>
 
-                    <AtTabsPane current={this.state.current} index={1}>
-                        <View style="padding: 100px 50px;background-color: #FAFBFC;text-align: center;">标签页二的内容</View>
-                    </AtTabsPane>
-                </AtTabs>
-            </View>
+                <AtTabsPane current={this.state.current} index={1}>
+                    <View style="padding: 100px 50px;background-color: #FAFBFC;text-align: center;">标签页二的内容</View>
+                </AtTabsPane>
+            </AtTabs>
         );
     }
 }
