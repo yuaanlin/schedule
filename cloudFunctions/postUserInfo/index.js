@@ -18,6 +18,7 @@ exports.main = async event => {
 
         if (!userRecord) {
             // 无记录，加记录
+            console.log(e)
             await userCollection.add({
                 data: {
                     _id: OPENID,
