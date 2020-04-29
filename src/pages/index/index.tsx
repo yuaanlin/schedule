@@ -121,15 +121,20 @@ class Index extends Component<Props, States> {
             current: value
         });
     }
-    getDetail(_id) {
-      Taro.cloud.callFunction({
+    getDetail(_id:String) {
+      console.log(_id)
+        Taro.cloud.callFunction({
           name: "getschedule",
           data: {
-              scheid: {_id}
+              "scheid": _id
           }
-      });
+      })
+      .then(res=>{
+          console.log(res)
+      })
+      ;
       Taro.navigateTo({
-          url: "../scheduleDetail/scheduleDetail?_id={_id}"
+          url: '../scheduleDetail/scheduleDetail?_id=${_id}'
       });
   }
     render() {
@@ -151,12 +156,12 @@ class Index extends Component<Props, States> {
             <AtTabs current={this.state.current} tabList={tabList} onClick={this.handleClick.bind(this)}>
                 <AtTabsPane current={this.state.current} index={0}>
                     <View style={{ paddingBottom: "80px" }}>
-                        <AtList>
-                        {this.state.schedule.map((item)=>(
-                          // console.log(item)
-                         <AtListItem key={item._id} arrow="right" note={item.description} title={item.title} extraText="" onClick={this.getDetail(item._id)} />
-                        ))}
-                        </AtList>
+                    <AtList>
+                        {this.state.schedule.map((item)=>{
+                        console.log(item)
+                        return <AtListItem key={item._id} arrow="right" note={item.description} title={item.title} extraText="" onClick={()=>{this.getDetail(item._id)}} />
+                        })}
+                    </AtList>
                         <View className="post-button">
                             <AtFab onClick={this.createsche}>
                                 <Text className="at-fab__icon at-icon at-icon-add"></Text>

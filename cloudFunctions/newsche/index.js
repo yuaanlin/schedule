@@ -11,6 +11,7 @@ const banciCollection=db.collection("Banci")
 // 云函数入口函数
 exports.main = async event => {
   const wxContext = cloud.getWXContext()
+  const open_id = wxContext.OPENID
   console.log("??")
   const { title, description,count,enddate,repeattype,endact,startact,startdate,bancistart,banciend } = event;
   console.log('event', event);
@@ -19,6 +20,7 @@ exports.main = async event => {
       data: {
         title: title,
         description:description,
+        ownerID:open_id
         // identity:identity
       },
     })
