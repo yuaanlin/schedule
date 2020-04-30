@@ -1,4 +1,3 @@
-import { ComponentClass } from "react";
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Picker } from "@tarojs/components";
 import { AtForm, AtInput, AtButton, AtFab } from "taro-ui";
@@ -7,6 +6,10 @@ import "./createSchedule.scss";
 import Schedule from "../../classes/Schedule";
 import { newscheResult } from "../../types";
 import User from "../../classes/user";
+import { AppState } from "../../redux/types";
+import store from "../../redux/store";
+import { updateSchedule } from "../../redux/actions/schedule";
+import { connect } from "@tarojs/redux";
 
 /** 定义这个页面的 Props 和 States */
 interface Props {
@@ -23,6 +26,21 @@ interface State {
     tag: string;
 }
 
+/** 把需要的 State 和 Action 从 Redux 注入 Props */
+function mapStateToProps(state: AppState) {
+    return {
+        user: state.user
+    };
+}
+
+function mapDispatchToProps(dispatch: typeof store.dispatch) {
+    return {
+        updateSchedule: (schedule: Schedule) => {
+            dispatch(updateSchedule(schedule));
+        }
+    };
+}
+
 interface BanciOptions {
     repeattype: string;
     repeatStart: Date;
@@ -37,8 +55,8 @@ class CreateSchedule extends Component<Props, State> {
         navigationBarTitleText: "创建新班表"
     };
 
-    constructor() {
-        super();
+    constructor(props: Readonly<Props>) {
+        super(props);
         this.state = {
             tag: "",
             Title: "",
@@ -159,6 +177,15 @@ class CreateSchedule extends Component<Props, State> {
             })
             .then(res => {
                 var resdata = (res as unknown) as newscheResult;
+                if (resdata.result.code !== 200) {
+                    Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                } else {
+                    this.props.updateSchedule(resdata.result.schedule);
+                    Taro.navigateTo({
+                        url: "../scheduleDetail/scheduleDetail?_id=" + resdata.result.schedule._id
+                    });
+                    Taro.showToast({ title: "创建成功", icon: "success", duration: 2000 });
+                }
             });
     }
 
@@ -284,4 +311,4 @@ class CreateSchedule extends Component<Props, State> {
     }
 }
 
-export default CreateSchedule as ComponentClass;
+export default connect(mapStateToProps, mapDispatchToProps)(CreateSchedule);

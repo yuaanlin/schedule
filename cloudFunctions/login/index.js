@@ -23,7 +23,7 @@ exports.main = async () => {
                     name: userInfo.name,
                     avatarUrl: userInfo.avatarUrl,
                     gender: userInfo.gender,
-                    openId: OPENID
+                    _id: OPENID
                 }
             };
     } catch (e) {

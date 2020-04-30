@@ -70,12 +70,14 @@ class Index extends Component<Props, States> {
                         })
                         .then(res => {
                             var resdata = (res as unknown) as getPerscheResult;
-                            resdata.result.schedules.map(sche => {
-                                this.props.updateSchedule(sche);
-                            });
-                            resdata.result.infos.map(info => {
-                                this.props.updateInfo(info);
-                            });
+                            if (resdata.result.code === 200) {
+                                resdata.result.schedules.map(sche => {
+                                    this.props.updateSchedule(sche);
+                                });
+                                resdata.result.infos.map(info => {
+                                    this.props.updateInfo(info);
+                                });
+                            }
                         });
                 }
             });
@@ -120,7 +122,7 @@ class Index extends Component<Props, States> {
             }
         });
         Taro.navigateTo({
-            url: "../scheduleDetail/scheduleDetail?_id=${_id}"
+            url: "../scheduleDetail/scheduleDetail?_id=" + _id
         });
     }
 

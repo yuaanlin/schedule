@@ -13,6 +13,10 @@ type Props = {
     schedules: Array<Schedule>;
 };
 
+type States = {
+    schedule: Schedule;
+};
+
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
 function mapStateToProps(state: AppState) {
     return {
@@ -24,44 +28,37 @@ function mapStateToProps(state: AppState) {
 function mapDispatchToProps(dispatch: typeof store.dispatch) {
     return {};
 }
-class ScheduleDetail extends Component<Props> {
-    schedule: Schedule | undefined;
+class ScheduleDetail extends Component<Props, States> {
     config: Config = {
         navigationBarTitleText: "班表详情"
     };
 
     componentDidMount() {
-        var scheID = this.$router.params.id;
-        this.schedule = this.props.schedules.find(sc => sc._id === scheID);
-
+        var scheID = this.$router.params._id;
+        var sc = this.props.schedules.find(sc => sc._id === scheID);
         /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
-        if (this.schedule === undefined) {
+        if (sc === undefined) {
             Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
             Taro.navigateTo({
                 url: "../index/index"
             });
+        } else {
+            this.setState({ schedule: sc });
         }
     }
 
     render() {
-        return (
-            <View className="index">
-                <View>
-                    <Text>这里是班表详情页面</Text>
-                    <Text>进来的时候链接应该带有一个 schedule ID</Text>
-                    <Text>所以先去后端把这场 schedule 的数据抓回来存到 store 的 scheduleData</Text>
-                    <Text>然后用户进到这里的时候 store 的 userData 应该有东西了</Text>
-                    <Text>没有的话一样先帮他登入</Text>
-                    <Text>如果这个 schedule 不在这个人拥有的或是这个人参加的</Text>
-                    <Text>就把它导回首页</Text>
-                    <Text>成功进来的话就显示班表内容</Text>
+        if (this.state.schedule === undefined) return <View>发生错误</View>;
+        else
+            return (
+                <View className="index">
+                    <View>
+                        <Text>你正在查看班表 {this.state.schedule.title} 的详情</Text>
+                    </View>
+
+                    <Text> 用 this.state.schedule 来取用关于他的完整信息</Text>
                 </View>
-                <View>
-                    <Text>用户从这个页面可以做这些事情</Text>
-                    <Text>1. 查看班表状态</Text>
-                </View>
-            </View>
-        );
+            );
     }
 }
 

@@ -22,9 +22,10 @@ exports.main = async event => {
             attenders: [],
             bancis: [],
             startact: new Date(startact),
-            endact: new Date(endact),
+            endact: new Date(endact)
         };
-        bancis.map(banci => {
+
+        bancis.map(async banci => {
             var banciID = generateUUID();
             newsche.bancis.push(banciID);
             await banciCollection.add({
@@ -33,16 +34,15 @@ exports.main = async event => {
                     scheid: newsche._id,
                     count: banci.count,
                     startTime: new Date(banci.startTime),
-                    endTime: new Date(banci.endTime),
+                    endTime: new Date(banci.endTime)
                 }
             });
-        })
+        });
 
-        await scheCollection.add(newsche);
-        return {
+        return await scheCollection.add({ data: newsche }).then(() => ({
             code: 200,
             schedule: newsche
-        };
+        }));
     } catch (e) {
         console.error(e);
         return {

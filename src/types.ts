@@ -20,6 +20,7 @@ export interface getPerscheResult {
     errMsg: string;
     requestID: string;
     result: {
+        code: number;
         schedules: Array<Schedule>;
         infos: Array<info>;
     };
