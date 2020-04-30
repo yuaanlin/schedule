@@ -1,4 +1,3 @@
-import User from "./user";
 import Banci from "./banci";
 
 /**
@@ -7,7 +6,7 @@ import Banci from "./banci";
  * 对应数据库的 schedules 集合 */
 export default class Schedule {
     // 班表 id
-    id: string;
+    _id: string;
 
     /** 创建者的唯一识别码 */
     ownerID: string;
@@ -18,8 +17,8 @@ export default class Schedule {
     /** 班表说明 */
     description: string;
 
-    /** 所有参加者 */
-    attenders: Array<User>;
+    /** 所有参加者 id */
+    attenders: Array<string>;
 
     /** 需要排班的班次 */
     banci: Array<Banci>;
