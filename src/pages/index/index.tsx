@@ -1,4 +1,3 @@
-import { ComponentClass } from "react";
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Button } from "@tarojs/components";
 import { AtTabs, AtTabsPane, AtList, AtListItem, AtFab } from "taro-ui";

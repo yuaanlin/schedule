@@ -25,6 +25,7 @@ export interface getPerscheResult {
     };
 }
 
+/** 云函数 "postUserInfo" 的返回格式 */
 export interface postUserInfoResult {
     errMsg: string;
     requestID: string;
@@ -34,5 +35,18 @@ export interface postUserInfoResult {
 
         /** 用户数据 */
         data: User;
+    };
+}
+
+/** 云函数 "newsche" 的返回格式 */
+export interface newscheResult {
+    errMsg: string;
+    requestID: string;
+    result: {
+        /** 回应代码 */
+        code: number;
+
+        /** 创立成功的数据 */
+        schedule: Schedule;
     };
 }

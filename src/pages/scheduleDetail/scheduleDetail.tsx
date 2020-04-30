@@ -1,11 +1,47 @@
 import { ComponentClass } from "react";
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
+import store from "../../redux/store";
+import { AppState } from "../../redux/types";
+import Schedule from "../../classes/schedule";
+import User from "../../classes/user";
+import { connect } from "@tarojs/redux";
 
-class ScheduleDetail extends Component {
+/** 定义这个页面的 Props 和 States */
+type Props = {
+    user: User;
+    schedules: Array<Schedule>;
+};
+
+/** 把需要的 State 和 Action 从 Redux 注入 Props */
+function mapStateToProps(state: AppState) {
+    return {
+        user: state.user,
+        schedules: state.schedules
+    };
+}
+
+function mapDispatchToProps(dispatch: typeof store.dispatch) {
+    return {};
+}
+class ScheduleDetail extends Component<Props> {
+    schedule: Schedule | undefined;
     config: Config = {
         navigationBarTitleText: "班表详情"
     };
+
+    componentDidMount() {
+        var scheID = this.$router.params.id;
+        this.schedule = this.props.schedules.find(sc => sc._id === scheID);
+
+        /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
+        if (this.schedule === undefined) {
+            Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
+            Taro.navigateTo({
+                url: "../index/index"
+            });
+        }
+    }
 
     render() {
         return (
@@ -29,4 +65,4 @@ class ScheduleDetail extends Component {
     }
 }
 
-export default ScheduleDetail as ComponentClass;
+export default connect(mapStateToProps, mapDispatchToProps)(ScheduleDetail);

@@ -4,48 +4,44 @@ cloud.init({
     env: cloud.DYNAMIC_CURRENT_ENV
 });
 const db = cloud.database();
-const scheCollection = db.collection("Schedules");
-const banciCollection = db.collection("Banci");
+const scheCollection = db.collection("schedules");
+const banciCollection = db.collection("bancis");
 
 // 云函数入口函数
 exports.main = async event => {
     const wxContext = cloud.getWXContext();
     const open_id = wxContext.OPENID;
-    const { title, description, count, enddate, repeattype, endact, startact, startdate, bancistart, banciend } = event;
+    const { title, description, tag, startact, endact, bancis } = event;
     try {
         var newsche = {
             _id: generateUUID(),
+            ownerID: open_id,
             title: title,
             description: description,
-            ownerID: open_id,
-            identity: identity,
-            attenders: []
+            tag: tag,
+            attenders: [],
+            bancis: [],
+            startact: new Date(startact),
+            endact: new Date(endact),
         };
+        bancis.map(banci => {
+            var banciID = generateUUID();
+            newsche.bancis.push(banciID);
+            await banciCollection.add({
+                data: {
+                    _id: banciID,
+                    scheid: newsche._id,
+                    count: banci.count,
+                    startTime: new Date(banci.startTime),
+                    endTime: new Date(banci.endTime),
+                }
+            });
+        })
+
         await scheCollection.add(newsche);
-        await banciCollection.add({
-            data: {
-                scheid: newsche._id,
-                count: count,
-                enddate: enddate,
-                startdate: startdate,
-                endact: endact,
-                startact: startact,
-                banciend: banciend,
-                bancistart: bancistart,
-                repeattype: repeattype
-            }
-        });
         return {
-            title,
-            description,
-            count,
-            enddate,
-            repeattype,
-            endact,
-            startact,
-            startdate,
-            bancistart,
-            banciend
+            code: 200,
+            schedule: newsche
         };
     } catch (e) {
         console.error(e);

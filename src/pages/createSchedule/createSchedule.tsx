@@ -4,6 +4,15 @@ import { View, Text, Picker } from "@tarojs/components";
 import { AtForm, AtInput, AtButton, AtFab } from "taro-ui";
 
 import "./createSchedule.scss";
+import Schedule from "../../classes/Schedule";
+import { newscheResult } from "../../types";
+import User from "../../classes/user";
+
+/** 定义这个页面的 Props 和 States */
+interface Props {
+    user: User;
+    updateSchedule: (Schedule: Schedule) => void;
+}
 
 interface State {
     Title: string;
@@ -11,6 +20,7 @@ interface State {
     startact: Date;
     endact: Date;
     bancis: Array<BanciOptions>;
+    tag: string;
 }
 
 interface BanciOptions {
@@ -18,10 +28,11 @@ interface BanciOptions {
     repeatStart: Date;
     repeatEnd: Date;
     startTime: Date;
+    count: number;
     endTime: Date;
 }
 
-class CreateSchedule extends Component<Readonly<{}>, State> {
+class CreateSchedule extends Component<Props, State> {
     config: Config = {
         navigationBarTitleText: "创建新班表"
     };
@@ -29,6 +40,7 @@ class CreateSchedule extends Component<Readonly<{}>, State> {
     constructor() {
         super();
         this.state = {
+            tag: "",
             Title: "",
             description: "",
             startact: new Date(),
@@ -107,6 +119,7 @@ class CreateSchedule extends Component<Readonly<{}>, State> {
     createBanci() {
         var newBancis = this.state.bancis;
         newBancis.push({
+            count: 1,
             repeattype: "不重复",
             repeatStart: new Date(),
             repeatEnd: new Date(),
@@ -122,6 +135,15 @@ class CreateSchedule extends Component<Readonly<{}>, State> {
         const description = this.state.description;
         const startact = this.state.startact;
         const endact = this.state.endact;
+        const tag = this.state.tag;
+
+        /** 把用户填写的 Bancis 展开为具体的班次数组 */
+        var bancis = new Array<{ count: number; startTime: Date; endTime: Date }>();
+        this.state.bancis.map(banci => {
+            if (banci.repeattype === "不重复") {
+                bancis.push({ count: banci.count, startTime: banci.startTime, endTime: banci.endTime });
+            }
+        });
 
         Taro.cloud
             .callFunction({
@@ -130,11 +152,13 @@ class CreateSchedule extends Component<Readonly<{}>, State> {
                     title: title,
                     description: description,
                     startact: startact,
-                    endact: endact
+                    endact: endact,
+                    tag: tag,
+                    bancis: bancis
                 }
             })
             .then(res => {
-                console.log(res);
+                var resdata = (res as unknown) as newscheResult;
             });
     }
 

@@ -3,7 +3,7 @@ const cloud = require("wx-server-sdk");
 
 cloud.init();
 const db = cloud.database();
-const scheduleform = db.collection("Schedules");
+const scheduleform = db.collection("schedules");
 // 云函数入口函数
 exports.main = async (event, context) => {
     let sche;
@@ -14,8 +14,6 @@ exports.main = async (event, context) => {
     let i;
     const wxContext = cloud.getWXContext();
     const open_id = wxContext.OPENID;
-    console.log(open_id);
-    console.log(scheduleform);
     sche = await db
         .collection("Schedules")
         .where({

@@ -1,7 +1,7 @@
 const cloud = require("wx-server-sdk");
 cloud.init();
 const db = cloud.database();
-const userCollection = db.collection("User");
+const userCollection = db.collection("users");
 
 exports.main = async event => {
     const { OPENID } = cloud.getWXContext();
