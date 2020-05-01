@@ -3,3 +3,39 @@
     right: 60px;
     bottom: 80px;
 }
+.at-card {
+  border-top: 1PX #d6e4ef solid;
+  border-bottom: 1PX #d6e4ef solid;
+  border-right: 1PX #d6e4ef solid;
+  border-left: 1PX #d6e4ef solid;
+  margin: 3% 4%;
+  border-radius: 20rpx;
+  background-color: #FFF;
+
+  }
+
+.at-card__header {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-align: center;
+  border-bottom: 1PX #d6e4ef solid;
+  padding: 18rpx 24rpx;
+  position: relative;
+  height: 7vh;
+  }
+.at-card__content {
+  padding: 6rpx 24rpx;
+  }
+.at-card__header-title {
+  -webkit-flex: auto;
+  -ms-flex: auto;
+  flex: auto;
+  -webkit-box-flex: auto;
+  display: block;
+  color: #2C405A;
+  font-size: 44rpx;
+  }

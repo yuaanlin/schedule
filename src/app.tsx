@@ -3,6 +3,8 @@ import { Provider } from "@tarojs/redux";
 import Index from "./pages/index";
 
 import "./app.scss";
+import "./assets/icon/iconfont.scss"
+import './custom-theme.scss'
 import store from "./redux/store";
 
 class App extends Component {
@@ -14,13 +16,31 @@ class App extends Component {
      * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
      */
     config: Config = {
-        pages: ["pages/index/index", "pages/createSchedule/createSchedule", "pages/scheduleDetail/scheduleDetail"],
+        pages: ["pages/index/index", "pages/createSchedule/createSchedule", "pages/scheduleDetail/scheduleDetail","pages/Individual/individual"],
         window: {
             backgroundTextStyle: "light",
-            navigationBarBackgroundColor: "#fff",
+            navigationBarBackgroundColor: "#c0dbdc",
             navigationBarTitleText: "WeChat",
             navigationBarTextStyle: "black"
-        }
+        },
+        // tabBar:{
+        //   "color": "#ccc",
+        //   "selectedColor": "#35495e",
+        //   "borderStyle": "white",
+        //   "backgroundColor": "#f9f9f9",
+
+        //   list:[
+        //     {
+        //       "text":"我的排班",
+        //       "pagePath":"pages/index/index",
+        //       "iconPath":"assets/image/list1",
+        //       "selectedIconPath": "assets/image/list2"
+        //     },{
+        //       "text":"个人界面",
+        //       "pagePath":"pages/Individual/individual"
+        //     }
+        //   ]
+        // }
     };
 
     componentDidMount() {

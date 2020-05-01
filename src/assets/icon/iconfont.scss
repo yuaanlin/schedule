@@ -1,0 +1,41 @@
+@font-face {font-family: "iconfont";
+  src: url('iconfont.eot?t=1588335318946'); /* IE9 */
+  src: url('iconfont.eot?t=1588335318946#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAREAAsAAAAACUAAAAP1AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDSAqFIIRWATYCJAMYCw4ABCAFhG0HaRsdCBFVnPvIfiTYuMXFequLakGT9CaI+Jz6s0/PiqiAcCJWGWSX8UROCgBsp0Afi3xKAwQQiN13vyRWEybCfJRnRx59r02B8l+ao+fn9JSakBNyP9wv9aKwQPLZt3OJLItOPjrBw7PsbbgGG+AGNJ2gbhi7uIzHIYBDbkoites2bo2FRlsngAzo27srVsyALskWLAQz56hG5hDCUlPVDWC2+/PyjlJigSJkoG1t3qtOD/z/P71KMsakjKGDjULYnw1gToEBlAQ0yIhcx1AMP1QSA0f6C5qGgIeFQv//6f+fr2q8qvcqKSWFmETzCJ7+Lw8EhYEmBGICMz0AGmNdiB0UmggE/v+JQMGrGggMeFUPgYZXSQZCUGP2WJkNuAOSDuJLbjVQaEycrJ6XISG1p2G10nFQ6b/SoGDhyhVbCnqbtq1anSWytVBrV1zc8OZ2sVjw4EHreDycnBxceJB3bazO5eQC6+JRPJVGXJacKJh60ykxxp4uMrBqDymTRyItTanoJa8rLg6O6CO5Ik8XwZE0pJawmzhcjTnhpJ7WcyRwcCNmf7fQ0ctljjPF3XgSUsvY090Zh4e3Tai4+titWl//zvs2799fa92K5J/5s+NqbIw/Jubs+NP7bDsVjUo7aRtNbAe4RCttYX402q7KX61bpUltyv5ySanTvDUHt/nX47zz3zml17CndI54jtJ7WmW9EWnN3dSwe9TcbWf/rDrSyG+U9++/a52KFW4pFgR+EPbDhj2IvR1CqiwBpLWVRHJitC29Vas8uVtJv5ik3HnySVnrB/42v7g+9LNXSNkWZ4KcpXMWR1XBm9P9/H6rq1tDqkelb1BB/2n91/Sf3r/sNBP7b+ufo/Tb4nmyD8jJCLQnGOXVOwBjgNoOYPhxV1hNcFXxn+h3yDAg4UfnNFV+WK4G4PG90nFo0LQLWyioLfxlhDX7tCzWjKYWm5tLEcCkCg7cewNOWPejeNLzvC9VptoBEKyYkAFFArnAwKIgWuNLQgiXMmBiUR0cVCW8nnZlwE7JbKC4bwAirR9QUjsNhrR+0Rr/ByGZ/YMpbQY4wj1c6Spc35tHRiVoYH2AoKlawyw3XvYbuk1WHBW79C/kFrww9WMy+ooVuY8dbetmEQuWqcALeBrmTLAwRdTSe5FlNQw275N6TeXoRi0MKQIZYO0ABBqprD1e3KS+/w1yNjKFS5pKnF8Qa8LkYNIba6BfFbVW07k8p9lyZkJYwGKkAC/AhrIeImDJXxQhTfR8i8BiZUDDbF1FP76qXGUVF7GFdqWZEkO0hMSUBFJ901qoaN3eFVUv0AQhvlXGdEpr2lS50gdylyM+3GuVsRrFnQ05Hx0BAAAA') format('woff2'),
+  url('iconfont.woff?t=1588335318946') format('woff'),
+  url('iconfont.ttf?t=1588335318946') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  url('iconfont.svg?t=1588335318946#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.icon {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bussiness-man:before {
+  content: "\e6ef";
+  font-size:80px
+}
+
+.icon-editor:before {
+  content: "\e6f6";
+  font-size:80px
+}
+
+.icon-add-account:before {
+  content: "\e741";
+  font-size:80px
+}
+
+.icon-category:before {
+  content: "\e747";
+  font-size:80px
+}
+
+.icon-calendar-fill:before {
+  content: "\e779";
+}
+
