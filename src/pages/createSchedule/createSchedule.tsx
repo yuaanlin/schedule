@@ -1,9 +1,21 @@
-import { ComponentClass } from "react";
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Picker } from "@tarojs/components";
 import { AtForm, AtInput, AtButton, AtFab } from "taro-ui";
 
 import "./createSchedule.scss";
+import Schedule from "../../classes/Schedule";
+import { newscheResult } from "../../types";
+import User from "../../classes/user";
+import { AppState } from "../../redux/types";
+import store from "../../redux/store";
+import { updateSchedule } from "../../redux/actions/schedule";
+import { connect } from "@tarojs/redux";
+
+/** 定义这个页面的 Props 和 States */
+interface Props {
+    user: User;
+    updateSchedule: (Schedule: Schedule) => void;
+}
 
 interface State {
     Title: string;
@@ -11,6 +23,22 @@ interface State {
     startact: Date;
     endact: Date;
     bancis: Array<BanciOptions>;
+    tag: string;
+}
+
+/** 把需要的 State 和 Action 从 Redux 注入 Props */
+function mapStateToProps(state: AppState) {
+    return {
+        user: state.user
+    };
+}
+
+function mapDispatchToProps(dispatch: typeof store.dispatch) {
+    return {
+        updateSchedule: (schedule: Schedule) => {
+            dispatch(updateSchedule(schedule));
+        }
+    };
 }
 
 interface BanciOptions {
@@ -18,17 +46,19 @@ interface BanciOptions {
     repeatStart: Date;
     repeatEnd: Date;
     startTime: Date;
+    count: number;
     endTime: Date;
 }
 
-class CreateSchedule extends Component<Readonly<{}>, State> {
+class CreateSchedule extends Component<Props, State> {
     config: Config = {
         navigationBarTitleText: "创建新班表"
     };
 
-    constructor() {
-        super();
+    constructor(props: Readonly<Props>) {
+        super(props);
         this.state = {
+            tag: "",
             Title: "",
             description: "",
             startact: new Date(),
@@ -107,6 +137,7 @@ class CreateSchedule extends Component<Readonly<{}>, State> {
     createBanci() {
         var newBancis = this.state.bancis;
         newBancis.push({
+            count: 1,
             repeattype: "不重复",
             repeatStart: new Date(),
             repeatEnd: new Date(),
@@ -122,6 +153,15 @@ class CreateSchedule extends Component<Readonly<{}>, State> {
         const description = this.state.description;
         const startact = this.state.startact;
         const endact = this.state.endact;
+        const tag = this.state.tag;
+
+        /** 把用户填写的 Bancis 展开为具体的班次数组 */
+        var bancis = new Array<{ count: number; startTime: Date; endTime: Date }>();
+        this.state.bancis.map(banci => {
+            if (banci.repeattype === "不重复") {
+                bancis.push({ count: banci.count, startTime: banci.startTime, endTime: banci.endTime });
+            }
+        });
 
         Taro.cloud
             .callFunction({
@@ -130,11 +170,22 @@ class CreateSchedule extends Component<Readonly<{}>, State> {
                     title: title,
                     description: description,
                     startact: startact,
-                    endact: endact
+                    endact: endact,
+                    tag: tag,
+                    bancis: bancis
                 }
             })
             .then(res => {
-                console.log(res);
+                var resdata = (res as unknown) as newscheResult;
+                if (resdata.result.code !== 200) {
+                    Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                } else {
+                    this.props.updateSchedule(resdata.result.schedule);
+                    Taro.navigateTo({
+                        url: "../scheduleDetail/scheduleDetail?_id=" + resdata.result.schedule._id
+                    });
+                    Taro.showToast({ title: "创建成功", icon: "success", duration: 2000 });
+                }
             });
     }
 
@@ -260,4 +311,4 @@ class CreateSchedule extends Component<Readonly<{}>, State> {
     }
 }
 
-export default CreateSchedule as ComponentClass;
+export default connect(mapStateToProps, mapDispatchToProps)(CreateSchedule);

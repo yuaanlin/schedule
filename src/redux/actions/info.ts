@@ -10,6 +10,6 @@ interface updateInfo {
 export type InfoActions = updateInfo;
 
 /** 将新的 Info 存入 Redux （或是覆写原有的 Info) */
-export function updateInfo(data: info) {
+export function updateInfo(data: info): updateInfo {
     return { type: UPDATE_INFO, data: data };
 }
