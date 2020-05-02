@@ -1,11 +1,11 @@
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Button } from "@tarojs/components";
-import { AtTabs, AtTabsPane, AtList, AtListItem, AtFab ,AtSearchBar,AtAccordion,AtTabBar,AtIcon, AtCard} from "taro-ui";
+import { AtTabs, AtTabsPane, AtList, AtListItem, AtFab, AtSearchBar, AtAccordion, AtTabBar, AtCard } from "taro-ui";
 import "./index.scss";
 import User from "../../classes/user";
 import Schedule from "../../classes/schedule";
 import info from "../../classes/info";
-import { Provider,connect } from "@tarojs/redux";
+import { Provider, connect } from "@tarojs/redux";
 import { setUserData } from "../../redux/actions/user";
 import { updateSchedule } from "../../redux/actions/schedule";
 import { loginResult, getPerscheResult, postUserInfoResult } from "../../types";
@@ -25,11 +25,11 @@ type Props = {
 
 type States = {
     current: number;
-    tabcurrent:number;
-    searchvalue:string,
-    openunfinished:boolean;
+    tabcurrent: number;
+    searchvalue: string;
+    openunfinished: boolean;
     openfinished: boolean;
-    openfailed:boolean;
+    openfailed: boolean;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -60,11 +60,6 @@ class Index extends Component<Props, States> {
         navigationBarTitleText: "首页"
     };
 
-    onChange(value){
-      this.setState({
-        searchvalue: value
-      })
-    }
     componentDidMount() {
         Taro.cloud.init();
         Taro.cloud
@@ -88,6 +83,7 @@ class Index extends Component<Props, States> {
                                 resdata.result.infos.map(info => {
                                     this.props.updateInfo(info);
                                 });
+                                this.setState({ openunfinished: true });
                             }
                         });
                 }
@@ -113,52 +109,32 @@ class Index extends Component<Props, States> {
             });
     }
 
-    toDateString(date){
-      console.log(typeof(date),date)
-      date = new Date(Date.parse(date))
-      console.log(typeof(date),date)
-      var Month = date.getMonth() + 1;
-      var Day = date.getDate();
-      var Y = date.getFullYear() + '-';
-      var M = Month < 10 ? '0' + Month + '-' : Month + '-';
-      var D = Day + 1 < 10 ? '0' + Day : Day;
-      return Y + M + D;
+    toDateString(date: Date) {
+        var Month = date.getMonth() + 1;
+        var Day = date.getDate();
+        var Y = date.getFullYear() + " 年 ";
+        var M = Month < 10 ? "0" + Month + " 月 " : Month + " 月 ";
+        var D = Day + 1 < 10 ? "0" + Day + " 日 " : Day + " 日 ";
+        return Y + M + D;
     }
+
     createsche() {
         Taro.navigateTo({
             url: "../createSchedule/createSchedule"
         });
     }
 
-    handleClick(value: number) {
+    handlebarClick(value: number) {
         this.setState({
-            current: value
+            tabcurrent: value
         });
+        if (value == 1) {
+            Taro.redirectTo({
+                url: "../Individual/individual"
+            });
+        }
     }
-    handleopenClick(value:boolean){
-      this.setState({
-        openunfinished:value
-      })
-    }
-    handleopenClick2(value:boolean){
-      this.setState({
-        openfinished:value
-      })
-    }
-    handlebarClick(value:number) {
-      this.setState({
-        tabcurrent: value
-      })
-      if(value==0){
-        Taro.redirectTo({
-          url:"./index"
-        })
-      }else if(value==1){
-        Taro.redirectTo({
-          url: "../Individual/individual"
-        })
-      }
-    }
+
     getDetail(_id: String) {
         Taro.cloud.callFunction({
             name: "getschedule",
@@ -170,16 +146,17 @@ class Index extends Component<Props, States> {
             url: "../scheduleDetail/scheduleDetail?_id=" + _id
         });
     }
+
     constructor() {
-      super(...arguments);
-      this.state = {
-          current: 0,
-          tabcurrent:0,
-          searchvalue:'',
-          openunfinished:false,
-          openfinished:false,
-          openfailed:false
-      };
+        super(...arguments);
+        this.state = {
+            current: 0,
+            tabcurrent: 0,
+            searchvalue: "",
+            openunfinished: false,
+            openfinished: false,
+            openfailed: false
+        };
     }
     render() {
         /** 尚未登入 */
@@ -198,104 +175,97 @@ class Index extends Component<Props, States> {
         const tabList = [{ title: "我组织的" }, { title: "我参与的" }];
 
         return (
-          <Provider store={store}>
-              <AtSearchBar
-              value={this.state.searchvalue}
-              onChange={this.onChange.bind(this)}
-            />
-            <AtTabs current={this.state.current} tabList={tabList} onClick={this.handleClick.bind(this)}>
-              <AtTabsPane current={this.state.current} index={0}>
-                <View>
-                  <AtAccordion
-                    open={this.state.openunfinished}
-                    onClick={this.handleopenClick.bind(this)}
-                    title='未完成班表'
-                  >
-                    <AtList hasBorder={false}>
-                    {this.props.schedules
-                        .filter(sc => sc.ownerID === this.props.user._id)
-                        .map(item => {
-                          let start=this.toDateString(item.startact);
-                          let end=this.toDateString(item.endact);
-                            return (
-                                <AtCard
-                                    key={item._id}
-                                    note={start+"-"+end}
-                                    title={item.title}
-                                    extra="填写人数\n"
-                                    onClick={() => {
-                                        this.getDetail(item._id);
-                                    }}
-                                />
-                            );
-                        })}
-                        </AtList>
-                    </AtAccordion>
-                  </View>
-                  <View>
-                    <AtAccordion
-                      open={this.state.openfinished}
-                      onClick={this.handleopenClick2.bind(this)}
-                      title='结束班表'
-                    >
+            <Provider store={store}>
+                <AtSearchBar value={this.state.searchvalue} onChange={value => this.setState({ searchvalue: value })} />
+                <AtTabs current={this.state.current} tabList={tabList} onClick={value => this.setState({ current: value })}>
+                    <AtTabsPane current={this.state.current} index={0}>
+                        <View>
+                            <AtAccordion
+                                open={this.state.openunfinished}
+                                onClick={value => this.setState({ openunfinished: value })}
+                                title="未完成班表"
+                            >
+                                <AtList hasBorder={false}>
+                                    {this.props.schedules
+                                        .filter(sc => sc.ownerID === this.props.user._id)
+                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
+                                        .map(item => {
+                                            let start = this.toDateString(item.startact);
+                                            let end = this.toDateString(item.endact);
+                                            return (
+                                                <AtCard
+                                                    key={item._id}
+                                                    note={start + " 到 " + end}
+                                                    title={item.title}
+                                                    extra="填写人数"
+                                                    onClick={() => {
+                                                        this.getDetail(item._id);
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                </AtList>
+                            </AtAccordion>
+                        </View>
+                        <View>
+                            <AtAccordion
+                                open={this.state.openfinished}
+                                onClick={value => this.setState({ openfinished: value })}
+                                title="结束班表"
+                            ></AtAccordion>
+                        </View>
+                    </AtTabsPane>
 
-                    </AtAccordion>
-                  </View>
-              </AtTabsPane>
-
-              <AtTabsPane current={this.state.current} index={1}>
-                <View>
-                <AtAccordion
-                    open={this.state.openunfinished}
-                    onClick={this.handleopenClick.bind(this)}
-                    title='未完成班表'
-                  >
-                    <AtList>
-                        {this.props.schedules
-                            .filter(sc => sc.ownerID !== this.props.user._id && sc.attenders.includes(this.props.user._id))
-                            .map(item => {
-                                return (
-                                    <AtListItem
-                                        key={item._id}
-                                        arrow="right"
-                                        note={item.description}
-                                        title={item.title}
-                                        extraText=""
-                                        onClick={() => {
-                                            this.getDetail(item._id);
-                                        }}
-                                    />
-                                );
-                            })}
-                    </AtList>
-                </AtAccordion>
+                    <AtTabsPane current={this.state.current} index={1}>
+                        <View>
+                            <AtAccordion
+                                open={this.state.openunfinished}
+                                onClick={value => this.setState({ openunfinished: value })}
+                                title="未完成班表"
+                            >
+                                <AtList>
+                                    {this.props.schedules
+                                        .filter(sc => sc.ownerID !== this.props.user._id && sc.attenders.includes(this.props.user._id))
+                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
+                                        .map(item => {
+                                            return (
+                                                <AtListItem
+                                                    key={item._id}
+                                                    arrow="right"
+                                                    note={item.description}
+                                                    title={item.title}
+                                                    extraText=""
+                                                    onClick={() => {
+                                                        this.getDetail(item._id);
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                </AtList>
+                            </AtAccordion>
+                        </View>
+                        <AtAccordion
+                            open={this.state.openfinished}
+                            onClick={value => this.setState({ openfinished: value })}
+                            title="结束班表"
+                        ></AtAccordion>
+                    </AtTabsPane>
+                </AtTabs>
+                <View className="post-button" style={{ bottom: 0, position: "absolute", paddingBottom: "20%", paddingLeft: "75%" }}>
+                    <AtFab onClick={this.createsche}>
+                        <Text className="at-fab__icon at-icon at-icon-add"></Text>
+                    </AtFab>
                 </View>
-                <AtAccordion
-                    open={this.state.openfinished}
-                    onClick={this.handleopenClick2.bind(this)}
-                    title='结束班表'
-                  >
-                </AtAccordion>
-                </AtTabsPane>
-
-
-            </AtTabs>
-            <View className="post-button"  style={{ bottom: 0, position:"absolute", paddingBottom:"20%", paddingLeft: "75%" }}>
-                  <AtFab onClick={this.createsche}>
-                    <Text className="at-fab__icon at-icon at-icon-add"></Text>
-                  </AtFab>
-                </View>
-            <AtTabBar
-              fixed
-              tabList={[
-                {iconPrefixClass:'icon', iconType:'category', title:''},
-                {iconPrefixClass:'icon',iconType:'bussiness-man' ,title:''}
-              ]}
-              onClick={this.handlebarClick.bind(this)}
-              current={this.state.tabcurrent}
-            >
-            </AtTabBar>
-          </Provider>
+                <AtTabBar
+                    fixed
+                    tabList={[
+                        { iconPrefixClass: "icon", iconType: "category", title: "" },
+                        { iconPrefixClass: "icon", iconType: "bussiness-man", title: "" }
+                    ]}
+                    onClick={this.handlebarClick.bind(this)}
+                    current={this.state.tabcurrent}
+                ></AtTabBar>
+            </Provider>
         );
     }
 }
