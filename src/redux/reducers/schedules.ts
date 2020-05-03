@@ -6,7 +6,7 @@ import { UPDATE_SCHEDULE } from "../constants/schedule";
 export default function schedules(state: Array<Schedule> = [], action: ScheduleDataActions) {
     switch (action.type) {
         case UPDATE_SCHEDULE:
-            return [...state.filter(sche => sche._id !== action.data._id), action.data];
+            return [...state.filter(sche => sche._id !== action.data._id), new Schedule(action.data)];
         default:
             return state;
     }

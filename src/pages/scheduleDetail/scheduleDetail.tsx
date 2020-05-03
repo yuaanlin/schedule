@@ -1,4 +1,3 @@
-import { ComponentClass } from "react";
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import store from "../../redux/store";
