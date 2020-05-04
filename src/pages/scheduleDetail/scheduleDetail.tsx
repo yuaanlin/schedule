@@ -149,6 +149,7 @@ class ScheduleDetail extends Component<Props, States> {
                                     <View>{info
                                       // .filter(x=> x.classid===item._id)
                                       .map(x=>{
+                                        x.classid===item._id
                                         return(
                                           <AtBadge >
                                             <AtButton size='small'>{x.tag}</AtButton>
