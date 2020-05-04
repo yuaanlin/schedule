@@ -4,7 +4,7 @@
  * 对应数据库的 Banci 集合 */
 export default class Banci {
     // 班次 id
-    id: string;
+    _id: string;
 
     // 对应班表
     scheid: string;

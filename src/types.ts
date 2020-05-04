@@ -1,6 +1,7 @@
 import Schedule from "./classes/schedule";
 import info from "./classes/info";
 import User from "./classes/user";
+import Banci from "src/classes/banci";
 
 /** 云函数 "Login" 的返回格式 */
 export interface loginResult {
@@ -23,6 +24,7 @@ export interface getPerscheResult {
         code: number;
         schedules: Array<Schedule>;
         infos: Array<info>;
+        bancis: Array<Banci>
     };
 }
 

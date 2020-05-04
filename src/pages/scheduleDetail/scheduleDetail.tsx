@@ -4,6 +4,7 @@ import store from "../../redux/store";
 import { AppState } from "../../redux/types";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
+import Banci from "src/classes/banci";
 import { connect,Provider } from "@tarojs/redux";
 import { AtBadge,AtButton,AtIcon,AtDivider, AtList,AtListItem,AtAccordion,AtModal, AtModalHeader, AtModalContent, AtModalAction} from "taro-ui";
 
@@ -12,6 +13,7 @@ import { AtBadge,AtButton,AtIcon,AtDivider, AtList,AtListItem,AtAccordion,AtModa
 type Props = {
     user: User;
     schedules: Array<Schedule>;
+    bancis: Array<Banci>;
 };
 
 type States = {
@@ -24,12 +26,13 @@ type States = {
 function mapStateToProps(state: AppState) {
     return {
         user: state.user,
-        schedules: state.schedules
+        schedules: state.schedules,
     };
 }
 
 function mapDispatchToProps(dispatch: typeof store.dispatch) {
-    return {};
+    return {
+    };
 }
 class ScheduleDetail extends Component<Props, States> {
     config: Config = {
@@ -47,6 +50,7 @@ class ScheduleDetail extends Component<Props, States> {
 
     componentDidMount() {
         var scheID = this.$router.params._id;
+        // console.log(this.props.schedules)
         var sc = this.props.schedules.find(sc => sc._id === scheID);
         /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
         if (sc === undefined) {
@@ -57,6 +61,14 @@ class ScheduleDetail extends Component<Props, States> {
         } else {
             this.setState({ schedule: sc });
         }
+        this.setState({openbanci: true });
+        console.log(store)
+        // var ban;
+        // console.log(this.props.bancis)
+        // this.state.schedule.bancis.map(value=>{
+        //   ban.push(this.props.bancis.filter(x=>x._id===value))
+        // })
+        // console.log(ban)
     }
 
     render() {
