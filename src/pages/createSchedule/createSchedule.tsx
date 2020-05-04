@@ -236,7 +236,7 @@ class CreateSchedule extends Component<Props, State> {
                         <View style={{ paddingBottom: "36px" }}>
                             <Text>班次 #{index + 1}</Text>
                             <View style={{ backgroundColor: "rgb(240,240,240)", padding: "18px" }}>
-                                <Text className="form-lable">循環模式</Text>
+                                <Text className="form-lable">循环模式</Text>
                                 <Picker
                                     value={0}
                                     mode="selector"
@@ -247,7 +247,7 @@ class CreateSchedule extends Component<Props, State> {
                                 </Picker>
                                 {banci.repeattype === "不重复" ? null : (
                                     <View>
-                                        <Text className="form-lable">班次重複起點</Text>
+                                        <Text className="form-lable">班次重复起点</Text>
                                         <View>
                                             <Picker
                                                 style={{ margin: "12px" }}
@@ -258,7 +258,7 @@ class CreateSchedule extends Component<Props, State> {
                                                 <View className="picker form-value">{banci.repeatStart.toISOString()}</View>
                                             </Picker>
                                         </View>
-                                        <Text className="form-lable">班次重複終點</Text>
+                                        <Text className="form-lable">班次重复终点</Text>
                                         <View>
                                             <Picker
                                                 style={{ margin: "12px" }}
@@ -271,7 +271,7 @@ class CreateSchedule extends Component<Props, State> {
                                         </View>
                                     </View>
                                 )}
-                                <Text className="form-lable">班次開始時間</Text>
+                                <Text className="form-lable">班次开始时间</Text>
                                 <View>
                                     <Picker
                                         style={{ margin: "12px" }}
@@ -282,7 +282,7 @@ class CreateSchedule extends Component<Props, State> {
                                         <View className="picker form-value">{banci.startTime.toISOString()}</View>
                                     </Picker>
                                 </View>
-                                <Text className="form-lable">班次結束時間</Text>
+                                <Text className="form-lable">班次结束时间</Text>
                                 <View>
                                     <Picker
                                         style={{ margin: "12px" }}

@@ -77,8 +77,8 @@ class Individual extends Component<Props, States> {
               </View>
               <View className="relevant">
                 <AtList>
-                  <AtListItem iconInfo={{prefixClass:"icon",value:"add-account"}} title='关于我们' arrow='right' />
-                  <AtListItem iconInfo={{prefixClass:"icon",value:"suggest"}} title='意见反馈' arrow='right' />
+                  <AtListItem iconInfo={{prefixClass:"icon",value:"add-account"}} title='关于我们' arrow='right'  onClick={()=>{Taro.navigateTo({url:"../aboutus/aboutus"})}} />
+                  <AtListItem iconInfo={{prefixClass:"icon",value:"suggest"}} title='意见反馈' arrow='right' onClick={()=>{Taro.navigateTo({url:"../suggest/suggest"})}} />
                 </AtList>
               </View>
             <AtTabBar
