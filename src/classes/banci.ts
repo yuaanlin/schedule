@@ -19,7 +19,7 @@ export default class Banci {
     endTime: Date;
 
     constructor(banci: Banci = defaultBanci) {
-        this.id = banci.id;
+        this._id = banci._id;
         this.count = banci.count;
         this.scheid = banci.scheid;
         this.startTime = banci.startTime;
@@ -28,7 +28,7 @@ export default class Banci {
 }
 
 const defaultBanci = {
-    id: "",
+    _id: "",
     scheid: "",
     count: 0,
     startTime: new Date(),

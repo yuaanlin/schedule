@@ -94,6 +94,7 @@ class Index extends Component<Props, States> {
                                 });
                                 resdata.result.bancis.map(banci => {
                                   this.props.updateBanci(banci);
+                                  console.log(banci)
                               });
                                 this.setState({ openunfinished: true });
                                 console.log(this.props.bancis)
