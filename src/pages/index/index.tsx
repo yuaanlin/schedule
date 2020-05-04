@@ -57,7 +57,7 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
 /** 首页 */
 class Index extends Component<Props, States> {
     config: Config = {
-        navigationBarTitleText: "首页"
+        navigationBarTitleText: "排了个班"
     };
 
     componentDidMount() {
@@ -260,7 +260,7 @@ class Index extends Component<Props, States> {
                     fixed
                     tabList={[
                         { iconPrefixClass: "icon", iconType: "category", title: "" },
-                        { iconPrefixClass: "icon", iconType: "bussiness-man", title: "" }
+                        { iconPrefixClass: "icon", iconType: "usercenter", title: "" }
                     ]}
                     onClick={this.handlebarClick.bind(this)}
                     current={this.state.tabcurrent}
