@@ -5,9 +5,10 @@ import { AppState } from "../../redux/types";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
 import Banci from "src/classes/banci";
+import info from "src/classes/info";
 import { connect,Provider } from "@tarojs/redux";
 import { AtBadge,AtButton,AtIcon,AtDivider, AtList,AtListItem,AtAccordion,AtModal, AtModalHeader, AtModalContent, AtModalAction} from "taro-ui";
-import info from "src/classes/info";
+
 
 
 /** 定义这个页面的 Props 和 States */
@@ -46,7 +47,7 @@ class ScheduleDetail extends Component<Props, States> {
     };
     tospeTime(date: Date){
       date = new Date(Date.parse(date))
-      console.log(typeof(date),date)
+      // console.log(typeof(date),date)
       var Month = date.getMonth() + 1;
       var Day = date.getDate();
       var Hour = date.getHours();
@@ -60,7 +61,7 @@ class ScheduleDetail extends Component<Props, States> {
     toDateString(date: Date) {
       // date = date.toString()
       date = new Date(Date.parse(date))
-      console.log(typeof(date),date)
+      // console.log(typeof(date),date)
       var Month = date.getMonth() + 1;
       var Day = date.getDate();
       var Y = date.getFullYear() + ".";
@@ -71,8 +72,9 @@ class ScheduleDetail extends Component<Props, States> {
 
     componentDidMount() {
         var scheID = this.$router.params._id;
-        // console.log(this.props.schedules)
+        // console.log(scheID)
         var sc = this.props.schedules.find(sc => sc._id === scheID);
+        // console.log(sc)
         /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
         if (sc === undefined) {
             Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
@@ -83,22 +85,20 @@ class ScheduleDetail extends Component<Props, States> {
             this.setState({ schedule: sc });
             let infor;
             let ban = this.props.bancis.filter(banci=>{
-              banci.scheid===sc._id
                 infor = this.props.infos.filter(info=>{
-                info.classid ===banci._id
-                return info
+                return info.classid ===banci._id
               })
-              return banci
+              return banci.scheid===sc._id
+              // return banci
             });
             this.setState({ bancis:ban })
             this.setState({ infos:infor })
-            console.log(this.props.infos)
+            // console.log(ban)
+            // console.log(this.props.bancis)
         }
         this.setState({openbanci: true });
     }
     componentDidShow() {
-      // console.log(this.state.bancis)
-      // console.log(this.props.bancis)
     }
 
     render() {
@@ -107,7 +107,7 @@ class ScheduleDetail extends Component<Props, States> {
         else{
 
         }
-          console.log(this.props.bancis)
+          // console.log(this.props.bancis)
             return (
               <View>
                 <AtList>
@@ -118,10 +118,11 @@ class ScheduleDetail extends Component<Props, States> {
                     title='班次列表'
                   >
                     {/* 循环班次数据库取得所有班次信息 */}
-                    {/* {console.log("render-0:",this.props.bancis)} */}
+                    {console.log("render-0:",this.state.bancis)}
                     {
                     this.state.bancis
                       .map(item=>{
+                        console.log("item-:",item)
                         let count = 0
                         count++;
                         return(

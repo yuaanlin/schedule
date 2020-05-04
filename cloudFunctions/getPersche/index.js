@@ -29,8 +29,8 @@ exports.main = async (event, context) => {
                 _id: sche.data[i].bancis[j]
               })
               .get()
+            ban.push(tmp)
           }
-          ban.push(tmp)
         }
       tmp = ban
       console.log(tmp)
