@@ -7,6 +7,7 @@ import User from "../../classes/user";
 import Banci from "src/classes/banci";
 import { connect,Provider } from "@tarojs/redux";
 import { AtBadge,AtButton,AtIcon,AtDivider, AtList,AtListItem,AtAccordion,AtModal, AtModalHeader, AtModalContent, AtModalAction} from "taro-ui";
+import info from "src/classes/info";
 
 
 /** 定义这个页面的 Props 和 States */
@@ -14,10 +15,13 @@ type Props = {
     user: User;
     schedules: Array<Schedule>;
     bancis: Array<Banci>;
+    infos: Array<info>;
 };
 
 type States = {
     schedule: Schedule;
+    bancis: Array<Banci>;
+    infos: Array<info>;
     openbanci:boolean;
     openmodal:boolean
 };
@@ -27,6 +31,8 @@ function mapStateToProps(state: AppState) {
     return {
         user: state.user,
         schedules: state.schedules,
+        bancis:state.bancis,
+        infos:state.infos,
     };
 }
 
@@ -38,8 +44,23 @@ class ScheduleDetail extends Component<Props, States> {
     config: Config = {
         navigationBarTitleText: "班表详情"
     };
-
+    tospeTime(date: Date){
+      date = new Date(Date.parse(date))
+      console.log(typeof(date),date)
+      var Month = date.getMonth() + 1;
+      var Day = date.getDate();
+      var Hour = date.getHours();
+      var min = date.getSeconds();
+      var M = Month < 10 ? "0" + Month + "." : Month + ".";
+      var D = Day + 1 < 10 ? "0" + Day+ " " : Day + " ";
+      var H = Hour + 1 < 10 ? "0" + Hour+ ":" : Hour + ":";
+      var Min = min + 1 < 10 ? "0" + min: min;
+      return  M + D + H + Min;
+    }
     toDateString(date: Date) {
+      // date = date.toString()
+      date = new Date(Date.parse(date))
+      console.log(typeof(date),date)
       var Month = date.getMonth() + 1;
       var Day = date.getDate();
       var Y = date.getFullYear() + ".";
@@ -60,21 +81,35 @@ class ScheduleDetail extends Component<Props, States> {
             });
         } else {
             this.setState({ schedule: sc });
+            let infor;
+            let ban = this.props.bancis.filter(banci=>{
+              banci.scheid===sc._id
+                infor = this.props.infos.filter(info=>{
+                info.classid ===banci._id
+                return info
+              })
+              return banci
+            });
+            this.setState({ bancis:ban })
+            this.setState({ infos:infor })
+            console.log(this.props.infos)
         }
         this.setState({openbanci: true });
-        console.log(store)
-        // var ban;
-        // console.log(this.props.bancis)
-        // this.state.schedule.bancis.map(value=>{
-        //   ban.push(this.props.bancis.filter(x=>x._id===value))
-        // })
-        // console.log(ban)
+    }
+    componentDidShow() {
+      // console.log(this.state.bancis)
+      // console.log(this.props.bancis)
     }
 
     render() {
+        const {info}=this.state.infos
         if (this.state.schedule === undefined) return <View>发生错误</View>;
-        else
+        else{
+
+        }
+          console.log(this.props.bancis)
             return (
+              <View>
                 <AtList>
                   <AtListItem title={this.state.schedule.title} note= {this.toDateString(this.state.schedule.startact)+"到"+this.toDateString(this.state.schedule.endact)} />
                   <AtAccordion
@@ -83,41 +118,69 @@ class ScheduleDetail extends Component<Props, States> {
                     title='班次列表'
                   >
                     {/* 循环班次数据库取得所有班次信息 */}
-                    <AtListItem
-                      title='班次标题'
-                      note='需要人数{banci[i].count}'
-                      extraText='是否重复{banci.repeattype}'
-                      onClick={() => {this.setState({openmodal:true})}}
-                    />
-                    {/* 对应listitem生成对应的modal */}
-                    <AtModal  isOpened={this.state.openmodal}>
-                      <AtModalHeader>班次标题</AtModalHeader>
-                      <AtModalContent>
-                        <View className ="at-row">
-                          <View className="at-col at-col-3"><AtIcon prefixClass='icon' value='Customermanagement'></AtIcon></View>
-                          <View className="at-col at-col-6"><Text>成员</Text></View>
-                        </View>
-                        {/* 循环班次成员获取tag */}
-                        <AtBadge >
-                            <AtButton size='small'>tag</AtButton>
-                        </AtBadge>
-                        <AtDivider></AtDivider>
-                        <View className="at-row">
-                          <View className="at-col at-col-3"><AtIcon prefixClass='icon' value='clock'></AtIcon></View>
-                          <View className="at-col at-col-6"><Text>班表详细时间</Text></View>
-                        </View>
-                        <AtDivider></AtDivider>
-                        <View className="at-row">
-                        <View className="at-col at-col-3"><AtIcon prefixClass='icon' value='suggest'></AtIcon></View>
-                        <View className="at-col at-col-6"><Text>注意事项之类的</Text></View>
-                        </View>
-                      </AtModalContent>
-                      <AtModalAction>
-                        <Button onClick={()=>{this.setState({openmodal:false})}}>返回</Button>
-                      </AtModalAction>
-                    </AtModal>
+                    {/* {console.log("render-0:",this.props.bancis)} */}
+                    {
+                    this.state.bancis
+                      .map(item=>{
+                        let count = 0
+                        count++;
+                        return(
+                          <View>
+                            <AtListItem
+                              key={item._id}
+                              title={this.tospeTime(item.startTime)}
+                              note={"共需要"+item.count.toString()+"人"}
+                              // extraText={item.}
+                              onClick={() => {this.setState({openmodal:true})}}
+                            />
+                            {/* 对应listitem生成对应的modal */}
+                            <AtModal  isOpened={this.state.openmodal}>
+                              <AtModalHeader>{"班次"+count} </AtModalHeader>
+                              <AtModalContent>
+                                <View className ="at-row">
+                                  <View className="at-col at-col-3"><AtIcon prefixClass='icon' value='Customermanagement'></AtIcon></View>
+                                  <View className="at-col at-col-6"><Text>成员</Text></View>
+                                </View>
+                                {/* 循环班次成员获取tag */}
+                                <View>
+                                  {info ==null
+                                    ?<Text>暂时没有成员</Text>
+                                    :
+                                    <View>{info
+                                      // .filter(x=> x.classid===item._id)
+                                      .map(x=>{
+                                        return(
+                                          <AtBadge >
+                                            <AtButton size='small'>{x.tag}</AtButton>
+                                          </AtBadge>
+                                        )
+                                      })
+                                    }
+                                    </View>
+                                  }
+                                </View>
+                                <AtDivider></AtDivider>
+                                <View className="at-row">
+                                  <View className="at-col at-col-3"><AtIcon prefixClass='icon' value='clock'></AtIcon></View>
+                                  <View className="at-col at-col-6">{this.tospeTime(item.startTime)+"至"+this.tospeTime(item.endTime)}</View>
+                                </View>
+                                <AtDivider></AtDivider>
+                                <View className="at-row">
+                                <View className="at-col at-col-3"><AtIcon prefixClass='icon' value='suggest'></AtIcon></View>
+                                <View className="at-col at-col-6">{<Text>注意事项之类的</Text>}</View>
+                                </View>
+                              </AtModalContent>
+                              <AtModalAction>
+                                <Button onClick={()=>{this.setState({openmodal:false})}}>返回</Button>
+                              </AtModalAction>
+                            </AtModal>
+                          </View>
+                        )
+                      })
+                    }
                   </AtAccordion>
                 </AtList>
+              </View>
                 // <View className="index">
                 //     <View>
                 //         <Text>你正在查看班表 {this.state.schedule.title} 的详情</Text>

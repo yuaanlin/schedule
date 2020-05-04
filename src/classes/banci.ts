@@ -22,8 +22,8 @@ export default class Banci {
         this._id = banci._id;
         this.count = banci.count;
         this.scheid = banci.scheid;
-        this.startTime = banci.startTime;
-        this.endTime = banci.endTime;
+        this.startTime = new Date(banci.startTime);
+        this.endTime = new Date(banci.endTime);
     }
 }
 

@@ -65,7 +65,7 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
 /** 首页 */
 class Index extends Component<Props, States> {
     config: Config = {
-        navigationBarTitleText: "排了个班"
+        navigationBarTitleText: "排了个班",
     };
 
     componentDidMount() {
@@ -94,7 +94,6 @@ class Index extends Component<Props, States> {
                                 });
                                 resdata.result.bancis.map(banci => {
                                   this.props.updateBanci(banci);
-                                  console.log(banci)
                               });
                                 this.setState({ openunfinished: true });
                                 console.log(this.props.bancis)

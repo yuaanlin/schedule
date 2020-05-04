@@ -19,9 +19,10 @@ class App extends Component {
         pages: ["pages/index/index", "pages/createSchedule/createSchedule", "pages/scheduleDetail/scheduleDetail","pages/Individual/individual","pages/suggest/suggest","pages/aboutus/aboutus"],
         window: {
           backgroundTextStyle: "light",
-          navigationBarBackgroundColor: "#C7DEDF",
+          navigationBarBackgroundColor: "#ABCFD0",
           navigationBarTitleText: "排了个班",
-          navigationBarTextStyle: "black",
+          enablePullDownRefresh:true
+          // navigationBarTextStyle: "black",
         },
     };
 
