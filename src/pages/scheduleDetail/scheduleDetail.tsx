@@ -42,6 +42,17 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
     };
 }
 class ScheduleDetail extends Component<Props, States> {
+    constructor(props){
+      super(props);
+      this.state = {
+        schedule: {
+          attenders: []
+        },
+        bancis: [],
+        inofs: []
+      }
+    }
+
     config: Config = {
         navigationBarTitleText: "班表详情"
     };
@@ -84,16 +95,18 @@ class ScheduleDetail extends Component<Props, States> {
         } else {
             this.setState({ schedule: sc });
             let infor;
+            // console.log(this.props)
             let ban = this.props.bancis.filter(banci=>{
                 infor = this.props.infos.filter(info=>{
-                return info.classid ===banci._id
+                // console.log(info, banci,info.classid === banci._id)
+                return info.classid === banci._id
               })
               return banci.scheid===sc._id
               // return banci
             });
             this.setState({ bancis:ban })
             this.setState({ infos:infor })
-            // console.log(ban)
+            // console.log(infor)
             // console.log(this.props.bancis)
         }
         this.setState({openbanci: true });
@@ -102,16 +115,15 @@ class ScheduleDetail extends Component<Props, States> {
     }
 
     render() {
-        const {info}=this.state.infos
+        const {infos}=this.state
         if (this.state.schedule === undefined) return <View>发生错误</View>;
         else{
 
         }
-          // console.log(this.props.bancis)
             return (
               <View>
                 <AtList>
-                  <AtListItem title={this.state.schedule.title} note= {this.toDateString(this.state.schedule.startact)+"到"+this.toDateString(this.state.schedule.endact)} />
+                  <AtListItem title={this.state.schedule.title} note= {this.toDateString(this.state.schedule.startact) + "到" + this.toDateString(this.state.schedule.endact)} />
                   <AtAccordion
                     open={this.state.openbanci}
                     onClick={value => this.setState({ openbanci: value })}
@@ -143,15 +155,16 @@ class ScheduleDetail extends Component<Props, States> {
                                 </View>
                                 {/* 循环班次成员获取tag */}
                                 <View>
-                                  {info ==null
+                                  {console.log(infos)}
+                                  {infos ==null
                                     ?<Text>暂时没有成员</Text>
                                     :
-                                    <View>{info
+                                    <View>{infos
                                       // .filter(x=> x.classid===item._id)
                                       .map(x=>{
                                         x.classid===item._id
                                         return(
-                                          <AtBadge >
+                                          <AtBadge key={item._id} >
                                             <AtButton size='small'>{x.tag}</AtButton>
                                           </AtBadge>
                                         )

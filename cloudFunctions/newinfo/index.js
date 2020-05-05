@@ -12,7 +12,7 @@ exports.main = async (event, context) => {
   const {classid,tag} = event
   try {
     var newinfo = {
-      openid:wxContext.OPENID,
+      userid:wxContext.OPENID,
       classid:classid,
       tag:tag,
       tendency:true
@@ -23,7 +23,7 @@ exports.main = async (event, context) => {
       return {
         code:200,
         data:{
-          openid: wxContext.OPENID,
+          userid: wxContext.OPENID,
           classid: classid,
           tag: tag,
           tendency: true,

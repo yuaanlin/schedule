@@ -5,7 +5,7 @@ import { AppState } from "../../redux/types";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
 import Banci from "src/classes/banci";
-import info from "src/classes/info";
+import info from "../../classes/info";
 import { connect,Provider } from "@tarojs/redux";
 import { AtInput,AtToast,AtBadge,AtButton,AtIcon,AtDivider, AtList,AtListItem,AtAccordion,AtModal, AtModalHeader, AtModalContent, AtModalAction} from "taro-ui";
 
@@ -46,6 +46,16 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
     };
 }
 class JoinSchedule extends Component<Props, States> {
+  constructor(props){
+    super(props);
+    this.state = {
+      schedule: {
+        attenders: []
+      },
+      bancis: [],
+      inofs: []
+    }
+  }
     config: Config = {
         navigationBarTitleText: "班表预览"
     };
@@ -77,6 +87,7 @@ class JoinSchedule extends Component<Props, States> {
     this.setState({
       openmodal:false
     })
+    console.log(this.state.tag)
     Taro.cloud
      .callFunction({
        name:"newinfo",
@@ -89,8 +100,7 @@ class JoinSchedule extends Component<Props, States> {
      })
   }
 
-  getTag(tag:string){
-    this.setState({tag:tag})
+  getTag(){
     if(this.state.tag!=null){
       this.setState({gettag:false})
     }else{
@@ -105,6 +115,13 @@ class JoinSchedule extends Component<Props, States> {
       title:'班表详情预览',
       path:'/pages/joinSchedule/joinSchedule?_id='+this.$router.params._id
     }
+  }
+
+  settag(value){
+    console.log(value)
+    this.setState({
+      tag: value
+    })
   }
     componentDidMount() {
         var scheID = this.$router.params._id;
@@ -128,7 +145,7 @@ class JoinSchedule extends Component<Props, States> {
                 return info.classid ===banci._id
               })
               }
-              return banci.scheid===sc._id
+              return banci.scheid === sc._id
               // return banci
             });
             this.setState({ bancis:ban })
@@ -143,12 +160,12 @@ class JoinSchedule extends Component<Props, States> {
     }
 
     render() {
-        const {info}=this.state.infos
         if (this.state.schedule === undefined) return <View>发生错误</View>;
         else{
-
+          // const { warntag, startact, endact, title, getting } = this.state
         }
           // console.log(this.props.bancis)
+          const { infos } = this.state
             return (
               <View>
                 <AtList>
@@ -161,7 +178,7 @@ class JoinSchedule extends Component<Props, States> {
                         type='text'
                         placeholder='请输入唯一标识'
                         value={this.state.tag}
-                        onChange={value=>{this.setState({tag:value})}}
+                        onChange={this.settag.bind(this)}
                       />
                     </AtModalContent>
                     <AtModalAction>
@@ -194,7 +211,7 @@ class JoinSchedule extends Component<Props, States> {
                                 type='text'
                                 placeholder='请输入唯一标识'
                                 value={this.state.tag}
-                                onChange={value=>{this.setState({tag:value})}}
+                                onChange={this.settag.bind(this)}
                               />
                             </AtModalContent>
                             <AtModalAction>
@@ -202,6 +219,7 @@ class JoinSchedule extends Component<Props, States> {
                             </AtModalAction>
                           </AtModal>
                         }
+
                         return(
                           <View key={item._id}>
                             <AtListItem
@@ -220,10 +238,10 @@ class JoinSchedule extends Component<Props, States> {
                                 </View>
                                 {/* 循环班次成员获取tag */}
                                 <View>
-                                  {info ==null
+                                  {infos ==null
                                     ?<Text>暂时没有成员</Text>
                                     :
-                                    <View>{info
+                                    <View>{infos
                                       // .filter(x=> x.classid===item._id)
                                       .map(x=>{
                                         x.classid===item._id

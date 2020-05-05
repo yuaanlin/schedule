@@ -83,7 +83,7 @@ class Index extends Component<Props, States> {
                             name: "getPersche"
                         })
                         .then(res => {
-                          // console.log(res)
+                          console.log(res)
                             var resdata = (res as unknown) as getPerscheResult;
                             if (resdata.result.code === 200) {
                                 resdata.result.schedules.map(sche => {
