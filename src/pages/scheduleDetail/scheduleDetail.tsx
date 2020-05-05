@@ -53,6 +53,7 @@ class ScheduleDetail extends Component<Props, States> {
         navigationBarTitleText: "班表详情"
     };
     tospeTime(date: Date) {
+        date = new Date(date);
         var Month = date.getMonth() + 1;
         var Day = date.getDate();
         var Hour = date.getHours();
@@ -64,6 +65,7 @@ class ScheduleDetail extends Component<Props, States> {
         return M + D + H + Min;
     }
     toDateString(date: Date) {
+        date = new Date(date);
         var Month = date.getMonth() + 1;
         var Day = date.getDate();
         var Y = date.getFullYear() + ".";

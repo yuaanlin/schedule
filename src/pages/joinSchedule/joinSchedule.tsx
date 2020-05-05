@@ -56,6 +56,7 @@ class JoinSchedule extends Component<Props, States> {
         navigationBarTitleText: "班表预览"
     };
     tospeTime(date: Date) {
+        date = new Date(date);
         var Month = date.getMonth() + 1;
         var Day = date.getDate();
         var Hour = date.getHours();
@@ -67,6 +68,7 @@ class JoinSchedule extends Component<Props, States> {
         return M + D + H + Min;
     }
     toDateString(date: Date) {
+        date = new Date(date);
         var Month = date.getMonth() + 1;
         var Day = date.getDate();
         var Y = date.getFullYear() + ".";
@@ -113,6 +115,7 @@ class JoinSchedule extends Component<Props, States> {
                 url: "../index/index"
             });
         } else {
+            console.log(sc);
             this.setState({ schedule: sc });
             let infor = new Array<info>();
             let ban = this.props.bancis.filter(banci => {
