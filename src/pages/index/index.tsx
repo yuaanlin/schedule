@@ -83,7 +83,7 @@ class Index extends Component<Props, States> {
                             name: "getPersche"
                         })
                         .then(res => {
-                          console.log(res)
+                          // console.log(res)
                             var resdata = (res as unknown) as getPerscheResult;
                             if (resdata.result.code === 200) {
                                 resdata.result.schedules.map(sche => {
@@ -96,7 +96,7 @@ class Index extends Component<Props, States> {
                                   this.props.updateBanci(banci);
                               });
                                 this.setState({ openunfinished: true });
-                                console.log(this.props.bancis)
+                                // console.log(this.props.bancis)
                             }
                         });
                 }

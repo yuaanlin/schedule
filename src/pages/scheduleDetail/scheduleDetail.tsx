@@ -118,11 +118,11 @@ class ScheduleDetail extends Component<Props, States> {
                     title='班次列表'
                   >
                     {/* 循环班次数据库取得所有班次信息 */}
-                    {console.log("render-0:",this.state.bancis)}
+                    {/* {console.log("render-0:",this.state.bancis)} */}
                     {
                     this.state.bancis
                       .map(item=>{
-                        console.log("item-:",item)
+                        // console.log("item-:",item)
                         let count = 0
                         count++;
                         return(

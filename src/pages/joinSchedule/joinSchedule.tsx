@@ -85,7 +85,7 @@ class JoinSchedule extends Component<Props, States> {
          tag : this.state.tag,
        }
      }).then(res=>{
-       console.log(res)
+      //  console.log(res)
      })
   }
 
@@ -120,8 +120,8 @@ class JoinSchedule extends Component<Props, States> {
         } else {
             this.setState({ schedule: sc });
             let infor;
-            console.log(sc)
-            console.log(this.props.bancis)
+            // console.log(sc)
+            // console.log(this.props.bancis)
             let ban = this.props.bancis.filter(banci=>{
               if(this.props.infos){
                 infor = this.props.infos.filter(info=>{
@@ -133,7 +133,7 @@ class JoinSchedule extends Component<Props, States> {
             });
             this.setState({ bancis:ban })
             this.setState({ infos:infor })
-            console.log("finalban"+ban)
+            // console.log("finalban"+ban)
         }
         this.setState({openbanci: true });
         this.setState({gettag: true });
@@ -181,9 +181,27 @@ class JoinSchedule extends Component<Props, States> {
                     {
                     this.state.bancis
                       .map(item=>{
-                        console.log("item-:",item)
+                        // console.log("item-:",item)
                         let count = 0
                         count++;
+                        if(this.state.tag === null){
+                          <AtModal isOpened={this.state.gettag}>
+                            <AtModalHeader>请先填写个人信息</AtModalHeader>
+                            <AtModalContent>
+                              <AtInput
+                                required
+                                name='tag'
+                                type='text'
+                                placeholder='请输入唯一标识'
+                                value={this.state.tag}
+                                onChange={value=>{this.setState({tag:value})}}
+                              />
+                            </AtModalContent>
+                            <AtModalAction>
+                              <Button onClick={this.getTag.bind(this)}>确定</Button>
+                            </AtModalAction>
+                          </AtModal>
+                        }
                         return(
                           <View key={item._id}>
                             <AtListItem
