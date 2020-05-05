@@ -1,11 +1,14 @@
 import Taro, { Component } from "@tarojs/taro";
-import { View, Text } from "@tarojs/components";
+import { View, Text,Image } from "@tarojs/components";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
 import User from "../../classes/user";
 import { connect } from "@tarojs/redux";
 import { setUserData } from "../../redux/actions/user";
-import { AtTabBar } from "taro-ui";
+import { AtTabBar,AtList,AtListItem } from "taro-ui";
+
+import './individual.scss'
+import user from "src/redux/reducers/user";
 
 type Props = {
     user: User;
@@ -42,6 +45,11 @@ class Individual extends Component<Props, States> {
             });
         }
     }
+    onImageClick(){
+      Taro.previewImage({
+        urls:[this.props.user.avatarUrl]
+      })
+    }
     constructor() {
         super(...arguments);
         this.state = {
@@ -50,18 +58,39 @@ class Individual extends Component<Props, States> {
     }
     render() {
         return (
-            <View className="index">
-                <Text>个人页面</Text>
-                <AtTabBar
-                    fixed
-                    tabList={[
-                        { iconPrefixClass: "icon", iconType: "category", title: "" },
-                        { iconPrefixClass: "icon", iconType: "bussiness-man", title: "" }
-                    ]}
-                    onClick={this.handlebarClick.bind(this)}
-                    current={this.state.tabcurrent}
-                ></AtTabBar>
-            </View>
+          <View className="index">
+            {/* <View className='at-row'> */}
+              <View className="logged-mine">
+                <Image
+                  src={this.props.user.avatarUrl}
+                  className="mine-avatar"
+                  onClick={this.onImageClick}
+                />
+                <View className="mine-nickName">
+                  {this.props.user.name ?this.props.user.name  : '勤小创'}
+                </View>
+              </View>
+              <View className="myteam">
+                <AtList>
+                  <AtListItem iconInfo={{prefixClass:"icon",value:"Customermanagement"}} title='我的团队' arrow='right' />
+                </AtList>
+              </View>
+              <View className="relevant">
+                <AtList>
+                  <AtListItem iconInfo={{prefixClass:"icon",value:"add-account"}} title='关于我们' arrow='right'  onClick={()=>{Taro.navigateTo({url:"../aboutus/aboutus"})}} />
+                  <AtListItem iconInfo={{prefixClass:"icon",value:"suggest"}} title='意见反馈' arrow='right' onClick={()=>{Taro.navigateTo({url:"../suggest/suggest"})}} />
+                </AtList>
+              </View>
+            <AtTabBar
+              fixed
+              tabList={[
+                  { iconPrefixClass: "icon", iconType: "category", title: "" },
+                  { iconPrefixClass: "icon", iconType: "usercenter", title: "" }
+              ]}
+              onClick={this.handlebarClick.bind(this)}
+              current={this.state.tabcurrent}
+            ></AtTabBar>
+          </View>
         );
     }
 }

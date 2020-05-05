@@ -12,7 +12,7 @@ exports.main = async (event, context) => {
         let tmp;
         let ban = [];
         let info;
-        let i;
+        let i,j;
         const wxContext = cloud.getWXContext();
         const open_id = wxContext.OPENID;
         sche = await db
@@ -21,6 +21,23 @@ exports.main = async (event, context) => {
                 ownerID: open_id
             })
             .get();
+        for(i=0;i<sche.data.length;i++){
+          for(j=0;j<sche.data[i].bancis.length;j++){
+            tmp = await db
+              .collection("bancis")
+              .where({
+                _id: sche.data[i].bancis[j]
+              })
+              .get()
+            ban.push(tmp)
+          }
+        }
+      tmp = ban
+      console.log(tmp)
+      ban = []
+      for(i=0;i<tmp.length;i++)
+        ban = ban.concat(tmp[i].data)
+      console.log(ban)
         await db
             .collection("infos")
             .aggregate()
@@ -35,7 +52,8 @@ exports.main = async (event, context) => {
             })
             .end()
             .then(res => {
-                info = res;
+              info = res;
+              console.log(info)
             })
             .catch(err => console.error(err));
         sche = sche.data;
@@ -57,7 +75,8 @@ exports.main = async (event, context) => {
         return {
             code: 200,
             schedules: sche,
-            infos: info
+            infos: info,
+            bancis:ban
         };
     } catch (e) {
         return {

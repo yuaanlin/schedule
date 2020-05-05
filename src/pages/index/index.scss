@@ -1,7 +1,8 @@
 .post-button {
-    position: fixed;
-    right: 60px;
-    bottom: 80px;
+  position: fixed;
+  right: 60px;
+  bottom: 80px;
+  z-index: 2000;
 }
 .at-card {
   border-top: 1PX #d6e4ef solid;

@@ -16,31 +16,14 @@ class App extends Component {
      * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
      */
     config: Config = {
-        pages: ["pages/index/index", "pages/createSchedule/createSchedule", "pages/scheduleDetail/scheduleDetail","pages/Individual/individual"],
+        pages: ["pages/index/index", "pages/createSchedule/createSchedule", "pages/scheduleDetail/scheduleDetail","pages/Individual/individual","pages/suggest/suggest","pages/aboutus/aboutus","pages/joinSchedule/joinSchedule"],
         window: {
-            backgroundTextStyle: "light",
-            navigationBarBackgroundColor: "#c0dbdc",
-            navigationBarTitleText: "WeChat",
-            navigationBarTextStyle: "black"
+          backgroundTextStyle: "light",
+          navigationBarBackgroundColor: "#ABCFD0",
+          navigationBarTitleText: "排了个班",
+          enablePullDownRefresh:true
+          // navigationBarTextStyle: "black",
         },
-        // tabBar:{
-        //   "color": "#ccc",
-        //   "selectedColor": "#35495e",
-        //   "borderStyle": "white",
-        //   "backgroundColor": "#f9f9f9",
-
-        //   list:[
-        //     {
-        //       "text":"我的排班",
-        //       "pagePath":"pages/index/index",
-        //       "iconPath":"assets/image/list1",
-        //       "selectedIconPath": "assets/image/list2"
-        //     },{
-        //       "text":"个人界面",
-        //       "pagePath":"pages/Individual/individual"
-        //     }
-        //   ]
-        // }
     };
 
     componentDidMount() {

@@ -5,9 +5,11 @@ import "./index.scss";
 import User from "../../classes/user";
 import Schedule from "../../classes/schedule";
 import info from "../../classes/info";
+import Banci from "src/classes/banci";
 import { Provider, connect } from "@tarojs/redux";
 import { setUserData } from "../../redux/actions/user";
 import { updateSchedule } from "../../redux/actions/schedule";
+import { updateBanci } from "../../redux/actions/banci";
 import { loginResult, getPerscheResult, postUserInfoResult } from "../../types";
 import { updateInfo } from "../../redux/actions/info";
 import { AppState } from "src/redux/types";
@@ -18,8 +20,10 @@ import store from "../../redux/store";
 type Props = {
     user: User;
     schedules: Array<Schedule>;
+    bancis: Array<Banci>;
     setUserData: (user: User) => void;
     updateSchedule: (Schedule: Schedule) => void;
+    updateBanci:(banci:Banci)=> void
     updateInfo: (info: info) => void;
 };
 
@@ -36,20 +40,24 @@ type States = {
 function mapStateToProps(state: AppState) {
     return {
         user: state.user,
-        schedules: state.schedules
+        schedules: state.schedules,
+        bancis: state.bancis
     };
 }
 
 function mapDispatchToProps(dispatch: typeof store.dispatch) {
     return {
         setUserData: (user: User) => {
-            dispatch(setUserData(user));
+          dispatch(setUserData(user));
         },
         updateSchedule: (schedule: Schedule) => {
-            dispatch(updateSchedule(schedule));
+          dispatch(updateSchedule(schedule));
         },
         updateInfo: (info: info) => {
-            dispatch(updateInfo(info));
+          dispatch(updateInfo(info));
+        },
+        updateBanci: (banci: Banci) => {
+          dispatch(updateBanci(banci));
         }
     };
 }
@@ -57,7 +65,7 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
 /** 首页 */
 class Index extends Component<Props, States> {
     config: Config = {
-        navigationBarTitleText: "首页"
+        navigationBarTitleText: "排了个班",
     };
 
     componentDidMount() {
@@ -75,6 +83,7 @@ class Index extends Component<Props, States> {
                             name: "getPersche"
                         })
                         .then(res => {
+                          console.log(res)
                             var resdata = (res as unknown) as getPerscheResult;
                             if (resdata.result.code === 200) {
                                 resdata.result.schedules.map(sche => {
@@ -83,7 +92,11 @@ class Index extends Component<Props, States> {
                                 resdata.result.infos.map(info => {
                                     this.props.updateInfo(info);
                                 });
+                                resdata.result.bancis.map(banci => {
+                                  this.props.updateBanci(banci);
+                              });
                                 this.setState({ openunfinished: true });
+                                console.log(this.props.bancis)
                             }
                         });
                 }
@@ -260,7 +273,7 @@ class Index extends Component<Props, States> {
                     fixed
                     tabList={[
                         { iconPrefixClass: "icon", iconType: "category", title: "" },
-                        { iconPrefixClass: "icon", iconType: "bussiness-man", title: "" }
+                        { iconPrefixClass: "icon", iconType: "usercenter", title: "" }
                     ]}
                     onClick={this.handlebarClick.bind(this)}
                     current={this.state.tabcurrent}

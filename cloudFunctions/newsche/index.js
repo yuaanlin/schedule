@@ -12,6 +12,8 @@ exports.main = async event => {
     const wxContext = cloud.getWXContext();
     const open_id = wxContext.OPENID;
     const { title, description, tag, startact, endact, bancis } = event;
+    var newbanci=[];
+    var tmp;
     try {
         var newsche = {
             _id: generateUUID(),
@@ -28,20 +30,22 @@ exports.main = async event => {
         bancis.map(async banci => {
             var banciID = generateUUID();
             newsche.bancis.push(banciID);
+            tmp = {
+              _id: banciID,
+              scheid: newsche._id,
+              count: banci.count,
+              startTime: new Date(banci.startTime),
+              endTime: new Date(banci.endTime)
+            }
+            newbanci.push(tmp)
             await banciCollection.add({
-                data: {
-                    _id: banciID,
-                    scheid: newsche._id,
-                    count: banci.count,
-                    startTime: new Date(banci.startTime),
-                    endTime: new Date(banci.endTime)
-                }
+                data: tmp
             });
         });
-
         return await scheCollection.add({ data: newsche }).then(() => ({
             code: 200,
-            schedule: newsche
+            schedule: newsche,
+            banci:newbanci
         }));
     } catch (e) {
         console.error(e);

@@ -4,7 +4,7 @@
  * 对应数据库的 Banci 集合 */
 export default class Banci {
     // 班次 id
-    id: string;
+    _id: string;
 
     // 对应班表
     scheid: string;
@@ -19,16 +19,16 @@ export default class Banci {
     endTime: Date;
 
     constructor(banci: Banci = defaultBanci) {
-        this.id = banci.id;
+        this._id = banci._id;
         this.count = banci.count;
         this.scheid = banci.scheid;
-        this.startTime = banci.startTime;
-        this.endTime = banci.endTime;
+        this.startTime = new Date(banci.startTime);
+        this.endTime = new Date(banci.endTime);
     }
 }
 
 const defaultBanci = {
-    id: "",
+    _id: "",
     scheid: "",
     count: 0,
     startTime: new Date(),
