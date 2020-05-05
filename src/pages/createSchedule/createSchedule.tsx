@@ -7,10 +7,12 @@ import Schedule from "../../classes/Schedule";
 import { newscheResult } from "../../types";
 import User from "../../classes/user";
 import Banci from "src/classes/banci";
-import info from "src/classes/info"
+import info from "src/classes/info";
 import { AppState } from "../../redux/types";
 
-import { getPerscheResult } from "../../types";
+import getTimeString from "../../utils/getTimeString";
+import getDateString from "../../utils/getDateString";
+
 import store from "../../redux/store";
 import { updateSchedule } from "../../redux/actions/schedule";
 import { updateBanci } from "../../redux/actions/banci";
@@ -37,10 +39,7 @@ interface State {
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user,
-        banci: state.bancis,
-        schedule: state.schedules,
-        infos:state.infos
+        user: state.user
     };
 }
 
@@ -49,10 +48,10 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         updateSchedule: (schedule: Schedule) => {
             dispatch(updateSchedule(schedule));
         },
-        updateBanci: (banci: Banci)=>{
+        updateBanci: (banci: Banci) => {
             dispatch(updateBanci(banci));
         },
-        updateInfo: (info: info) =>{
+        updateInfo: (info: info) => {
             dispatch(updateInfo(info));
         }
     };
@@ -74,12 +73,15 @@ class CreateSchedule extends Component<Props, State> {
 
     constructor(props: Readonly<Props>) {
         super(props);
+        const default_startact = new Date();
+        const default_endact = new Date();
+        default_endact.setDate(new Date().getDate() + 7);
         this.state = {
             tag: "",
             Title: "",
             description: "",
-            startact: new Date(),
-            endact: new Date(),
+            startact: default_startact,
+            endact: default_endact,
             bancis: []
         };
         this.handleBanciChange = this.handleBanciChange.bind(this);
@@ -120,7 +122,7 @@ class CreateSchedule extends Component<Props, State> {
     handleBanciChange(e: any, index: number, key: "RepeatType" | "RepeatStart" | "RepeatEnd" | "StartTime" | "EndTime") {
         var newBancis = this.state.bancis;
         var newDate = new Date();
-        if (key === "RepeatStart" || key === "RepeatEnd" || key === "StartTime" || key === "EndTime") {
+        if (key === "RepeatStart" || key === "RepeatEnd") {
             const year = +e.detail.value.split("-")[0];
             const month = +e.detail.value.split("-")[1];
             const date = +e.detail.value.split("-")[2];
@@ -129,6 +131,13 @@ class CreateSchedule extends Component<Props, State> {
             newDate.setFullYear(year);
             newDate.setMonth(month - 1);
             newDate.setDate(date);
+        } else if (key === "StartTime" || key === "EndTime") {
+            const hour = +e.detail.value.split(":")[0];
+            const minute = +e.detail.value.split(":")[1];
+            var newDate = new Date();
+            newDate.setTime(this.state.endact.getTime());
+            newDate.setHours(hour);
+            newDate.setMinutes(minute);
         }
         switch (key) {
             case "RepeatType":
@@ -153,13 +162,15 @@ class CreateSchedule extends Component<Props, State> {
 
     createBanci() {
         var newBancis = this.state.bancis;
+        const default_endtime = new Date(this.state.startact);
+        default_endtime.setHours(default_endtime.getHours() + 1);
         newBancis.push({
             count: 1,
             repeattype: "不重复",
-            repeatStart: new Date(),
-            repeatEnd: new Date(),
-            startTime: new Date(),
-            endTime: new Date()
+            repeatStart: this.state.startact,
+            repeatEnd: this.state.endact,
+            startTime: this.state.startact,
+            endTime: default_endtime
         });
         this.setState({ bancis: newBancis });
     }
@@ -177,6 +188,18 @@ class CreateSchedule extends Component<Props, State> {
         this.state.bancis.map(banci => {
             if (banci.repeattype === "不重复") {
                 bancis.push({ count: banci.count, startTime: banci.startTime, endTime: banci.endTime });
+            } else {
+                var datePoniter = new Date(banci.repeatStart);
+                while (datePoniter <= banci.repeatEnd) {
+                    var start = new Date(datePoniter);
+                    var end = new Date(datePoniter);
+                    start.setHours(banci.startTime.getHours(), banci.startTime.getMinutes());
+                    end.setHours(banci.endTime.getHours(), banci.endTime.getMinutes());
+                    bancis.push({ count: banci.count, startTime: start, endTime: end });
+                    if (banci.repeattype === "日循环") datePoniter.setDate(datePoniter.getDate() + 1);
+                    else if (banci.repeattype === "周循环") datePoniter.setDate(datePoniter.getDate() + 7);
+                    else if (banci.repeattype === "月循环") datePoniter.setMonth(datePoniter.getMonth() + 1);
+                }
             }
         });
 
@@ -198,8 +221,9 @@ class CreateSchedule extends Component<Props, State> {
                     Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
                 } else {
                     this.props.updateSchedule(resdata.result.schedule);
-                    console.log(resdata.result)
-                    resdata.result.banci.map(item=>{this.props.updateBanci(item)});
+                    resdata.result.banci.map(item => {
+                        this.props.updateBanci(item);
+                    });
                     Taro.navigateTo({
                         url: "../joinSchedule/joinSchedule?_id=" + resdata.result.schedule._id
                     });
@@ -238,21 +262,25 @@ class CreateSchedule extends Component<Props, State> {
                         value={this.state.description}
                         onChange={this.handleDescriptionChange.bind(this)}
                     />
-                    <View className="form-lable">班表开始时间</View>
+                    <View className="form-lable">班表开始日期</View>
                     <View>
-                        <Picker value={"0"} mode="date" onChange={this.handleStartactChange.bind(this)}>
-                            <View className="picker form-value">{this.state.startact.toISOString()}</View>
+                        <Picker
+                            value={getDateString(this.state.startact, false)}
+                            mode="date"
+                            onChange={this.handleStartactChange.bind(this)}
+                        >
+                            <View className="picker form-value">{getDateString(this.state.startact, true)}</View>
                         </Picker>
                     </View>
-                    <Text className="form-lable">班表结束时间</Text>
+                    <Text className="form-lable">班表结束日期</Text>
                     <View>
-                        <Picker value={"0"} mode="date" onChange={this.handleEndactChange.bind(this)}>
-                            <View className="picker form-value">{this.state.endact.toISOString()}</View>
+                        <Picker value={getDateString(this.state.endact, false)} mode="date" onChange={this.handleEndactChange.bind(this)}>
+                            <View className="picker form-value">{getDateString(this.state.endact, true)}</View>
                         </Picker>
                     </View>
 
                     {this.state.bancis.map((banci, index) => (
-                        <View style={{ paddingBottom: "36px" }}key={index+1} >
+                        <View style={{ paddingBottom: "36px" }} key={index + 1}>
                             <Text>班次 #{index + 1}</Text>
                             <View style={{ backgroundColor: "rgb(240,240,240)", padding: "18px" }}>
                                 <Text className="form-lable">循环模式</Text>
@@ -264,28 +292,42 @@ class CreateSchedule extends Component<Props, State> {
                                 >
                                     <View className="picker form-value">{banci.repeattype}</View>
                                 </Picker>
-                                {banci.repeattype === "不重复" ? null : (
+                                {banci.repeattype === "不重复" ? (
                                     <View>
-                                        <Text className="form-lable">班次重复起点</Text>
+                                        <Text className="form-lable">班次日期</Text>
                                         <View>
                                             <Picker
                                                 style={{ margin: "12px" }}
-                                                value={"0"}
+                                                value={getDateString(banci.repeatStart, false)}
                                                 mode="date"
                                                 onChange={e => this.handleBanciChange(e, index, "RepeatStart")}
                                             >
-                                                <View className="picker form-value">{banci.repeatStart.toISOString()}</View>
+                                                <View className="picker form-value">{getDateString(banci.repeatStart, true)}</View>
                                             </Picker>
                                         </View>
-                                        <Text className="form-lable">班次重复终点</Text>
+                                    </View>
+                                ) : (
+                                    <View>
+                                        <Text className="form-lable">循环起始日</Text>
                                         <View>
                                             <Picker
                                                 style={{ margin: "12px" }}
-                                                value={"0"}
+                                                value={getDateString(banci.repeatStart, false)}
+                                                mode="date"
+                                                onChange={e => this.handleBanciChange(e, index, "RepeatStart")}
+                                            >
+                                                <View className="picker form-value">{getDateString(banci.repeatStart, true)}</View>
+                                            </Picker>
+                                        </View>
+                                        <Text className="form-lable">循环终止日</Text>
+                                        <View>
+                                            <Picker
+                                                style={{ margin: "12px" }}
+                                                value={getDateString(banci.repeatEnd, false)}
                                                 mode="date"
                                                 onChange={e => this.handleBanciChange(e, index, "RepeatEnd")}
                                             >
-                                                <View className="picker form-value">{banci.repeatEnd.toISOString()}</View>
+                                                <View className="picker form-value">{getDateString(banci.repeatEnd, true)}</View>
                                             </Picker>
                                         </View>
                                     </View>
@@ -294,22 +336,22 @@ class CreateSchedule extends Component<Props, State> {
                                 <View>
                                     <Picker
                                         style={{ margin: "12px" }}
-                                        value={"0"}
-                                        mode="date"
+                                        value={getTimeString(banci.startTime, false)}
+                                        mode="time"
                                         onChange={e => this.handleBanciChange(e, index, "StartTime")}
                                     >
-                                        <View className="picker form-value">{banci.startTime.toISOString()}</View>
+                                        <View className="picker form-value">{getTimeString(banci.startTime, true)}</View>
                                     </Picker>
                                 </View>
                                 <Text className="form-lable">班次结束时间</Text>
                                 <View>
                                     <Picker
                                         style={{ margin: "12px" }}
-                                        value={"0"}
-                                        mode="date"
+                                        value={getTimeString(banci.endTime, false)}
+                                        mode="time"
                                         onChange={e => this.handleBanciChange(e, index, "EndTime")}
                                     >
-                                        <View className="picker form-value">{banci.endTime.toISOString()}</View>
+                                        <View className="picker form-value">{getTimeString(banci.endTime, true)}</View>
                                     </Picker>
                                 </View>
                             </View>
