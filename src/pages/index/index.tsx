@@ -23,7 +23,7 @@ type Props = {
     bancis: Array<Banci>;
     setUserData: (user: User) => void;
     updateSchedule: (Schedule: Schedule) => void;
-    updateBanci:(banci:Banci)=> void
+    updateBanci: (banci: Banci) => void;
     updateInfo: (info: info) => void;
 };
 
@@ -48,16 +48,16 @@ function mapStateToProps(state: AppState) {
 function mapDispatchToProps(dispatch: typeof store.dispatch) {
     return {
         setUserData: (user: User) => {
-          dispatch(setUserData(user));
+            dispatch(setUserData(user));
         },
         updateSchedule: (schedule: Schedule) => {
-          dispatch(updateSchedule(schedule));
+            dispatch(updateSchedule(schedule));
         },
         updateInfo: (info: info) => {
-          dispatch(updateInfo(info));
+            dispatch(updateInfo(info));
         },
         updateBanci: (banci: Banci) => {
-          dispatch(updateBanci(banci));
+            dispatch(updateBanci(banci));
         }
     };
 }
@@ -65,7 +65,7 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
 /** 首页 */
 class Index extends Component<Props, States> {
     config: Config = {
-        navigationBarTitleText: "排了个班",
+        navigationBarTitleText: "排了个班"
     };
 
     componentDidMount() {
@@ -83,7 +83,6 @@ class Index extends Component<Props, States> {
                             name: "getPersche"
                         })
                         .then(res => {
-                          console.log(res)
                             var resdata = (res as unknown) as getPerscheResult;
                             if (resdata.result.code === 200) {
                                 resdata.result.schedules.map(sche => {
@@ -93,10 +92,9 @@ class Index extends Component<Props, States> {
                                     this.props.updateInfo(info);
                                 });
                                 resdata.result.bancis.map(banci => {
-                                  this.props.updateBanci(banci);
-                              });
+                                    this.props.updateBanci(banci);
+                                });
                                 this.setState({ openunfinished: true });
-                                console.log(this.props.bancis)
                             }
                         });
                 }
