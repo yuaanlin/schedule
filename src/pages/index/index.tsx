@@ -1,20 +1,19 @@
+import { Button, Text, View } from "@tarojs/components";
+import { connect, Provider } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text, Button } from "@tarojs/components";
-import { AtTabs, AtTabsPane, AtList, AtListItem, AtFab, AtSearchBar, AtAccordion, AtTabBar, AtCard } from "taro-ui";
-import "./index.scss";
-import User from "../../classes/user";
-import Schedule from "../../classes/schedule";
-import info from "../../classes/info";
 import Banci from "src/classes/banci";
-import { Provider, connect } from "@tarojs/redux";
-import { setUserData } from "../../redux/actions/user";
-import { updateSchedule } from "../../redux/actions/schedule";
-import { updateBanci } from "../../redux/actions/banci";
-import { loginResult, getPerscheResult, postUserInfoResult } from "../../types";
-import { updateInfo } from "../../redux/actions/info";
 import { AppState } from "src/redux/types";
-
+import { AtAccordion, AtCard, AtFab, AtList, AtListItem, AtSearchBar, AtTabBar, AtTabs, AtTabsPane } from "taro-ui";
+import info from "../../classes/info";
+import Schedule from "../../classes/schedule";
+import User from "../../classes/user";
+import { updateBanci } from "../../redux/actions/banci";
+import { updateInfo } from "../../redux/actions/info";
+import { updateSchedule } from "../../redux/actions/schedule";
+import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
+import { getPerscheResult, loginResult, postUserInfoResult } from "../../types";
+import "./index.scss";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
