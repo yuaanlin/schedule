@@ -51,5 +51,6 @@ export interface newscheResult {
 
         /** 创立成功的数据 */
         schedule: Schedule;
+        banci:Array<Banci>;
     };
 }

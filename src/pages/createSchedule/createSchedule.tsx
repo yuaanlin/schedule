@@ -6,15 +6,23 @@ import "./createSchedule.scss";
 import Schedule from "../../classes/Schedule";
 import { newscheResult } from "../../types";
 import User from "../../classes/user";
+import Banci from "src/classes/banci";
+import info from "src/classes/info"
 import { AppState } from "../../redux/types";
+
+import { getPerscheResult } from "../../types";
 import store from "../../redux/store";
 import { updateSchedule } from "../../redux/actions/schedule";
+import { updateBanci } from "../../redux/actions/banci";
+import { updateInfo } from "../../redux/actions/info";
 import { connect } from "@tarojs/redux";
 
 /** 定义这个页面的 Props 和 States */
 interface Props {
     user: User;
     updateSchedule: (Schedule: Schedule) => void;
+    updateBanci: (banci: Banci) => void;
+    updateInfo: (info: info) => void;
 }
 
 interface State {
@@ -29,7 +37,10 @@ interface State {
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.user,
+        banci: state.bancis,
+        schedule: state.schedules,
+        infos:state.infos
     };
 }
 
@@ -37,6 +48,12 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
     return {
         updateSchedule: (schedule: Schedule) => {
             dispatch(updateSchedule(schedule));
+        },
+        updateBanci: (banci: Banci)=>{
+            dispatch(updateBanci(banci));
+        },
+        updateInfo: (info: info) =>{
+            dispatch(updateInfo(info));
         }
     };
 }
@@ -181,8 +198,10 @@ class CreateSchedule extends Component<Props, State> {
                     Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
                 } else {
                     this.props.updateSchedule(resdata.result.schedule);
+                    console.log(resdata.result)
+                    resdata.result.banci.map(item=>{this.props.updateBanci(item)});
                     Taro.navigateTo({
-                        url: "../scheduleDetail/scheduleDetail?_id=" + resdata.result.schedule._id
+                        url: "../joinSchedule/joinSchedule?_id=" + resdata.result.schedule._id
                     });
                     Taro.showToast({ title: "创建成功", icon: "success", duration: 2000 });
                 }
@@ -233,7 +252,7 @@ class CreateSchedule extends Component<Props, State> {
                     </View>
 
                     {this.state.bancis.map((banci, index) => (
-                        <View style={{ paddingBottom: "36px" }}>
+                        <View style={{ paddingBottom: "36px" }}key={index+1} >
                             <Text>班次 #{index + 1}</Text>
                             <View style={{ backgroundColor: "rgb(240,240,240)", padding: "18px" }}>
                                 <Text className="form-lable">循环模式</Text>

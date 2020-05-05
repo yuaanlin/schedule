@@ -126,9 +126,8 @@ class ScheduleDetail extends Component<Props, States> {
                         let count = 0
                         count++;
                         return(
-                          <View>
+                          <View key={item._id}>
                             <AtListItem
-                              key={item._id}
                               title={this.tospeTime(item.startTime)}
                               note={"共需要"+item.count.toString()+"人"}
                               // extraText={item.}

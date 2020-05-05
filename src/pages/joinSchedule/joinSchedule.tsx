@@ -7,7 +7,7 @@ import User from "../../classes/user";
 import Banci from "src/classes/banci";
 import info from "src/classes/info";
 import { connect,Provider } from "@tarojs/redux";
-import { AtBadge,AtToast,AtButton,AtIcon,AtDivider, AtList,AtListItem,AtAccordion,AtModal, AtModalHeader, AtModalContent, AtModalAction,AtInput} from "taro-ui";
+import { AtInput,AtToast,AtBadge,AtButton,AtIcon,AtDivider, AtList,AtListItem,AtAccordion,AtModal, AtModalHeader, AtModalContent, AtModalAction} from "taro-ui";
 
 
 
@@ -26,9 +26,10 @@ type States = {
     openbanci:boolean;
     openmodal:boolean;
     gettag: boolean;
-    tag:string;
-    warntag:boolean
-};
+    warntag: boolean;
+    tag:string
+
+  };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
 function mapStateToProps(state: AppState) {
@@ -50,7 +51,7 @@ class JoinSchedule extends Component<Props, States> {
     };
     tospeTime(date: Date){
       date = new Date(Date.parse(date))
-      console.log(typeof(date),date)
+      // console.log(typeof(date),date)
       var Month = date.getMonth() + 1;
       var Day = date.getDate();
       var Hour = date.getHours();
@@ -64,26 +65,26 @@ class JoinSchedule extends Component<Props, States> {
     toDateString(date: Date) {
       // date = date.toString()
       date = new Date(Date.parse(date))
-      console.log(typeof(date),date)
+      // console.log(typeof(date),date)
       var Month = date.getMonth() + 1;
       var Day = date.getDate();
       var Y = date.getFullYear() + ".";
       var M = Month < 10 ? "0" + Month + "." : Month + ".";
       var D = Day + 1 < 10 ? "0" + Day  : Day ;
       return Y + M + D;
+  }
+  getTag(tag:string){
+    if(this.state.tag!=null){
+      this.setState({gettag:false})
+    }else{
+      this.setState({warntag:true})
     }
-    getTag(tag:string){
-      if(this.state.tag!=null){
-        this.setState({gettag:false})
-      }else{
-        this.setState({warntag:true})
-      }
-    }
-
+  }
     componentDidMount() {
         var scheID = this.$router.params._id;
-        // console.log(this.props.schedules)
+        // console.log(scheID)
         var sc = this.props.schedules.find(sc => sc._id === scheID);
+        // console.log(sc)
         /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
         if (sc === undefined) {
             Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
@@ -93,24 +94,26 @@ class JoinSchedule extends Component<Props, States> {
         } else {
             this.setState({ schedule: sc });
             let infor;
+            console.log(sc)
+            console.log(this.props.bancis)
             let ban = this.props.bancis.filter(banci=>{
-              banci.scheid===sc._id
+              if(this.props.infos){
                 infor = this.props.infos.filter(info=>{
-                info.classid ===banci._id
-                return info
+                return info.classid ===banci._id
               })
-              return banci
+              }
+              return banci.scheid===sc._id
+              // return banci
             });
             this.setState({ bancis:ban })
             this.setState({ infos:infor })
-            console.log(this.props.infos)
+            console.log("finalban"+ban)
         }
         this.setState({openbanci: true });
         this.setState({gettag: true });
+        this.setState({warntag:false})
     }
     componentDidShow() {
-      // console.log(this.state.bancis)
-      // console.log(this.props.bancis)
     }
 
     render() {
@@ -119,7 +122,7 @@ class JoinSchedule extends Component<Props, States> {
         else{
 
         }
-          console.log(this.props.bancis)
+          // console.log(this.props.bancis)
             return (
               <View>
                 <AtList>
@@ -139,7 +142,8 @@ class JoinSchedule extends Component<Props, States> {
                       <Button onClick={this.getTag.bind(this)}>确定</Button>
                     </AtModalAction>
                   </AtModal>
-                  <AtToast isOpened={this.state.warntag} text="{text}" icon="{icon}"></AtToast>
+                  <AtToast isOpened={this.state.warntag} text="还没有输入标识噢"></AtToast>
+
                   <AtListItem title={this.state.schedule.title} note= {this.toDateString(this.state.schedule.startact)+"到"+this.toDateString(this.state.schedule.endact)} />
                   <AtAccordion
                     open={this.state.openbanci}
@@ -147,16 +151,16 @@ class JoinSchedule extends Component<Props, States> {
                     title='班次列表'
                   >
                     {/* 循环班次数据库取得所有班次信息 */}
-                    {/* {console.log("render-0:",this.props.bancis)} */}
+                    {console.log("render-0:",this.state.bancis)}
                     {
                     this.state.bancis
                       .map(item=>{
+                        console.log("item-:",item)
                         let count = 0
                         count++;
                         return(
-                          <View>
+                          <View key={item._id}>
                             <AtListItem
-                              key={item._id}
                               title={this.tospeTime(item.startTime)}
                               note={"共需要"+item.count.toString()+"人"}
                               // extraText={item.}
