@@ -47,7 +47,7 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
 }
 class JoinSchedule extends Component<Props, States> {
     config: Config = {
-        navigationBarTitleText: "班表详情"
+        navigationBarTitleText: "班表预览"
     };
     tospeTime(date: Date){
       date = new Date(Date.parse(date))
@@ -73,11 +73,37 @@ class JoinSchedule extends Component<Props, States> {
       var D = Day + 1 < 10 ? "0" + Day  : Day ;
       return Y + M + D;
   }
+  getInvolved(classid,e){
+    this.setState({
+      openmodal:false
+    })
+    Taro.cloud
+     .callFunction({
+       name:"newinfo",
+       data: {
+         classid:classid,
+         tag : this.state.tag,
+       }
+     }).then(res=>{
+       console.log(res)
+     })
+  }
+
   getTag(tag:string){
+    this.setState({tag:tag})
     if(this.state.tag!=null){
       this.setState({gettag:false})
     }else{
       this.setState({warntag:true})
+    }
+  }
+  onShareAppMessage(options){
+    (options.from === 'button'){
+      console.log(options.target)
+    }
+    return{
+      title:'班表详情预览',
+      path:'/pages/joinSchedule/joinSchedule?_id='+this.$router.params._id
     }
   }
     componentDidMount() {
@@ -151,7 +177,7 @@ class JoinSchedule extends Component<Props, States> {
                     title='班次列表'
                   >
                     {/* 循环班次数据库取得所有班次信息 */}
-                    {console.log("render-0:",this.state.bancis)}
+                    {/* {console.log("render-0:",this.state.bancis)} */}
                     {
                     this.state.bancis
                       .map(item=>{
@@ -205,7 +231,7 @@ class JoinSchedule extends Component<Props, States> {
                                 </View>
                               </AtModalContent>
                               <AtModalAction>
-                                <Button onClick={()=>{this.setState({openmodal:false})}}>返回</Button>
+                                <Button onClick={this.getInvolved.bind(this,item._id)}>加入该班次</Button>
                               </AtModalAction>
                             </AtModal>
                           </View>
@@ -214,6 +240,9 @@ class JoinSchedule extends Component<Props, States> {
                     }
                   </AtAccordion>
                 </AtList>
+                <AtButton type='primary' openType="share">
+                  分享此班表
+                </AtButton>
               </View>
                 // <View className="index">
                 //     <View>
