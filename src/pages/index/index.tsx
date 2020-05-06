@@ -283,11 +283,6 @@ class Index extends Component<Props, States> {
                         <AtAccordion open={this.state.openfinished} onClick={value => this.setState({ openfinished: value })} title="结束班表"></AtAccordion>
                     </AtTabsPane>
                 </AtTabs>
-                <View className="post-button" style={{ bottom: 0, position: "absolute", paddingBottom: "20%", paddingLeft: "75%" }}>
-                    <AtFab onClick={this.createsche}>
-                        <Text className="at-fab__icon at-icon at-icon-add"></Text>
-                    </AtFab>
-                </View>
                 <AtTabBar
                     fixed
                     tabList={[
@@ -297,6 +292,11 @@ class Index extends Component<Props, States> {
                     onClick={this.handlebarClick.bind(this)}
                     current={this.state.tabcurrent}
                 ></AtTabBar>
+                <View className="post-button">
+                    <AtFab onClick={this.createsche}>
+                        <Text className="at-fab__icon at-icon at-icon-add"></Text>
+                    </AtFab>
+                </View>
             </Provider>
         );
     }
