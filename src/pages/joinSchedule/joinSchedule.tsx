@@ -39,6 +39,7 @@ type States = {
     gettag: boolean;
     warntag: boolean;
     tag: string;
+    author:boolean
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -128,6 +129,10 @@ class JoinSchedule extends Component<Props, States> {
       tag: value
     })
   }
+
+  generatesche(){
+
+  }
     componentDidMount() {
         var scheID = this.$router.params._id;
         console.log(scheID)
@@ -140,7 +145,17 @@ class JoinSchedule extends Component<Props, States> {
                 url: "../index/index"
             });
         } else {
+          Taro.cloud.init();
+          Taro.cloud
+            .callFunction({
+              name: "login"
+            }).then(res=>{
+              if(res.result.user._id=!sc.ownerID){
+                this.setState({author:true })
+              }
+            })
           this.setState({ schedule: sc });
+
           let infor = new Array<info>();
           let ban = this.props.bancis.filter(banci => {
             if(banci.scheid === sc._id && sc!=null){
@@ -203,7 +218,7 @@ class JoinSchedule extends Component<Props, States> {
                         let count = 0
                         count++;
                         if(this.state.tag === null){
-                          <AtModal isOpened={this.state.gettag} >
+                          <AtModal isOpened={this.state.gettag} key={item._id} >
                             <AtModalHeader>请先填写个人信息</AtModalHeader>
                             <AtModalContent>
                               <AtInput
@@ -238,7 +253,7 @@ class JoinSchedule extends Component<Props, States> {
                                   <View className="at-col at-col-6"><Text>成员</Text></View>
                                 </View>
                                 {/* 循环班次成员获取tag */}
-                                <View>
+                                <View >
                                   {infos ==null
                                     ?<Text>暂时没有成员</Text>
                                     :
@@ -247,7 +262,7 @@ class JoinSchedule extends Component<Props, States> {
                                       .map(x=>{
                                         x.classid===item._id
                                         return(
-                                          <AtBadge >
+                                          <AtBadge  key={x._id}>
                                             <AtButton size='small'>{x.tag}</AtButton>
                                           </AtBadge>
                                         )
@@ -276,9 +291,16 @@ class JoinSchedule extends Component<Props, States> {
                       })}
                   </AtAccordion>
                 </AtList>
-                <AtButton type="primary" openType="share">
-                    分享此班表
-                </AtButton>
+                <View className="btn">
+                  <AtButton type="primary" openType="share">
+                      分享此班表
+                  </AtButton>
+                </View>
+                <View className="btn" >
+                  <AtButton type="secondary" onClick={this.generatesche} disabled={this.state.author}>
+                      生成排班
+                  </AtButton>
+                </View>
               </View>
             // <View className="index">
             //     <View>

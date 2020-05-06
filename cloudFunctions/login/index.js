@@ -13,7 +13,10 @@ exports.main = async () => {
         // 无记录，请前端调用 postUserInfo 来添加记录
         if (!userInfo)
             return {
-                code: 404
+                code: 404,
+                user:{
+                  _id:OPENID
+                }
             };
         // 有记录，回传记录
         else
