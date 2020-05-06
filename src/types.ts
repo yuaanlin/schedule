@@ -1,7 +1,7 @@
-import Schedule from "./classes/schedule";
-import info from "./classes/info";
-import User from "./classes/user";
 import Banci from "src/classes/banci";
+import info from "./classes/info";
+import Schedule from "./classes/schedule";
+import User from "./classes/user";
 
 /** 云函数 "Login" 的返回格式 */
 export interface loginResult {
@@ -24,7 +24,7 @@ export interface getPerscheResult {
         code: number;
         schedules: Array<Schedule>;
         infos: Array<info>;
-        bancis: Array<Banci>
+        bancis: Array<Banci>;
     };
 }
 
@@ -51,6 +51,18 @@ export interface newscheResult {
 
         /** 创立成功的数据 */
         schedule: Schedule;
-        banci:Array<Banci>;
+        banci: Array<Banci>;
+    };
+}
+
+export interface updatescheResult {
+    errMsg: string;
+    requestID: string;
+    result: {
+        /** 回应代码 */
+        code: number;
+
+        /** 创立成功的数据 */
+        schedule: Schedule;
     };
 }

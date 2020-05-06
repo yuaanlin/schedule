@@ -1,9 +1,9 @@
 import { Picker, Text, View } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import Banci from "src/classes/banci";
-import info from "src/classes/info";
 import { AtButton, AtFab, AtForm, AtInput, AtInputNumber } from "taro-ui";
+import Banci from "../../classes/banci";
+import info from "../../classes/info";
 import Schedule from "../../classes/Schedule";
 import User from "../../classes/user";
 import { updateBanci } from "../../redux/actions/banci";
@@ -12,7 +12,9 @@ import { updateSchedule } from "../../redux/actions/schedule";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
 import { newscheResult } from "../../types";
+import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
+import getTimeFromString from "../../utils/getTimeFromString";
 import getTimeString from "../../utils/getTimeString";
 import "./createSchedule.scss";
 
@@ -93,49 +95,23 @@ class CreateSchedule extends Component<Props, State> {
     }
 
     handleStartactChange(e: any) {
-        const year = +e.detail.value.split("-")[0];
-        const month = +e.detail.value.split("-")[1];
-        const date = +e.detail.value.split("-")[2];
         var newDate = new Date();
-        newDate.setTime(this.state.startact.getTime());
-        newDate.setFullYear(year);
-        newDate.setMonth(month - 1);
-        newDate.setDate(date);
+        newDate = getDateFromString(e.detail.value);
         this.setState({ startact: newDate });
     }
 
     handleEndactChange(e: any) {
-        const year = +e.detail.value.split("-")[0];
-        const month = +e.detail.value.split("-")[1];
-        const date = +e.detail.value.split("-")[2];
         var newDate = new Date();
-        newDate.setTime(this.state.endact.getTime());
-        newDate.setFullYear(year);
-        newDate.setMonth(month - 1);
-        newDate.setDate(date);
+        newDate = getDateFromString(e.detail.value);
         this.setState({ endact: newDate });
     }
 
     handleBanciChange(e: any, index: number, key: "RepeatType" | "RepeatStart" | "RepeatEnd" | "StartTime" | "EndTime") {
         var newBancis = this.state.bancis;
         var newDate = new Date();
-        if (key === "RepeatStart" || key === "RepeatEnd") {
-            const year = +e.detail.value.split("-")[0];
-            const month = +e.detail.value.split("-")[1];
-            const date = +e.detail.value.split("-")[2];
-            var newDate = new Date();
-            newDate.setTime(this.state.endact.getTime());
-            newDate.setFullYear(year);
-            newDate.setMonth(month - 1);
-            newDate.setDate(date);
-        } else if (key === "StartTime" || key === "EndTime") {
-            const hour = +e.detail.value.split(":")[0];
-            const minute = +e.detail.value.split(":")[1];
-            var newDate = new Date();
-            newDate.setTime(this.state.endact.getTime());
-            newDate.setHours(hour);
-            newDate.setMinutes(minute);
-        }
+        if (key === "RepeatStart" || key === "RepeatEnd") newDate = getDateFromString(e.detail.value);
+        else if (key === "StartTime" || key === "EndTime") newDate = getTimeFromString(this.state.endact, e.detail.value);
+
         switch (key) {
             case "RepeatType":
                 const repeatTypes = ["不重复", "日循环", "周循环", "月循环"];
@@ -279,7 +255,12 @@ class CreateSchedule extends Component<Props, State> {
                                     <View>
                                         <Text className="form-lable">班次日期</Text>
                                         <View>
-                                            <Picker style={{ margin: "12px" }} value={getDateString(banci.repeatStart, false)} mode="date" onChange={e => this.handleBanciChange(e, index, "RepeatStart")}>
+                                            <Picker
+                                                style={{ margin: "12px" }}
+                                                value={getDateString(banci.repeatStart, false)}
+                                                mode="date"
+                                                onChange={e => this.handleBanciChange(e, index, "RepeatStart")}
+                                            >
                                                 <View className="picker form-value">{getDateString(banci.repeatStart, true)}</View>
                                             </Picker>
                                         </View>
@@ -288,13 +269,23 @@ class CreateSchedule extends Component<Props, State> {
                                     <View>
                                         <Text className="form-lable">循环起始日</Text>
                                         <View>
-                                            <Picker style={{ margin: "12px" }} value={getDateString(banci.repeatStart, false)} mode="date" onChange={e => this.handleBanciChange(e, index, "RepeatStart")}>
+                                            <Picker
+                                                style={{ margin: "12px" }}
+                                                value={getDateString(banci.repeatStart, false)}
+                                                mode="date"
+                                                onChange={e => this.handleBanciChange(e, index, "RepeatStart")}
+                                            >
                                                 <View className="picker form-value">{getDateString(banci.repeatStart, true)}</View>
                                             </Picker>
                                         </View>
                                         <Text className="form-lable">循环终止日</Text>
                                         <View>
-                                            <Picker style={{ margin: "12px" }} value={getDateString(banci.repeatEnd, false)} mode="date" onChange={e => this.handleBanciChange(e, index, "RepeatEnd")}>
+                                            <Picker
+                                                style={{ margin: "12px" }}
+                                                value={getDateString(banci.repeatEnd, false)}
+                                                mode="date"
+                                                onChange={e => this.handleBanciChange(e, index, "RepeatEnd")}
+                                            >
                                                 <View className="picker form-value">{getDateString(banci.repeatEnd, true)}</View>
                                             </Picker>
                                         </View>
@@ -313,13 +304,23 @@ class CreateSchedule extends Component<Props, State> {
                                 </View>
                                 <Text className="form-lable">班次开始时间</Text>
                                 <View>
-                                    <Picker style={{ margin: "12px" }} value={getTimeString(banci.startTime, false)} mode="time" onChange={e => this.handleBanciChange(e, index, "StartTime")}>
+                                    <Picker
+                                        style={{ margin: "12px" }}
+                                        value={getTimeString(banci.startTime, false)}
+                                        mode="time"
+                                        onChange={e => this.handleBanciChange(e, index, "StartTime")}
+                                    >
                                         <View className="picker form-value">{getTimeString(banci.startTime, true)}</View>
                                     </Picker>
                                 </View>
                                 <Text className="form-lable">班次结束时间</Text>
                                 <View>
-                                    <Picker style={{ margin: "12px" }} value={getTimeString(banci.endTime, false)} mode="time" onChange={e => this.handleBanciChange(e, index, "EndTime")}>
+                                    <Picker
+                                        style={{ margin: "12px" }}
+                                        value={getTimeString(banci.endTime, false)}
+                                        mode="time"
+                                        onChange={e => this.handleBanciChange(e, index, "EndTime")}
+                                    >
                                         <View className="picker form-value">{getTimeString(banci.endTime, true)}</View>
                                     </Picker>
                                 </View>
