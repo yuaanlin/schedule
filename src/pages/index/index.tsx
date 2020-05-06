@@ -1,20 +1,19 @@
+import { Button, Text, View } from "@tarojs/components";
+import { connect, Provider } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text, Button } from "@tarojs/components";
-import { AtTabs, AtTabsPane, AtList, AtListItem, AtFab, AtSearchBar, AtAccordion, AtTabBar, AtCard } from "taro-ui";
-import "./index.scss";
-import User from "../../classes/user";
-import Schedule from "../../classes/schedule";
-import info from "../../classes/info";
 import Banci from "src/classes/banci";
-import { Provider, connect } from "@tarojs/redux";
-import { setUserData } from "../../redux/actions/user";
-import { updateSchedule } from "../../redux/actions/schedule";
-import { updateBanci } from "../../redux/actions/banci";
-import { loginResult, getPerscheResult, postUserInfoResult } from "../../types";
-import { updateInfo } from "../../redux/actions/info";
 import { AppState } from "src/redux/types";
-
+import { AtAccordion, AtCard, AtFab, AtList, AtListItem, AtSearchBar, AtTabBar, AtTabs, AtTabsPane } from "taro-ui";
+import info from "../../classes/info";
+import Schedule from "../../classes/schedule";
+import User from "../../classes/user";
+import { updateBanci } from "../../redux/actions/banci";
+import { updateInfo } from "../../redux/actions/info";
+import { updateSchedule } from "../../redux/actions/schedule";
+import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
+import { getPerscheResult, loginResult, postUserInfoResult } from "../../types";
+import "./index.scss";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -23,7 +22,7 @@ type Props = {
     bancis: Array<Banci>;
     setUserData: (user: User) => void;
     updateSchedule: (Schedule: Schedule) => void;
-    updateBanci:(banci:Banci)=> void
+    updateBanci: (banci: Banci) => void;
     updateInfo: (info: info) => void;
 };
 
@@ -48,16 +47,16 @@ function mapStateToProps(state: AppState) {
 function mapDispatchToProps(dispatch: typeof store.dispatch) {
     return {
         setUserData: (user: User) => {
-          dispatch(setUserData(user));
+            dispatch(setUserData(user));
         },
         updateSchedule: (schedule: Schedule) => {
-          dispatch(updateSchedule(schedule));
+            dispatch(updateSchedule(schedule));
         },
         updateInfo: (info: info) => {
-          dispatch(updateInfo(info));
+            dispatch(updateInfo(info));
         },
         updateBanci: (banci: Banci) => {
-          dispatch(updateBanci(banci));
+            dispatch(updateBanci(banci));
         }
     };
 }
@@ -65,7 +64,7 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
 /** 首页 */
 class Index extends Component<Props, States> {
     config: Config = {
-        navigationBarTitleText: "排了个班",
+        navigationBarTitleText: "排了个班"
     };
 
     componentDidMount() {
@@ -83,7 +82,6 @@ class Index extends Component<Props, States> {
                             name: "getPersche"
                         })
                         .then(res => {
-                          console.log(res)
                             var resdata = (res as unknown) as getPerscheResult;
                             if (resdata.result.code === 200) {
                                 resdata.result.schedules.map(sche => {
@@ -93,10 +91,9 @@ class Index extends Component<Props, States> {
                                     this.props.updateInfo(info);
                                 });
                                 resdata.result.bancis.map(banci => {
-                                  this.props.updateBanci(banci);
-                              });
+                                    this.props.updateBanci(banci);
+                                });
                                 this.setState({ openunfinished: true });
-                                // console.log(this.props.bancis)
                             }
                         });
                 }

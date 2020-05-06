@@ -1,15 +1,24 @@
+import { Button, Text, View } from "@tarojs/components";
+import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text,Button } from "@tarojs/components";
-import store from "../../redux/store";
-import { AppState } from "../../redux/types";
+import {
+    AtAccordion,
+    AtBadge,
+    AtButton,
+    AtDivider,
+    AtIcon,
+    AtList,
+    AtListItem,
+    AtModal,
+    AtModalAction,
+    AtModalContent,
+    AtModalHeader
+} from "taro-ui";
+import Banci from "../../classes/banci";
+import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
-import Banci from "src/classes/banci";
-import info from "src/classes/info";
-import { connect,Provider } from "@tarojs/redux";
-import { AtBadge,AtButton,AtIcon,AtDivider, AtList,AtListItem,AtAccordion,AtModal, AtModalHeader, AtModalContent, AtModalAction} from "taro-ui";
-
-
+import { AppState } from "../../redux/types";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -23,8 +32,10 @@ type States = {
     schedule: Schedule;
     bancis: Array<Banci>;
     infos: Array<info>;
-    openbanci:boolean;
-    openmodal:boolean
+    openbanci: boolean;
+
+    // 当前开启 modal 的班表 id
+    openmodal: string | undefined;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -32,15 +43,11 @@ function mapStateToProps(state: AppState) {
     return {
         user: state.user,
         schedules: state.schedules,
-        bancis:state.bancis,
-        infos:state.infos,
+        bancis: state.bancis,
+        infos: state.infos
     };
 }
 
-function mapDispatchToProps(dispatch: typeof store.dispatch) {
-    return {
-    };
-}
 class ScheduleDetail extends Component<Props, States> {
     constructor(props){
       super(props);
@@ -56,36 +63,31 @@ class ScheduleDetail extends Component<Props, States> {
     config: Config = {
         navigationBarTitleText: "班表详情"
     };
-    tospeTime(date: Date){
-      date = new Date(Date.parse(date))
-      // console.log(typeof(date),date)
-      var Month = date.getMonth() + 1;
-      var Day = date.getDate();
-      var Hour = date.getHours();
-      var min = date.getSeconds();
-      var M = Month < 10 ? "0" + Month + "." : Month + ".";
-      var D = Day + 1 < 10 ? "0" + Day+ " " : Day + " ";
-      var H = Hour + 1 < 10 ? "0" + Hour+ ":" : Hour + ":";
-      var Min = min + 1 < 10 ? "0" + min: min;
-      return  M + D + H + Min;
+    tospeTime(date: Date) {
+        date = new Date(date);
+        var Month = date.getMonth() + 1;
+        var Day = date.getDate();
+        var Hour = date.getHours();
+        var min = date.getSeconds();
+        var M = Month < 10 ? "0" + Month + "." : Month + ".";
+        var D = Day + 1 < 10 ? "0" + Day + " " : Day + " ";
+        var H = Hour + 1 < 10 ? "0" + Hour + ":" : Hour + ":";
+        var Min = min + 1 < 10 ? "0" + min : min;
+        return M + D + H + Min;
     }
     toDateString(date: Date) {
-      // date = date.toString()
-      date = new Date(Date.parse(date))
-      // console.log(typeof(date),date)
-      var Month = date.getMonth() + 1;
-      var Day = date.getDate();
-      var Y = date.getFullYear() + ".";
-      var M = Month < 10 ? "0" + Month + "." : Month + ".";
-      var D = Day + 1 < 10 ? "0" + Day  : Day ;
-      return Y + M + D;
-  }
+        date = new Date(date);
+        var Month = date.getMonth() + 1;
+        var Day = date.getDate();
+        var Y = date.getFullYear() + ".";
+        var M = Month < 10 ? "0" + Month + "." : Month + ".";
+        var D = Day + 1 < 10 ? "0" + Day : Day;
+        return Y + M + D;
+    }
 
     componentDidMount() {
         var scheID = this.$router.params._id;
-        // console.log(scheID)
         var sc = this.props.schedules.find(sc => sc._id === scheID);
-        // console.log(sc)
         /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
         if (sc === undefined) {
             Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
@@ -94,24 +96,17 @@ class ScheduleDetail extends Component<Props, States> {
             });
         } else {
             this.setState({ schedule: sc });
-            let infor;
-            // console.log(this.props)
-            let ban = this.props.bancis.filter(banci=>{
-                infor = this.props.infos.filter(info=>{
-                // console.log(info, banci,info.classid === banci._id)
-                return info.classid === banci._id
-              })
-              return banci.scheid===sc._id
-              // return banci
+            let infor = new Array<info>();
+            let ban = this.props.bancis.filter(banci => {
+                infor = this.props.infos.filter(info => {
+                    return info.classid === banci._id;
+                });
+                return sc === undefined ? "" : banci.scheid === sc._id;
             });
-            this.setState({ bancis:ban })
-            this.setState({ infos:infor })
-            // console.log(infor)
-            // console.log(this.props.bancis)
+            this.setState({ bancis: ban });
+            this.setState({ infos: infor });
         }
-        this.setState({openbanci: true });
-    }
-    componentDidShow() {
+        this.setState({ openbanci: true });
     }
 
     render() {
@@ -194,16 +189,9 @@ class ScheduleDetail extends Component<Props, States> {
                     }
                   </AtAccordion>
                 </AtList>
-              </View>
-                // <View className="index">
-                //     <View>
-                //         <Text>你正在查看班表 {this.state.schedule.title} 的详情</Text>
-                //     </View>
-
-                //     <Text> 用 this.state.schedule 来取用关于他的完整信息</Text>
-                // </View>
-            );
+            </View>
+        );
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ScheduleDetail);
+export default connect(mapStateToProps)(ScheduleDetail);
