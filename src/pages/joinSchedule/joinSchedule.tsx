@@ -115,12 +115,12 @@ class JoinSchedule extends Component<Props, States> {
     }
   }
 
-    onShareAppMessage() {
-        return {
-            title: "班表详情预览",
-            path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
-        };
-    }
+    // onShareAppMessage() {
+    //     return {
+    //         title: "班表详情预览",
+    //         path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
+    //     };
+    // }
 
 
   settag(value){
@@ -291,11 +291,11 @@ class JoinSchedule extends Component<Props, States> {
                       })}
                   </AtAccordion>
                 </AtList>
-                <View className="btn">
+                {/* <View className="btn">
                   <AtButton type="primary" openType="share">
                       分享此班表
                   </AtButton>
-                </View>
+                </View> */}
                 <View className="btn" >
                   <AtButton type="secondary" onClick={this.generatesche} disabled={this.state.author}>
                       生成排班

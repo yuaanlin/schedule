@@ -225,7 +225,7 @@ class CreateSchedule extends Component<Props, State> {
                         this.props.updateBanci(item);
                     });
                     Taro.navigateTo({
-                        url: "../joinSchedule/joinSchedule?_id=" + resdata.result.schedule._id
+                        url: "../scheduleDetail/scheduleDetail?_id=" + resdata.result.schedule._id
                     });
                     Taro.showToast({ title: "创建成功", icon: "success", duration: 2000 });
                 }
