@@ -1,6 +1,6 @@
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Picker } from "@tarojs/components";
-import { AtForm, AtInput, AtButton, AtFab } from "taro-ui";
+import { AtForm, AtInput, AtButton, AtFab,AtInputNumber } from "taro-ui";
 
 import "./createSchedule.scss";
 import Schedule from "../../classes/Schedule";
@@ -82,7 +82,7 @@ class CreateSchedule extends Component<Props, State> {
             description: "",
             startact: default_startact,
             endact: default_endact,
-            bancis: []
+            bancis: [],
         };
         this.handleBanciChange = this.handleBanciChange.bind(this);
     }
@@ -231,6 +231,14 @@ class CreateSchedule extends Component<Props, State> {
                 }
             });
     }
+    setBancivalue(value: number,index:number){
+      var newBancis = this.state.bancis;
+        newBancis[index].count=value
+        this.setState({
+          bancis:newBancis
+        })
+        console.log("banci["+index+"]="+value)
+    }
 
     onReset() {
         this.setState({
@@ -332,6 +340,15 @@ class CreateSchedule extends Component<Props, State> {
                                         </View>
                                     </View>
                                 )}
+                                <Text className="form-lable">需要人数</Text>
+                                  <View>
+                                  <AtInputNumber
+                                    type="number"
+                                    value={this.state.bancis[index].count}
+                                    onChange={value => {this.setBancivalue(value,index)}}
+                                    step={1}
+                                  ></AtInputNumber>
+                                  </View>
                                 <Text className="form-lable">班次开始时间</Text>
                                 <View>
                                     <Picker
