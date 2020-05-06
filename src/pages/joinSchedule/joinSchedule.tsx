@@ -1,15 +1,26 @@
+import { Button, Text, View } from "@tarojs/components";
+import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text,Button } from "@tarojs/components";
-import store from "../../redux/store";
-import { AppState } from "../../redux/types";
+import Banci from "src/classes/banci";
+import info from "src/classes/info";
+import {
+    AtAccordion,
+    AtBadge,
+    AtButton,
+    AtDivider,
+    AtIcon,
+    AtInput,
+    AtList,
+    AtListItem,
+    AtModal,
+    AtModalAction,
+    AtModalContent,
+    AtModalHeader,
+    AtToast
+} from "taro-ui";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
-import Banci from "src/classes/banci";
-import info from "../../classes/info";
-import { connect,Provider } from "@tarojs/redux";
-import { AtInput,AtToast,AtBadge,AtButton,AtIcon,AtDivider, AtList,AtListItem,AtAccordion,AtModal, AtModalHeader, AtModalContent, AtModalAction} from "taro-ui";
-
-
+import { AppState } from "../../redux/types";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -23,28 +34,23 @@ type States = {
     schedule: Schedule;
     bancis: Array<Banci>;
     infos: Array<info>;
-    openbanci:boolean;
-    openmodal:boolean;
+    openbanci: boolean;
+    openmodal: boolean;
     gettag: boolean;
     warntag: boolean;
-    tag:string
-
-  };
+    tag: string;
+};
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
 function mapStateToProps(state: AppState) {
     return {
         user: state.user,
         schedules: state.schedules,
-        bancis:state.bancis,
-        infos:state.infos,
+        bancis: state.bancis,
+        infos: state.infos
     };
 }
 
-function mapDispatchToProps(dispatch: typeof store.dispatch) {
-    return {
-    };
-}
 class JoinSchedule extends Component<Props, States> {
   constructor(props){
     super(props);
@@ -59,18 +65,17 @@ class JoinSchedule extends Component<Props, States> {
     config: Config = {
         navigationBarTitleText: "班表预览"
     };
-    tospeTime(date: Date){
-      date = new Date(Date.parse(date))
-      // console.log(typeof(date),date)
-      var Month = date.getMonth() + 1;
-      var Day = date.getDate();
-      var Hour = date.getHours();
-      var min = date.getSeconds();
-      var M = Month < 10 ? "0" + Month + "." : Month + ".";
-      var D = Day + 1 < 10 ? "0" + Day+ " " : Day + " ";
-      var H = Hour + 1 < 10 ? "0" + Hour+ ":" : Hour + ":";
-      var Min = min + 1 < 10 ? "0" + min: min;
-      return  M + D + H + Min;
+    tospeTime(date: Date) {
+        date = new Date(date);
+        var Month = date.getMonth() + 1;
+        var Day = date.getDate();
+        var Hour = date.getHours();
+        var min = date.getSeconds();
+        var M = Month < 10 ? "0" + Month + "." : Month + ".";
+        var D = Day + 1 < 10 ? "0" + Day + " " : Day + " ";
+        var H = Hour + 1 < 10 ? "0" + Hour + ":" : Hour + ":";
+        var Min = min + 1 < 10 ? "0" + min : min;
+        return M + D + H + Min;
     }
     toDateString(date: Date) {
       // date = date.toString()
@@ -83,6 +88,7 @@ class JoinSchedule extends Component<Props, States> {
       var D = Day + 1 < 10 ? "0" + Day  : Day ;
       return Y + M + D;
   }
+
   getInvolved(classid,e){
     this.setState({
       openmodal:false
@@ -107,15 +113,34 @@ class JoinSchedule extends Component<Props, States> {
       this.setState({warntag:true})
     }
   }
-  onShareAppMessage(options){
-    (options.from === 'button'){
-      console.log(options.target)
+    getInvolved(classid: string) {
+        this.setState({
+            openmodal: false
+        });
+        Taro.cloud.callFunction({
+            name: "newinfo",
+            data: {
+                classid: classid,
+                tag: this.state.tag
+            }
+        });
     }
-    return{
-      title:'班表详情预览',
-      path:'/pages/joinSchedule/joinSchedule?_id='+this.$router.params._id
+
+    getTag(tag: string) {
+        this.setState({ tag: tag });
+        if (this.state.tag != null) {
+            this.setState({ gettag: false });
+        } else {
+            this.setState({ warntag: true });
+        }
     }
-  }
+    onShareAppMessage() {
+        return {
+            title: "班表详情预览",
+            path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
+        };
+    }
+
 
   settag(value){
     console.log(value)
@@ -135,29 +160,25 @@ class JoinSchedule extends Component<Props, States> {
                 url: "../index/index"
             });
         } else {
+            console.log(sc);
             this.setState({ schedule: sc });
-            let infor;
-            // console.log(sc)
-            // console.log(this.props.bancis)
-            let ban = this.props.bancis.filter(banci=>{
-              if(this.props.infos){
-                infor = this.props.infos.filter(info=>{
-                return info.classid ===banci._id
-              })
-              }
-              return banci.scheid === sc._id
-              // return banci
+            let infor = new Array<info>();
+            let ban = this.props.bancis.filter(banci => {
+                if (this.props.infos) {
+                    infor = this.props.infos.filter(info => {
+                        return info.classid === banci._id;
+                    });
+                }
+                return sc === undefined ? "" : banci.scheid === sc._id;
             });
-            this.setState({ bancis:ban })
-            this.setState({ infos:infor })
-            // console.log("finalban"+ban)
+            this.setState({ bancis: ban });
+            this.setState({ infos: infor });
         }
-        this.setState({openbanci: true });
-        this.setState({gettag: true });
-        this.setState({warntag:false})
+        this.setState({ openbanci: true });
+        this.setState({ gettag: true });
+        this.setState({ warntag: false });
     }
-    componentDidShow() {
-    }
+    componentDidShow() {}
 
     render() {
         if (this.state.schedule === undefined) return <View>发生错误</View>;
@@ -207,9 +228,9 @@ class JoinSchedule extends Component<Props, States> {
                             <AtModalContent>
                               <AtInput
                                 required
-                                name='tag'
-                                type='text'
-                                placeholder='请输入唯一标识'
+                                name="tag"
+                                type="text"
+                                placeholder="请输入唯一标识"
                                 value={this.state.tag}
                                 onChange={this.settag.bind(this)}
                               />
@@ -266,29 +287,25 @@ class JoinSchedule extends Component<Props, States> {
                                 <View className="at-col at-col-6">{<Text>注意事项之类的</Text>}</View>
                                 </View>
                               </AtModalContent>
-                              <AtModalAction>
-                                <Button onClick={this.getInvolved.bind(this,item._id)}>加入该班次</Button>
-                              </AtModalAction>
-                            </AtModal>
-                          </View>
-                        )
-                      })
-                    }
+                              </AtModal>
+                            </View>
+                        );
+                      })}
                   </AtAccordion>
                 </AtList>
-                <AtButton type='primary' openType="share">
-                  分享此班表
+                <AtButton type="primary" openType="share">
+                    分享此班表
                 </AtButton>
               </View>
-                // <View className="index">
-                //     <View>
-                //         <Text>你正在查看班表 {this.state.schedule.title} 的详情</Text>
-                //     </View>
+            // <View className="index">
+            //     <View>
+            //         <Text>你正在查看班表 {this.state.schedule.title} 的详情</Text>
+            //     </View>
 
-                //     <Text> 用 this.state.schedule 来取用关于他的完整信息</Text>
-                // </View>
-            );
+            //     <Text> 用 this.state.schedule 来取用关于他的完整信息</Text>
+            // </View>
+        );
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(JoinSchedule);
+export default connect(mapStateToProps)(JoinSchedule);
