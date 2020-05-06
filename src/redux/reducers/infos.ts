@@ -6,7 +6,7 @@ import info from "../../classes/info";
 export default function infos(state: Array<info> = [], action: InfoActions) {
     switch (action.type) {
         case UPDATE_INFO:
-            return [...state.filter(info => info.id !== action.data.id), action.data];
+            return [...state.filter(info => info._id !== action.data._id), action.data];
         default:
             return state;
     }

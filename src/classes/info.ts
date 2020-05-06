@@ -3,7 +3,7 @@
  * 对应数据库的 info 集合 */
 export default class info {
     // id
-    id: string;
+    _id: string;
 
     // openid
     userid: string;
@@ -18,7 +18,7 @@ export default class info {
     tendency: string;
 
     constructor(data: info) {
-        this.id = data.id;
+        this._id = data._id;
         this.userid = data.userid;
         this.classid = data.classid;
         this.tag = data.tag;

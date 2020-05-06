@@ -102,7 +102,7 @@ class JoinSchedule extends Component<Props, States> {
          tag : this.state.tag,
        }
      }).then(res=>{
-      //  console.log(res)
+       console.log(res)
      })
   }
 
@@ -113,27 +113,7 @@ class JoinSchedule extends Component<Props, States> {
       this.setState({warntag:true})
     }
   }
-    getInvolved(classid: string) {
-        this.setState({
-            openmodal: false
-        });
-        Taro.cloud.callFunction({
-            name: "newinfo",
-            data: {
-                classid: classid,
-                tag: this.state.tag
-            }
-        });
-    }
 
-    getTag(tag: string) {
-        this.setState({ tag: tag });
-        if (this.state.tag != null) {
-            this.setState({ gettag: false });
-        } else {
-            this.setState({ warntag: true });
-        }
-    }
     onShareAppMessage() {
         return {
             title: "班表详情预览",
@@ -150,7 +130,7 @@ class JoinSchedule extends Component<Props, States> {
   }
     componentDidMount() {
         var scheID = this.$router.params._id;
-        // console.log(scheID)
+        console.log(scheID)
         var sc = this.props.schedules.find(sc => sc._id === scheID);
         // console.log(sc)
         /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
@@ -160,19 +140,19 @@ class JoinSchedule extends Component<Props, States> {
                 url: "../index/index"
             });
         } else {
-            console.log(sc);
-            this.setState({ schedule: sc });
-            let infor = new Array<info>();
-            let ban = this.props.bancis.filter(banci => {
-                if (this.props.infos) {
-                    infor = this.props.infos.filter(info => {
-                        return info.classid === banci._id;
-                    });
-                }
-                return sc === undefined ? "" : banci.scheid === sc._id;
+          this.setState({ schedule: sc });
+          let infor = new Array<info>();
+          let ban = this.props.bancis.filter(banci => {
+            if(banci.scheid === sc._id && sc!=null){
+              infor = this.props.infos.filter(info => {
+                return info.classid === banci._id;
             });
-            this.setState({ bancis: ban });
-            this.setState({ infos: infor });
+            }
+              return sc === undefined ? "" : banci.scheid === sc._id;
+          });
+          this.setState({ bancis: ban });
+          this.setState({ infos: infor });
+          // console.log(infor)
         }
         this.setState({ openbanci: true });
         this.setState({ gettag: true });
@@ -223,7 +203,7 @@ class JoinSchedule extends Component<Props, States> {
                         let count = 0
                         count++;
                         if(this.state.tag === null){
-                          <AtModal isOpened={this.state.gettag}>
+                          <AtModal isOpened={this.state.gettag} >
                             <AtModalHeader>请先填写个人信息</AtModalHeader>
                             <AtModalContent>
                               <AtInput
@@ -287,6 +267,9 @@ class JoinSchedule extends Component<Props, States> {
                                 <View className="at-col at-col-6">{<Text>注意事项之类的</Text>}</View>
                                 </View>
                               </AtModalContent>
+                              <AtModalAction>
+                                <Button onClick={this.getInvolved.bind(this,item._id)}>加入该班次</Button>
+                              </AtModalAction>
                               </AtModal>
                             </View>
                         );

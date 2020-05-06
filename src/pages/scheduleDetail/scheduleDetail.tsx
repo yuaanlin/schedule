@@ -88,6 +88,7 @@ class ScheduleDetail extends Component<Props, States> {
     componentDidMount() {
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
+        console.log(sc)
         /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
         if (sc === undefined) {
             Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
@@ -98,19 +99,23 @@ class ScheduleDetail extends Component<Props, States> {
             this.setState({ schedule: sc });
             let infor = new Array<info>();
             let ban = this.props.bancis.filter(banci => {
+              if(banci.scheid === sc._id && sc!=null){
                 infor = this.props.infos.filter(info => {
-                    return info.classid === banci._id;
-                });
+                  return info.classid === banci._id;
+              });
+              }
                 return sc === undefined ? "" : banci.scheid === sc._id;
             });
             this.setState({ bancis: ban });
             this.setState({ infos: infor });
+            console.log(infor)
         }
         this.setState({ openbanci: true });
     }
 
     render() {
         const {infos}=this.state
+
         if (this.state.schedule === undefined) return <View>发生错误</View>;
         else{
 
