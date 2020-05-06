@@ -10,26 +10,22 @@ const infoCollection = db.collection("infos");
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const {classid,tag} = event
+  console.log(event)
   try {
     var newinfo = {
-      openid:wxContext.OPENID,
+      userid:wxContext.OPENID,
       classid:classid,
       tag:tag,
       tendency:true
     }
+    console.log(newinfo)
     await infoCollection.add({
       data: newinfo
-    }).then(res=>{
+    })
       return {
         code:200,
-        data:{
-          openid: wxContext.OPENID,
-          classid: classid,
-          tag: tag,
-          tendency: true,
-        }
+        data:newinfo
       }
-    })
   }catch (e) {
     return {
       code: 500,
