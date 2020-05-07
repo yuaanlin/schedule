@@ -195,8 +195,6 @@ class ScheduleDetail extends Component<Props, States> {
                         <AtAccordion open={this.state.openbanci} onClick={value => this.setState({ openbanci: value })} title="班次列表">
                             {/* 循环班次数据库取得所有班次信息 */}
                             {this.state.bancis.map(item => {
-                                let count = 0;
-                                count++;
                                 return (
                                     <View key={item._id}>
                                         <AtListItem
@@ -208,7 +206,7 @@ class ScheduleDetail extends Component<Props, States> {
                                         />
                                         {/* 对应listitem生成对应的modal */}
                                         <AtModal isOpened={this.state.openmodal === item._id}>
-                                            <AtModalHeader>{"班次" + count} </AtModalHeader>
+                                            <AtModalHeader>{getDateString(new Date(item.startTime), true) + "的班次"}</AtModalHeader>
                                             <AtModalContent>
                                                 <View className="at-row">
                                                     <View className="at-col at-col-3">
@@ -220,17 +218,17 @@ class ScheduleDetail extends Component<Props, States> {
                                                 </View>
                                                 {/* 循环班次成员获取tag */}
                                                 <View>
-                                                    {infos.length === 0 ? (
-                                                        <Text>暂时没有成员</Text>
+                                                    {infos.filter(info => info.classid === item._id).length === 0 ? (
+                                                        <Text>没有成员</Text>
                                                     ) : (
                                                         <View>
                                                             {infos.map(x => {
-                                                                x.classid === item._id;
-                                                                return (
-                                                                    <AtBadge key={item._id}>
-                                                                        <AtButton size="small">{x.tag}</AtButton>
-                                                                    </AtBadge>
-                                                                );
+                                                                if (x.classid === item._id)
+                                                                    return (
+                                                                        <AtBadge key={item._id}>
+                                                                            <AtButton size="small">{x.tag}</AtButton>
+                                                                        </AtBadge>
+                                                                    );
                                                             })}
                                                         </View>
                                                     )}

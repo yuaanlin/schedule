@@ -1,5 +1,10 @@
 export default function getDateString(date: Date, useChinese: boolean) {
-    console.log(date);
-    if (useChinese) return date.getFullYear() + "年" + (date.getMonth() + 1) + "月" + date.getDate() + "日";
-    else return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    date = new Date(date);
+    if (useChinese) {
+        var Month = date.getMonth() + 1;
+        var Day = date.getDate();
+        var M = Month < 10 ? "0" + Month : Month;
+        var D = Day < 10 ? "0" + Day : Day;
+        return M + "月" + D + "日";
+    } else return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
 }
