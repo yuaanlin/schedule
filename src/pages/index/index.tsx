@@ -149,24 +149,12 @@ class Index extends Component<Props, States> {
     }
 
     getDetail(_id: String) {
-        Taro.cloud.callFunction({
-            name: "getschedule",
-            data: {
-                scheid: _id
-            }
-        });
         Taro.navigateTo({
             url: "../scheduleDetail/scheduleDetail?_id=" + _id
         });
     }
 
     getPreview(_id: String) {
-        Taro.cloud.callFunction({
-            name: "getschedule",
-            data: {
-                scheid: _id
-            }
-        });
         Taro.navigateTo({
             url: "../joinSchedule/joinSchedule?_id=" + _id
         });
@@ -243,7 +231,7 @@ class Index extends Component<Props, States> {
                                                     title={item.title}
                                                     extra="填写人数"
                                                     onClick={() => {
-                                                        this.getDetail(item._id);
+                                                        this.getPreview(item._id);
                                                     }}
                                                 />
                                             );
@@ -272,7 +260,7 @@ class Index extends Component<Props, States> {
                                                     title={item.title}
                                                     extraText=""
                                                     onClick={() => {
-                                                        this.getDetail(item._id);
+                                                        this.getPreview(item._id);
                                                     }}
                                                 />
                                             );
