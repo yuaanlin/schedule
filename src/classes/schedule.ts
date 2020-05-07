@@ -13,7 +13,7 @@ export default class Schedule {
     startact: Date;
     endact: Date;
 
-    constructor(data: any) {
+    constructor(data: Schedule = emptySchedule) {
         this._id = data._id;
         this.ownerID = data.ownerID;
         this.title = data.title;
@@ -25,3 +25,15 @@ export default class Schedule {
         this.endact = new Date(data.endact);
     }
 }
+
+const emptySchedule = {
+    _id: "",
+    ownerID: "",
+    title: "",
+    description: "",
+    tag: "",
+    attenders: [],
+    bancis: [],
+    startact: new Date(),
+    endact: new Date()
+};

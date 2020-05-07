@@ -34,7 +34,7 @@ type States = {
     openunfinished: boolean;
     openfinished: boolean;
     openfailed: boolean;
-    openunset:boolean
+    openunset: boolean;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -43,7 +43,7 @@ function mapStateToProps(state: AppState) {
         user: state.user,
         schedules: state.schedules,
         bancis: state.bancis,
-        info:state.infos,
+        infos: state.infos
     };
 }
 
@@ -85,7 +85,6 @@ class Index extends Component<Props, States> {
                             name: "getPersche"
                         })
                         .then(res => {
-                            // console.log(res)
                             var resdata = (res as unknown) as getPerscheResult;
                             if (resdata.result.code === 200) {
                                 resdata.result.schedules.map(sche => {
@@ -93,14 +92,12 @@ class Index extends Component<Props, States> {
                                 });
                                 resdata.result.infos.map(info => {
                                     this.props.updateInfo(info);
-                                    // console.log(info)
                                 });
                                 resdata.result.bancis.map(banci => {
                                     this.props.updateBanci(banci);
                                 });
                                 this.setState({ openunfinished: true });
                             }
-                            // console.log(this.props)
                         });
                 }
             });
@@ -162,17 +159,19 @@ class Index extends Component<Props, States> {
             url: "../scheduleDetail/scheduleDetail?_id=" + _id
         });
     }
+
     getPreview(_id: String) {
-      Taro.cloud.callFunction({
-          name: "getschedule",
-          data: {
-              scheid: _id
-          }
-      });
-      Taro.navigateTo({
-          url: "../joinSchedule/joinSchedule?_id=" + _id
-      });
-  }
+        Taro.cloud.callFunction({
+            name: "getschedule",
+            data: {
+                scheid: _id
+            }
+        });
+        Taro.navigateTo({
+            url: "../joinSchedule/joinSchedule?_id=" + _id
+        });
+    }
+
     constructor() {
         super(...arguments);
         this.state = {
@@ -182,7 +181,7 @@ class Index extends Component<Props, States> {
             openunfinished: false,
             openfinished: false,
             openfailed: false,
-            openunset: false,
+            openunset: false
         };
     }
     render() {
@@ -207,11 +206,7 @@ class Index extends Component<Props, States> {
                 <AtTabs current={this.state.current} tabList={tabList} onClick={value => this.setState({ current: value })}>
                     <AtTabsPane current={this.state.current} index={0}>
                         <View>
-                            <AtAccordion
-                                open={this.state.openunset}
-                                onClick={value => this.setState({ openunset: value })}
-                                title="未建立班表"
-                            >
+                            <AtAccordion open={this.state.openunset} onClick={value => this.setState({ openunset: value })} title="未建立班表">
                                 <AtList hasBorder={false}>
                                     {this.props.schedules
                                         .filter(sc => sc.ownerID === this.props.user._id)
@@ -233,11 +228,7 @@ class Index extends Component<Props, States> {
                                         })}
                                 </AtList>
                             </AtAccordion>
-                            <AtAccordion
-                                open={this.state.openunfinished}
-                                onClick={value => this.setState({ openunfinished: value })}
-                                title="未完成班表"
-                            >
+                            <AtAccordion open={this.state.openunfinished} onClick={value => this.setState({ openunfinished: value })} title="未完成班表">
                                 <AtList hasBorder={false}>
                                     {this.props.schedules
                                         .filter(sc => sc.ownerID === this.props.user._id)
@@ -261,21 +252,13 @@ class Index extends Component<Props, States> {
                             </AtAccordion>
                         </View>
                         <View>
-                            <AtAccordion
-                                open={this.state.openfinished}
-                                onClick={value => this.setState({ openfinished: value })}
-                                title="结束班表"
-                            ></AtAccordion>
+                            <AtAccordion open={this.state.openfinished} onClick={value => this.setState({ openfinished: value })} title="结束班表"></AtAccordion>
                         </View>
                     </AtTabsPane>
 
                     <AtTabsPane current={this.state.current} index={1}>
                         <View>
-                            <AtAccordion
-                                open={this.state.openunfinished}
-                                onClick={value => this.setState({ openunfinished: value })}
-                                title="未完成班表"
-                            >
+                            <AtAccordion open={this.state.openunfinished} onClick={value => this.setState({ openunfinished: value })} title="未完成班表">
                                 <AtList>
                                     {this.props.schedules
                                         .filter(sc => sc.ownerID !== this.props.user._id && sc.attenders.includes(this.props.user._id))
@@ -297,18 +280,9 @@ class Index extends Component<Props, States> {
                                 </AtList>
                             </AtAccordion>
                         </View>
-                        <AtAccordion
-                            open={this.state.openfinished}
-                            onClick={value => this.setState({ openfinished: value })}
-                            title="结束班表"
-                        ></AtAccordion>
+                        <AtAccordion open={this.state.openfinished} onClick={value => this.setState({ openfinished: value })} title="结束班表"></AtAccordion>
                     </AtTabsPane>
                 </AtTabs>
-                <View className="post-button" style={{ bottom: 0, position: "absolute", paddingBottom: "20%", paddingLeft: "75%" }}>
-                    <AtFab onClick={this.createsche}>
-                        <Text className="at-fab__icon at-icon at-icon-add"></Text>
-                    </AtFab>
-                </View>
                 <AtTabBar
                     fixed
                     tabList={[
@@ -318,6 +292,11 @@ class Index extends Component<Props, States> {
                     onClick={this.handlebarClick.bind(this)}
                     current={this.state.tabcurrent}
                 ></AtTabBar>
+                <View className="post-button">
+                    <AtFab onClick={this.createsche}>
+                        <Text className="at-fab__icon at-icon at-icon-add"></Text>
+                    </AtFab>
+                </View>
             </Provider>
         );
     }
