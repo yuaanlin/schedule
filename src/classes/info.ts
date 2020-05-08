@@ -17,11 +17,15 @@ export default class info {
     // 是否确定
     tendency: string;
 
+    //班表id
+    scheid:string;
+
     constructor(data: info) {
         this._id = data._id;
         this.userid = data.userid;
         this.classid = data.classid;
         this.tag = data.tag;
         this.tendency = data.tendency;
+        this.scheid = data.scheid;
     }
 }

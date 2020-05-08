@@ -99,6 +99,8 @@ class JoinSchedule extends Component<Props, States> {
     };
 
     getInvolved(classid: string) {
+        var scheID = this.$router.params._id;
+        console.log(scheID)
         if (checkIfInvolved(this.props.user._id, classid)) {
             Taro.showToast({ title: "你已经报名这个班次啦！", icon: "none", duration: 2000 });
             return;
@@ -109,7 +111,8 @@ class JoinSchedule extends Component<Props, States> {
                 name: "newinfo",
                 data: {
                     classid: classid,
-                    tag: this.state.tag
+                    tag: this.state.tag,
+                    scheid: scheID
                 }
             })
             .then(() =>
@@ -118,6 +121,7 @@ class JoinSchedule extends Component<Props, States> {
                         name: "getPersche"
                     })
                     .then(res => {
+                      console.log(res)
                         var resdata = (res as unknown) as getPerscheResult;
                         if (resdata.result.code === 200) {
                             resdata.result.schedules.map(sche => {
@@ -253,7 +257,7 @@ class JoinSchedule extends Component<Props, States> {
                     data: {
                         bancis: bancis,
                         infos: infos,
-                        schedule: schedule
+                        schedule: schedule._id
                     }
                 })
                 .then(res => {

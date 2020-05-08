@@ -9,13 +9,13 @@ const infoCollection = db.collection("infos");
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const {classid,tag} = event
-  console.log(event)
+  const {classid,tag,scheid} = event
   try {
     var newinfo = {
       userid:wxContext.OPENID,
       classid:classid,
       tag:tag,
+      scheid:scheid,
       tendency:true
     }
     console.log(newinfo)
