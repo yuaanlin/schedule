@@ -8,9 +8,11 @@ const scheduleform = db.collection("schedules");
 // 云函数入口函数
 exports.main = async event => {
     try {
-        let a;
-        let b;
-        let c = [];
+        
+        
+      const allUser = (await userCollection.get()).data;
+      const [userInfo] = allUser.filter(v => v._id === OPENID); let a;let b;
+        let c= [];
         let i;
         const wxContext = cloud.getWXContext();
         const { scheid } = event;
