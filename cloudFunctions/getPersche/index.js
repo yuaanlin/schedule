@@ -13,7 +13,7 @@ exports.main = async (event, context) => {
         let ban = [];
         let info;
         let inform;
-        let i,j;
+        let i, j;
         const wxContext = cloud.getWXContext();
         const open_id = wxContext.OPENID;
         sche = await db
@@ -24,29 +24,25 @@ exports.main = async (event, context) => {
             .get();
 
         inform = await db
-          .collection("infos")
-          .where({
-            userid: open_id
-          })
-          .get();
-          console.log(inform)
-        for(i=0;i<sche.data.length;i++){
-          for(j=0;j<sche.data[i].bancis.length;j++){
-            tmp = await db
-              .collection("bancis")
-              .where({
-                _id: sche.data[i].bancis[j]
-              })
-              .get()
-            ban.push(tmp)
-          }
+            .collection("infos")
+            .where({
+                userid: open_id
+            })
+            .get();
+        for (i = 0; i < sche.data.length; i++) {
+            for (j = 0; j < sche.data[i].bancis.length; j++) {
+                tmp = await db
+                    .collection("bancis")
+                    .where({
+                        _id: sche.data[i].bancis[j]
+                    })
+                    .get();
+                ban.push(tmp);
+            }
         }
-      tmp = ban
-      console.log(tmp)
-      ban = []
-      for(i=0;i<tmp.length;i++)
-        ban = ban.concat(tmp[i].data)
-      console.log(ban)
+        tmp = ban;
+        ban = [];
+        for (i = 0; i < tmp.length; i++) ban = ban.concat(tmp[i].data);
         await db
             .collection("infos")
             .aggregate()
@@ -61,8 +57,7 @@ exports.main = async (event, context) => {
             })
             .end()
             .then(res => {
-              info = res;
-              console.log(info)
+                info = res;
             })
             .catch(err => console.error(err));
         sche = sche.data;
@@ -85,7 +80,7 @@ exports.main = async (event, context) => {
             code: 200,
             schedules: sche,
             infos: inform.data,
-            bancis:ban
+            bancis: ban
         };
     } catch (e) {
         return {
