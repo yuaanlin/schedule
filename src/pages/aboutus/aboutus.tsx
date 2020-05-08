@@ -1,14 +1,12 @@
+import { Image, View } from "@tarojs/components";
+import { connect } from "@tarojs/redux";
 import Taro, { Component } from "@tarojs/taro";
-import { View, Text,Image } from "@tarojs/components";
+import logo from "../../assets/image/logo.jpg";
+import User from "../../classes/user";
+import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import User from "../../classes/user";
-import { connect } from "@tarojs/redux";
-import { setUserData } from "../../redux/actions/user";
-import logo from "../../assets/image/logo.jpg"
-
-import './aboutus.scss'
-import user from "src/redux/reducers/user";
+import "./aboutus.scss";
 
 type Props = {
     user: User;
@@ -35,27 +33,20 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
 }
 
 class Aboutus extends Component<Props, States> {
-
-    onImageClick(){
-      Taro.previewImage({
-        urls:[this.props.user.avatarUrl]
-      })
+    onImageClick() {
+        Taro.previewImage({
+            urls: [this.props.user.avatarUrl]
+        });
     }
     render() {
         return (
-          <View className="index">
-            {/* <View className='at-row'> */}
-              <View className="logged-mine">
-                <Image
-                  src={logo}
-                  className="mine-avatar"
-                  onClick={this.onImageClick}
-                />
-                <View className="Introduction">
-                  { '这里是来自ZJU的勤小创~'}
+            <View className="index">
+                {/* <View className='at-row'> */}
+                <View className="logged-mine">
+                    <Image src={logo} className="mine-avatar" onClick={this.onImageClick} />
+                    <View className="Introduction">{"这里是来自ZJU的勤小创~"}</View>
                 </View>
-              </View>
-          </View>
+            </View>
         );
     }
 }

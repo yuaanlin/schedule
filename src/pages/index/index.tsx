@@ -1,9 +1,8 @@
 import { Button, Text, View } from "@tarojs/components";
 import { connect, Provider } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import Banci from "src/classes/banci";
-import { AppState } from "src/redux/types";
 import { AtAccordion, AtCard, AtFab, AtList, AtListItem, AtSearchBar, AtTabBar, AtTabs, AtTabsPane } from "taro-ui";
+import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
@@ -12,7 +11,9 @@ import { updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
+import { AppState } from "../../redux/types";
 import { getPerscheResult, loginResult, postUserInfoResult } from "../../types";
+import getDateString from "../../utils/getDateString";
 import "./index.scss";
 
 /** 定义这个页面的 Props 和 States */
@@ -122,15 +123,6 @@ class Index extends Component<Props, States> {
             });
     }
 
-    toDateString(date: Date) {
-        var Month = date.getMonth() + 1;
-        var Day = date.getDate();
-        var Y = date.getFullYear() + " 年 ";
-        var M = Month < 10 ? "0" + Month + " 月 " : Month + " 月 ";
-        var D = Day + 1 < 10 ? "0" + Day + " 日 " : Day + " 日 ";
-        return Y + M + D;
-    }
-
     createsche() {
         Taro.navigateTo({
             url: "../createSchedule/createSchedule"
@@ -148,18 +140,6 @@ class Index extends Component<Props, States> {
         }
     }
 
-    getDetail(_id: String) {
-        Taro.navigateTo({
-            url: "../scheduleDetail/scheduleDetail?_id=" + _id
-        });
-    }
-
-    getPreview(_id: String) {
-        Taro.navigateTo({
-            url: "../joinSchedule/joinSchedule?_id=" + _id
-        });
-    }
-
     constructor() {
         super(...arguments);
         this.state = {
@@ -173,6 +153,24 @@ class Index extends Component<Props, States> {
         };
     }
     render() {
+        /** 我参加的班表 */
+        var joinedSches = new Array<Schedule>();
+        if (this.props.schedules !== undefined)
+            this.props.schedules.map(sche => {
+                if (sche.ownerID !== this.props.user._id && sche.attenders.includes(this.props.user._id)) {
+                    joinedSches.push(sche);
+                }
+            });
+
+        /** 我组织的班表 */
+        var ownedSches = new Array<Schedule>();
+        if (this.props.schedules !== undefined)
+            this.props.schedules.map(sche => {
+                if (sche.ownerID === this.props.user._id) {
+                    ownedSches.push(sche);
+                }
+            });
+
         /** 尚未登入 */
         if (this.props.user._id === "") {
             return (
@@ -194,14 +192,13 @@ class Index extends Component<Props, States> {
                 <AtTabs current={this.state.current} tabList={tabList} onClick={value => this.setState({ current: value })}>
                     <AtTabsPane current={this.state.current} index={0}>
                         <View>
-                            <AtAccordion open={this.state.openunset} onClick={value => this.setState({ openunset: value })} title="未建立班表">
+                            <AtAccordion open={this.state.openunset} onClick={value => this.setState({ openunset: value })} title="组织中的排班">
                                 <AtList hasBorder={false}>
-                                    {this.props.schedules
-                                        .filter(sc => sc.ownerID === this.props.user._id)
+                                    {ownedSches
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
-                                            let start = this.toDateString(item.startact);
-                                            let end = this.toDateString(item.endact);
+                                            let start = getDateString(item.startact, true);
+                                            let end = getDateString(item.endact, true);
                                             return (
                                                 <AtCard
                                                     key={item._id}
@@ -209,21 +206,23 @@ class Index extends Component<Props, States> {
                                                     title={item.title}
                                                     extra="填写人数"
                                                     onClick={() => {
-                                                        this.getPreview(item._id);
+                                                        Taro.navigateTo({
+                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                        });
                                                     }}
                                                 />
                                             );
                                         })}
                                 </AtList>
                             </AtAccordion>
-                            <AtAccordion open={this.state.openunfinished} onClick={value => this.setState({ openunfinished: value })} title="未完成班表">
+                            <AtAccordion open={this.state.openunfinished} onClick={value => this.setState({ openunfinished: value })} title="进行中的排班">
                                 <AtList hasBorder={false}>
                                     {this.props.schedules
                                         .filter(sc => sc.ownerID === this.props.user._id)
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
-                                            let start = this.toDateString(item.startact);
-                                            let end = this.toDateString(item.endact);
+                                            let start = getDateString(item.startact, true);
+                                            let end = getDateString(item.endact, true);
                                             return (
                                                 <AtCard
                                                     key={item._id}
@@ -231,7 +230,9 @@ class Index extends Component<Props, States> {
                                                     title={item.title}
                                                     extra="填写人数"
                                                     onClick={() => {
-                                                        this.getPreview(item._id);
+                                                        Taro.navigateTo({
+                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                        });
                                                     }}
                                                 />
                                             );
@@ -246,10 +247,9 @@ class Index extends Component<Props, States> {
 
                     <AtTabsPane current={this.state.current} index={1}>
                         <View>
-                            <AtAccordion open={this.state.openunfinished} onClick={value => this.setState({ openunfinished: value })} title="未完成班表">
+                            <AtAccordion open={this.state.openunfinished} onClick={value => this.setState({ openunfinished: value })} title="已结束的排班">
                                 <AtList>
-                                    {this.props.schedules
-                                        .filter(sc => sc.ownerID !== this.props.user._id && sc.attenders.includes(this.props.user._id))
+                                    {joinedSches
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
                                             return (
@@ -260,7 +260,9 @@ class Index extends Component<Props, States> {
                                                     title={item.title}
                                                     extraText=""
                                                     onClick={() => {
-                                                        this.getDetail(item._id);
+                                                        Taro.navigateTo({
+                                                            url: "../scheduleDetail/scheduleDetail?_id=" + item._id
+                                                        });
                                                     }}
                                                 />
                                             );
