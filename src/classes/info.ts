@@ -9,9 +9,6 @@ export default class info {
     tag: string;
     tendency: string;
 
-    //班表id
-    scheid:string;
-
     constructor(data: info) {
         this._id = data._id;
         this.userid = data.userid;
