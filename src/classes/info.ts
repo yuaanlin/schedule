@@ -2,19 +2,11 @@
  *
  * 对应数据库的 info 集合 */
 export default class info {
-    // id
     _id: string;
-
-    // openid
     userid: string;
-
-    // 班次 id
     classid: string;
-
-    // 用户区分 tag
+    scheid: string;
     tag: string;
-
-    // 是否确定
     tendency: string;
 
     //班表id
@@ -24,6 +16,7 @@ export default class info {
         this._id = data._id;
         this.userid = data.userid;
         this.classid = data.classid;
+        this.scheid = data.scheid;
         this.tag = data.tag;
         this.tendency = data.tendency;
         this.scheid = data.scheid;

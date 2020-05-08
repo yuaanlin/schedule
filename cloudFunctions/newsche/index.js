@@ -12,7 +12,7 @@ exports.main = async event => {
     const wxContext = cloud.getWXContext();
     const open_id = wxContext.OPENID;
     const { title, description, tag, startact, endact, bancis } = event;
-    var newbanci=[];
+    var newbanci = [];
     var tmp;
     try {
         var newsche = {
@@ -24,20 +24,21 @@ exports.main = async event => {
             attenders: [],
             bancis: [],
             startact: new Date(startact),
-            endact: new Date(endact)
+            endact: new Date(endact),
+            complete: false
         };
 
         bancis.map(async banci => {
             var banciID = generateUUID();
             newsche.bancis.push(banciID);
             tmp = {
-              _id: banciID,
-              scheid: newsche._id,
-              count: banci.count,
-              startTime: new Date(banci.startTime),
-              endTime: new Date(banci.endTime)
-            }
-            newbanci.push(tmp)
+                _id: banciID,
+                scheid: newsche._id,
+                count: banci.count,
+                startTime: new Date(banci.startTime),
+                endTime: new Date(banci.endTime)
+            };
+            newbanci.push(tmp);
             await banciCollection.add({
                 data: tmp
             });
@@ -45,10 +46,9 @@ exports.main = async event => {
         return await scheCollection.add({ data: newsche }).then(() => ({
             code: 200,
             schedule: newsche,
-            banci:newbanci
+            banci: newbanci
         }));
     } catch (e) {
-        console.error(e);
         return {
             code: 500,
             message: "服务器错误"
