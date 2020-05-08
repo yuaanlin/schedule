@@ -8,7 +8,7 @@ import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
 import UserBadge from "../../components/UserBadge";
 import { updateBanci } from "../../redux/actions/banci";
-import { updateInfo } from "../../redux/actions/info";
+import { deleteInfo, updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
@@ -26,6 +26,7 @@ type Props = {
     infos: Array<info>;
     setUserData: (user: User) => void;
     updateInfo: (info: info) => void;
+    deleteInfo: (id: string) => void;
     updateBanci: (banci: Banci) => void;
     updateSchedule: (Schedule: Schedule) => void;
 };
@@ -68,6 +69,9 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         },
         updateInfo: (info: info) => {
             dispatch(updateInfo(info));
+        },
+        deleteInfo: (id: string) => {
+            dispatch(deleteInfo(id));
         },
         updateBanci: (banci: Banci) => {
             dispatch(updateBanci(banci));
@@ -125,7 +129,6 @@ class JoinSchedule extends Component<Props, States> {
                             resdata.result.bancis.map(banci => {
                                 this.props.updateBanci(banci);
                             });
-                            this.setState({ openmodal: "" });
                             Taro.showToast({ title: "报名成功", icon: "success", duration: 2000 });
                         } else {
                             Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
@@ -223,6 +226,7 @@ class JoinSchedule extends Component<Props, States> {
             path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
         };
     }
+
     arrangeSche = () => {
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
@@ -384,7 +388,7 @@ class JoinSchedule extends Component<Props, States> {
                                                         {infos.filter(info => info.classid === item._id).length === 0 ? (
                                                             <Text>没有成员</Text>
                                                         ) : (
-                                                            <UserBadge user={this.props.user} infos={infos} banciID={item._id} />
+                                                            <UserBadge user={this.props.user} infos={infos} banciID={item._id} deleteInfo={this.props.deleteInfo} />
                                                         )}
                                                     </View>
                                                     <AtDivider></AtDivider>
