@@ -1,7 +1,7 @@
 import { Button, Picker, Text, View } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { AtAccordion, AtDivider, AtIcon, AtInput, AtList, AtListItem, AtModal, AtModalAction, AtModalContent, AtModalHeader, AtToast } from "taro-ui";
+import { AtAccordion, AtDivider, AtIcon, AtInput, AtList, AtListItem, AtModal, AtModalAction, AtModalContent, AtModalHeader, AtToast,AtButton } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
@@ -176,6 +176,7 @@ class JoinSchedule extends Component<Props, States> {
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
 
+
         /** 前端找不到班表，先下载请求的班表数据 */
         if (sc === undefined) {
             Taro.cloud
@@ -203,8 +204,59 @@ class JoinSchedule extends Component<Props, States> {
                 });
         }
         this.setState({ openbanci: true, gettag: true, warntag: false });
+        if(sc.ownerID===this.props.user._id){
+          this.setState({author:true})
+        }else{
+          this.setState({author:false})
+        }
+        this.props.infos.map(x=>{
+          if(x.tag){
+            this.setState({
+              gettag:false
+            })
+          }
+        })
     }
 
+    onShareAppMessage() {
+      return {
+          title: "班表详情预览",
+          path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
+      };
+  }
+    arrangeSche=()=>{
+      var scheID = this.$router.params._id;
+      var sc = this.props.schedules.find(sc => sc._id === scheID);
+      if(this.state.author===false){
+        Taro.showToast({ title: "宁没有此权限", icon: "none", duration: 2000 });
+      }else{
+        var sc = this.props.schedules.find(sc => sc._id === scheID);
+        let ban = this.props.bancis.filter(banci => banci.scheid === scheID);
+        let infor = this.props.infos.filter(info => {
+            var bid = info.classid;
+            var found = false;
+            ban.map(b => {
+                if (b._id === bid) found = true;
+            });
+            return found;
+        });
+
+        const schedule = sc;
+        const infos = infor;
+        const bancis = ban;
+        Taro.cloud
+         .callFunction({
+             name: "arrangesche",
+             data: {
+                 bancis:bancis,
+                 infos:infos,
+                 schedule:schedule
+             }
+         }).then(res=>{
+           console.log(res)
+         })
+      }
+    }
     updateSche = (schedule: Schedule, key: string, value: string | Date) => {
         var newScheData = {};
         if (key === "title") {
@@ -332,7 +384,7 @@ class JoinSchedule extends Component<Props, States> {
                                                         {infos.filter(info => info.classid === item._id).length === 0 ? (
                                                             <Text>没有成员</Text>
                                                         ) : (
-                                                            <UserBadge infos={infos} banciID={item._id} />
+                                                            <UserBadge user={this.props.user} infos={infos} banciID={item._id} />
                                                         )}
                                                     </View>
                                                     <AtDivider></AtDivider>
@@ -360,6 +412,14 @@ class JoinSchedule extends Component<Props, States> {
                                 })}
                             </AtAccordion>
                         </AtList>
+                        <View className="btn">
+                          <AtButton type="primary" onClick={this.arrangeSche}>
+                            生成排班
+                          </AtButton>
+                          <AtButton type="primary" openType="share">
+                              分享此班表
+                          </AtButton>
+                        </View>
                     </View>
 
                     <AtModal isOpened={this.state.editing === "title"}>

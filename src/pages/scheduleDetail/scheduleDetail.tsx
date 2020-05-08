@@ -135,12 +135,7 @@ class ScheduleDetail extends Component<Props, States> {
         });
     };
 
-    onShareAppMessage() {
-        return {
-            title: "班表详情预览",
-            path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
-        };
-    }
+
 
     componentDidMount() {
         var scheID = this.$router.params._id;
@@ -264,11 +259,7 @@ class ScheduleDetail extends Component<Props, States> {
                         </AtAccordion>
                     </AtList>
                 </View>
-                <View className="btn">
-                    <AtButton type="primary" openType="share">
-                        分享此班表
-                    </AtButton>
-                </View>
+
 
                 <AtModal isOpened={this.state.editing === "title"}>
                     <AtModalHeader>修改班表标题</AtModalHeader>

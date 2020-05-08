@@ -260,7 +260,7 @@ class Index extends Component<Props, States> {
                                                     title={item.title}
                                                     extraText=""
                                                     onClick={() => {
-                                                        this.getPreview(item._id);
+                                                        this.getDetail(item._id);
                                                     }}
                                                 />
                                             );
