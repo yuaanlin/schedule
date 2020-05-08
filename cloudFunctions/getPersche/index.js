@@ -72,7 +72,7 @@ exports.main = async (event, context) => {
                         _id: ban[i].scheid
                     })
                     .get();
-                sche.push(tmp);
+                sche.push(tmp.data[0]);
             }
         }
         info = info.list;
