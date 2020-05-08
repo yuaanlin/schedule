@@ -209,6 +209,13 @@ class JoinSchedule extends Component<Props, States> {
         }else{
           this.setState({author:false})
         }
+        this.props.infos.map(x=>{
+          if(x.tag){
+            this.setState({
+              gettag:false
+            })
+          }
+        })
     }
 
     onShareAppMessage() {
