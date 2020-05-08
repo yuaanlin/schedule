@@ -11,7 +11,7 @@ const banciCollection = db.collection("bancis");
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const {bancis,infos,schedule}=event
+  const { bancis, infos, schedule } = event
   var allUser = (await userCollection.get()).data;
   allUser.map(x => x.choosenum = 0)
   var users = []
@@ -19,24 +19,26 @@ exports.main = async (event, context) => {
   var ban = bancis
   ban.map(x => x.choosenum = 0)
 
-  infor.map(info=>{
+  infor.map(info => {
     const [userInfo] = users.filter(v => v._id === info.userid);
-    if(!userInfo){
+    if (!userInfo) {
       [tmp] = allUser.filter(x => x._id === info.userid)
       tmp.choosenum = 1;
       users = users.concat(tmp)
-      }else{
-        users.map(v=>{
-          if(v._id===info.userid){
-            // console.log(v)
-            // console.log(users)
-            v.choosenum = v.choosenum+1
-          }})
+    } else {
+      users.map(v => {
+        if (v._id === info.userid) {
+          // console.log(v)
+          // console.log(users)
+          v.choosenum = v.choosenum + 1
+        }
+      })
+    }
+    ban.map(x => {
+      if (x._id === info.classid) {
+        x.choosenum = x.choosenum + 1
       }
-      ban.map(x=>{
-        if(x._id === info.classid){
-          x.choosenum = x.choosenum+1
-        }})
+    })
   })
 
   //根据choosenum快速排序bancis与users做为排班优先级
@@ -57,9 +59,11 @@ exports.main = async (event, context) => {
     // console.log(arr)
     return quickSort(left).concat(pivote, quickSort(right));
   };
+
   ban = quickSort(ban)
   users = quickSort(users)
-  var scheArr = (banci, user, info) => {
+
+  var scheArr = async (banci, user, info) => {
     var infoindex = 0;
     var tmp = 0;
     var newinfo = [];
@@ -83,12 +87,20 @@ exports.main = async (event, context) => {
           }
         }
       }
-      for (var n = 0; n < info.length; n++) {
-        for (var m = 0; m < newinfo.length; m++) {
-          if (newinfo[m]._id === info[n]._id) {
-            info[n].tendency = false
-          }
-        }
+      // for (var n = 0; n < info.length; n++) {
+      //   for (var m = 0; m < newinfo.length; m++) {
+      //     if (newinfo[m]._id === info[n]._id) {
+      //       info[n].tendency = false
+      //     }
+      //   }
+      // }
+      for (var m = 0; m < newinfo.length; m++) {
+        await infoCollection.doc(newinfo[m]._id)
+          .update({
+            data: {
+              tendency: false
+            }
+          })
       }
       tmp = 0
 
@@ -96,7 +108,8 @@ exports.main = async (event, context) => {
     }
     return newinfo
   }
-  var newinfo = scheArr(ban,users,infor)
+
+  var newinfo = await scheArr(ban, users, infor)
   console.log(newinfo)
   var failnum = 0;
   var leftban = []
@@ -126,9 +139,9 @@ exports.main = async (event, context) => {
     tag = false
   }
   return {
-    code:200,
-    infos:newinfo,
-    leftban:leftban,
-    leftman:leftmen,
+    code: 200,
+    infos: newinfo,
+    leftban: leftban,
+    leftman: leftmen,
   }
 }
