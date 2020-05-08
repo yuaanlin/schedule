@@ -257,7 +257,7 @@ class JoinSchedule extends Component<Props, States> {
                     data: {
                         bancis: bancis,
                         infos: infos,
-                        schedule: schedule._id
+                        schedule: schedule
                     }
                 })
                 .then(res => {
