@@ -66,3 +66,14 @@ export interface updatescheResult {
         schedule: Schedule;
     };
 }
+
+export interface arrangesche{
+  errMsg: string;
+  requestID: string;
+  result:{
+    code:number;
+    leftban:Array<Banci>;
+    leftman: Array<User>;
+    infos: Array<info>;
+  }
+}

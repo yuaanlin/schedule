@@ -126,9 +126,9 @@ exports.main = async (event, context) => {
     tag = false
   }
   return {
+    code:200,
     infos:newinfo,
     leftban:leftban,
     leftman:leftmen,
-    openid: wxContext.OPENID,
   }
 }

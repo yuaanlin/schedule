@@ -384,7 +384,7 @@ class JoinSchedule extends Component<Props, States> {
                                                         {infos.filter(info => info.classid === item._id).length === 0 ? (
                                                             <Text>没有成员</Text>
                                                         ) : (
-                                                            <UserBadge infos={infos} banciID={item._id} />
+                                                            <UserBadge user={this.props.user} infos={infos} banciID={item._id} />
                                                         )}
                                                     </View>
                                                     <AtDivider></AtDivider>
