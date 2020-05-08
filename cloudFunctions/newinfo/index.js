@@ -6,12 +6,20 @@ cloud.init({
 const db = cloud.database();
 const infoCollection = db.collection("infos");
 const banciCollection = db.collection("bancis");
+const scheduleCollection = db.collection("schedules");
 
 // 云函数入口函数
 exports.main = async (event, context) => {
     const wxContext = cloud.getWXContext();
     const { classid, tag } = event;
-    const scheid = banciCollection.doc(classid).scheid;
+    const scheid = await banciCollection
+        .doc(classid)
+        .get()
+        .then(res => res.data.scheid);
+    const sche = await scheduleCollection
+        .doc(scheid)
+        .get()
+        .then(res => res.data);
     try {
         var newinfo = {
             userid: wxContext.OPENID,
@@ -23,6 +31,15 @@ exports.main = async (event, context) => {
         await infoCollection.add({
             data: newinfo
         });
+
+        if (!sche.attenders.includes(wxContext.OPENID)) {
+            var newsche = {};
+            Object.assign(newsche, sche);
+            newsche.attenders.push(wxContext.OPENID);
+            delete newsche._id;
+            scheduleCollection.doc(scheid).update({ data: newsche });
+        }
+
         return {
             code: 200,
             data: newinfo
