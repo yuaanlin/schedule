@@ -12,12 +12,14 @@ export default class Schedule {
     bancis: Array<string>;
     startact: Date;
     endact: Date;
+    complete: boolean;
 
     constructor(data: Schedule = emptySchedule) {
         this._id = data._id;
         this.ownerID = data.ownerID;
         this.title = data.title;
         this.description = data.description;
+        this.complete = data.complete;
         this.tag = data.tag;
         this.attenders = data.attenders;
         this.bancis = data.bancis;
@@ -35,5 +37,6 @@ const emptySchedule = {
     attenders: [],
     bancis: [],
     startact: new Date(),
-    endact: new Date()
+    endact: new Date(),
+    complete: false
 };
