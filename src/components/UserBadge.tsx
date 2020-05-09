@@ -3,19 +3,21 @@ import { Component } from "@tarojs/taro";
 import { AtBadge, AtButton } from "taro-ui";
 import info from "../classes/info";
 import User from "../classes/User";
+import Schedule from "../classes/Schedule";
 import { deleteinfoResult } from "../types";
 
 interface Props {
     user: User;
     infos: Array<info>;
     banciID: string;
+    schedule:Schedule;
     deleteInfo: (id: string) => void;
 }
 
 export default class UserBadge extends Component<Props> {
     Delete(info_id: string, user_id: string) {
         Taro.showToast({ title: "移除中", icon: "loading", duration: 2000 });
-        if (user_id === this.props.user._id) {
+        if (user_id === this.props.user._id || user_id === this.props.schedule.ownerID) {
             Taro.cloud
                 .callFunction({
                     name: "deleteinfo",

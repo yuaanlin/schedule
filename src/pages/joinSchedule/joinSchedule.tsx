@@ -411,6 +411,7 @@ class JoinSchedule extends Component<Props, States> {
                                                                 user={this.props.user}
                                                                 infos={infos}
                                                                 banciID={item._id}
+                                                                schedule={schedule}
                                                                 deleteInfo={this.props.deleteInfo}
                                                             />
                                                         )}
