@@ -11,7 +11,7 @@ const banciCollection = db.collection("bancis");
 exports.main = async event => {
     const wxContext = cloud.getWXContext();
     const open_id = wxContext.OPENID;
-    const { _id, ownerID, title, attenders, bancis, description, tag, startact, endact } = event;
+    const { _id, ownerID, title, attenders, bancis, description, tag, startact, endact, complete } = event;
     var newbanci = [];
     var tmp;
     try {
@@ -23,7 +23,8 @@ exports.main = async event => {
             attenders: attenders,
             bancis: bancis,
             startact: new Date(startact),
-            endact: new Date(endact)
+            endact: new Date(endact),
+            complete: complete
         };
         return await scheCollection
             .doc(_id)

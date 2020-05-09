@@ -1,7 +1,7 @@
 import { Button, Text, View } from "@tarojs/components";
 import { connect, Provider } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { AtAccordion, AtCard, AtFab, AtList, AtListItem, AtSearchBar, AtTabBar, AtTabs, AtTabsPane } from "taro-ui";
+import { AtAccordion, AtCard, AtFab, AtList, AtSearchBar, AtTabBar, AtTabs, AtTabsPane } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
@@ -97,7 +97,6 @@ class Index extends Component<Props, States> {
                                 resdata.result.bancis.map(banci => {
                                     this.props.updateBanci(banci);
                                 });
-                                this.setState({ openunfinished: true });
                             }
                         });
                 }
@@ -146,30 +145,28 @@ class Index extends Component<Props, States> {
             current: 0,
             tabcurrent: 0,
             searchvalue: "",
-            openunfinished: false,
-            openfinished: false,
-            openfailed: false,
-            openunset: false
+            openunfinished: true,
+            openfinished: true,
+            openfailed: true,
+            openunset: true
         };
     }
     render() {
         /** 我参加的班表 */
         var joinedSches = new Array<Schedule>();
-        if (this.props.schedules !== undefined)
-            this.props.schedules.map(sche => {
-                if (sche.ownerID !== this.props.user._id && sche.attenders.includes(this.props.user._id)) {
-                    joinedSches.push(sche);
-                }
-            });
+        this.props.schedules.map(sche => {
+            if (sche.ownerID !== this.props.user._id && sche.attenders.includes(this.props.user._id)) {
+                joinedSches.push(sche);
+            }
+        });
 
         /** 我组织的班表 */
         var ownedSches = new Array<Schedule>();
-        if (this.props.schedules !== undefined)
-            this.props.schedules.map(sche => {
-                if (sche.ownerID === this.props.user._id) {
-                    ownedSches.push(sche);
-                }
-            });
+        this.props.schedules.map(sche => {
+            if (sche.ownerID === this.props.user._id) {
+                ownedSches.push(sche);
+            }
+        });
 
         /** 尚未登入 */
         if (this.props.user._id === "") {
@@ -192,9 +189,14 @@ class Index extends Component<Props, States> {
                 <AtTabs current={this.state.current} tabList={tabList} onClick={value => this.setState({ current: value })}>
                     <AtTabsPane current={this.state.current} index={0}>
                         <View>
-                            <AtAccordion open={this.state.openunset} onClick={value => this.setState({ openunset: value })} title="组织中的排班">
+                            <AtAccordion
+                                open={this.state.openunset}
+                                onClick={value => this.setState({ openunset: value })}
+                                title="组织中的排班"
+                            >
                                 <AtList hasBorder={false}>
                                     {ownedSches
+                                        .filter(sc => !sc.complete)
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
@@ -215,10 +217,15 @@ class Index extends Component<Props, States> {
                                         })}
                                 </AtList>
                             </AtAccordion>
-                            <AtAccordion open={this.state.openunfinished} onClick={value => this.setState({ openunfinished: value })} title="进行中的排班">
+                            <AtAccordion
+                                open={this.state.openunfinished}
+                                onClick={value => this.setState({ openunfinished: value })}
+                                title="进行中的排班"
+                            >
                                 <AtList hasBorder={false}>
-                                    {this.props.schedules
-                                        .filter(sc => sc.ownerID === this.props.user._id)
+                                    {ownedSches
+                                        .filter(sc => sc.complete)
+                                        .filter(sc => sc.endact.getTime() < new Date().getTime())
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
@@ -241,27 +248,61 @@ class Index extends Component<Props, States> {
                             </AtAccordion>
                         </View>
                         <View>
-                            <AtAccordion open={this.state.openfinished} onClick={value => this.setState({ openfinished: value })} title="结束班表"></AtAccordion>
+                            <AtAccordion
+                                open={this.state.openfinished}
+                                onClick={value => this.setState({ openfinished: value })}
+                                title="已结束的排班"
+                            >
+                                <AtList hasBorder={false}>
+                                    {ownedSches
+                                        .filter(sc => sc.complete)
+                                        .filter(sc => sc.endact.getTime() > new Date().getTime())
+                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
+                                        .map(item => {
+                                            let start = getDateString(item.startact, true);
+                                            let end = getDateString(item.endact, true);
+                                            return (
+                                                <AtCard
+                                                    key={item._id}
+                                                    note={start + " 到 " + end}
+                                                    title={item.title}
+                                                    extra="填写人数"
+                                                    onClick={() => {
+                                                        Taro.navigateTo({
+                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                        });
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                </AtList>
+                            </AtAccordion>
                         </View>
                     </AtTabsPane>
 
                     <AtTabsPane current={this.state.current} index={1}>
                         <View>
-                            <AtAccordion open={this.state.openunfinished} onClick={value => this.setState({ openunfinished: value })} title="已结束的排班">
-                                <AtList>
+                            <AtAccordion
+                                open={this.state.openunset}
+                                onClick={value => this.setState({ openunset: value })}
+                                title="组织中的排班"
+                            >
+                                <AtList hasBorder={false}>
                                     {joinedSches
+                                        .filter(sc => !sc.complete)
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
+                                            let start = getDateString(item.startact, true);
+                                            let end = getDateString(item.endact, true);
                                             return (
-                                                <AtListItem
+                                                <AtCard
                                                     key={item._id}
-                                                    arrow="right"
-                                                    note={item.description}
+                                                    note={start + " 到 " + end}
                                                     title={item.title}
-                                                    extraText=""
+                                                    extra="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
-                                                            url: "../scheduleDetail/scheduleDetail?_id=" + item._id
+                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
                                                         });
                                                     }}
                                                 />
@@ -270,7 +311,68 @@ class Index extends Component<Props, States> {
                                 </AtList>
                             </AtAccordion>
                         </View>
-                        <AtAccordion open={this.state.openfinished} onClick={value => this.setState({ openfinished: value })} title="结束班表"></AtAccordion>
+                        <View>
+                            <AtAccordion
+                                open={this.state.openunfinished}
+                                onClick={value => this.setState({ openunfinished: value })}
+                                title="进行中的排班"
+                            >
+                                <AtList hasBorder={false}>
+                                    {ownedSches
+                                        .filter(sc => sc.complete)
+                                        .filter(sc => sc.endact.getTime() < new Date().getTime())
+                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
+                                        .map(item => {
+                                            let start = getDateString(item.startact, true);
+                                            let end = getDateString(item.endact, true);
+                                            return (
+                                                <AtCard
+                                                    key={item._id}
+                                                    note={start + " 到 " + end}
+                                                    title={item.title}
+                                                    extra="填写人数"
+                                                    onClick={() => {
+                                                        Taro.navigateTo({
+                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                        });
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                </AtList>
+                            </AtAccordion>
+                        </View>
+                        <View>
+                            <AtAccordion
+                                open={this.state.openfinished}
+                                onClick={value => this.setState({ openfinished: value })}
+                                title="已结束的排班"
+                            >
+                                <AtList hasBorder={false}>
+                                    {ownedSches
+                                        .filter(sc => sc.complete)
+                                        .filter(sc => sc.endact.getTime() > new Date().getTime())
+                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
+                                        .map(item => {
+                                            let start = getDateString(item.startact, true);
+                                            let end = getDateString(item.endact, true);
+                                            return (
+                                                <AtCard
+                                                    key={item._id}
+                                                    note={start + " 到 " + end}
+                                                    title={item.title}
+                                                    extra="填写人数"
+                                                    onClick={() => {
+                                                        Taro.navigateTo({
+                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                        });
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                </AtList>
+                            </AtAccordion>
+                        </View>
                     </AtTabsPane>
                 </AtTabs>
                 <AtTabBar
