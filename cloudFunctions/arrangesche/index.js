@@ -7,6 +7,7 @@ const db = cloud.database();
 const infoCollection = db.collection("infos");
 const userCollection = db.collection("users");
 const banciCollection = db.collection("bancis");
+const scheCollection = db.collection("schedules")
 
 // 云函数入口函数
 exports.main = async (event, context) => {
@@ -17,6 +18,13 @@ exports.main = async (event, context) => {
     var users = [];
     var infor = infos;
     var ban = bancis;
+    await scheCollection.doc(schedule._id)
+    .update({
+      data:{
+        complete:true
+      }
+    })
+
     ban.map(x => (x.choosenum = 0));
 
     infor.map(info => {
