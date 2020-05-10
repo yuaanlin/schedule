@@ -67,22 +67,21 @@ export interface updatescheResult {
     };
 }
 
-export interface deleteinfoResult {
-    errMsg: string;
-    requestID: string;
-    result: {
-        /** 回应代码 */
-        code: number;
-    };
+export interface arrangesche{
+  errMsg: string;
+  requestID: string;
+  result:{
+    code:number;
+    leftban:Array<Banci>;
+    leftman: Array<User>;
+    infos: Array<info>;
+  }
 }
 
-export interface arrangesche {
-    errMsg: string;
-    requestID: string;
-    result: {
-        code: number;
-        leftban: Array<Banci>;
-        leftman: Array<User>;
-        infos: Array<info>;
-    };
+export interface deleteinfoResult{
+  errMsg: string;
+  requestID: string;
+  result: {
+    code: number;
+  }
 }
