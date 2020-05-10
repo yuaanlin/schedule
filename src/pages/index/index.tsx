@@ -167,7 +167,6 @@ class Index extends Component<Props, States> {
                 ownedSches.push(sche);
             }
         });
-
         /** 尚未登入 */
         if (this.props.user._id === "") {
             return (
@@ -225,7 +224,7 @@ class Index extends Component<Props, States> {
                                 <AtList hasBorder={false}>
                                     {ownedSches
                                         .filter(sc => sc.complete)
-                                        .filter(sc => sc.endact.getTime() < new Date().getTime())
+                                        .filter(sc => sc.endact.getTime() > new Date().getTime())
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
@@ -238,7 +237,7 @@ class Index extends Component<Props, States> {
                                                     extra="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
-                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                            url: "../scheduleDetail/scheduleDetail?_id=" + item._id
                                                         });
                                                     }}
                                                 />
@@ -256,7 +255,7 @@ class Index extends Component<Props, States> {
                                 <AtList hasBorder={false}>
                                     {ownedSches
                                         .filter(sc => sc.complete)
-                                        .filter(sc => sc.endact.getTime() > new Date().getTime())
+                                        .filter(sc => sc.endact.getTime() < new Date().getTime())
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
@@ -269,7 +268,7 @@ class Index extends Component<Props, States> {
                                                     extra="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
-                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                            url: "../scheduleDetail/scheduleDetail?_id=" + item._id
                                                         });
                                                     }}
                                                 />
@@ -320,7 +319,7 @@ class Index extends Component<Props, States> {
                                 <AtList hasBorder={false}>
                                     {ownedSches
                                         .filter(sc => sc.complete)
-                                        .filter(sc => sc.endact.getTime() < new Date().getTime())
+                                        .filter(sc => sc.endact.getTime() > new Date().getTime())
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
@@ -333,7 +332,7 @@ class Index extends Component<Props, States> {
                                                     extra="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
-                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                            url: "../scheduleDetail/scheduleDetail?_id=" + item._id
                                                         });
                                                     }}
                                                 />
@@ -351,7 +350,7 @@ class Index extends Component<Props, States> {
                                 <AtList hasBorder={false}>
                                     {ownedSches
                                         .filter(sc => sc.complete)
-                                        .filter(sc => sc.endact.getTime() > new Date().getTime())
+                                        .filter(sc => sc.endact.getTime() < new Date().getTime())
                                         .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
@@ -364,7 +363,7 @@ class Index extends Component<Props, States> {
                                                     extra="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
-                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                            url: "../scheduleDetail/scheduleDetail?_id=" + item._id
                                                         });
                                                     }}
                                                 />
