@@ -13,7 +13,8 @@ import {
     AtModalAction,
     AtModalContent,
     AtModalHeader,
-    AtToast
+    AtToast,
+    AtBadge
 } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
@@ -363,7 +364,8 @@ class JoinSchedule extends Component<Props, States> {
         const schedule = sc;
         const infos = infor;
         const bancis = ban;
-
+        const failman = this.state.failman
+        const failclass = this.state.failclass
         if (schedule !== undefined)
             return (
                 <View>
@@ -571,11 +573,26 @@ class JoinSchedule extends Component<Props, States> {
                         <AtModalContent>
                         <View className="at-row">
                           <View className="at-col at-col-3">
-                              <AtIcon prefixClass="icon" value="bussiness-man"></AtIcon>
+                              <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
                           </View>
                           <View className="at-col at-col-6">
                               <Text>未成功成员</Text>
                           </View>
+                        </View>
+                        <View>
+                          {failman.length === 0 ? (
+                              <Text>全部成员匹配成功</Text>
+                          ) : (
+                          <View>
+                            {failman.map(x => {
+                                return (
+                                    <AtBadge key={x._id}>
+                                        <AtButton size="small">{x.name}</AtButton>
+                                    </AtBadge>
+                                );
+                            })}
+                          </View>
+                          )}
                         </View>
                         <AtDivider></AtDivider>
                         <View className="at-row">
@@ -585,6 +602,21 @@ class JoinSchedule extends Component<Props, States> {
                           <View className="at-col at-col-6">
                               <Text>未成功班次</Text>
                           </View>
+                        </View>
+                        <View>
+                          {failclass.length === 0 ? (
+                              <Text>全部成员匹配成功</Text>
+                          ) : (
+                          <View>
+                            {failclass.map(x => {
+                                return (
+                                    <AtBadge key={x._id}>
+                                        <AtButton size="small">{x._id}</AtButton>
+                                    </AtBadge>
+                                );
+                            })}
+                          </View>
+                          )}
                         </View>
                         </AtModalContent>
                         <AtModalAction>
