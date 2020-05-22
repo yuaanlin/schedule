@@ -67,7 +67,7 @@ export interface updatescheResult {
     };
 }
 
-export interface arrangesche{
+export interface arrangescheResult{
   errMsg: string;
   requestID: string;
   result:{

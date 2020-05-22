@@ -18,12 +18,12 @@ exports.main = async (event, context) => {
     var users = [];
     var infor = infos;
     var ban = bancis;
-    await scheCollection.doc(schedule._id)
-    .update({
-      data:{
-        complete:true
-      }
-    })
+    // await scheCollection.doc(schedule._id)
+    // .update({
+    //   data:{
+    //     complete:true
+    //   }
+    // })
 
     ban.map(x => (x.choosenum = 0));
 
@@ -75,12 +75,16 @@ exports.main = async (event, context) => {
         var tmp = 0;
         var newinfo = [];
         var tmpinfo = [];
+      console.log(banci)
+      console.log(info)
+      console.log(user)
         for (var i = 0; i < banci.length; i++) {
             for (var k = 0; k < info.length; k++) {
                 if (banci[i]._id === info[k].classid && info[k].tendency == true) {
                     tmpinfo.push(info[k]);
                 }
             }
+            console.log(tmpinfo)
             for (var j = 0; j < user.length; j++) {
                 for (var m = 0; m < tmpinfo.length; m++) {
                     if (user[j]._id === tmpinfo[m].userid && tmp < banci[i].count) {
@@ -89,13 +93,14 @@ exports.main = async (event, context) => {
                     }
                 }
             }
-            for (var m = 0; m < newinfo.length; m++) {
-                await infoCollection.doc(newinfo[m]._id).update({
-                    data: {
-                        tendency: false
-                    }
-                });
-            }
+            console.log(newinfo)
+            // for (var m = 0; m < newinfo.length; m++) {
+            //     await infoCollection.doc(newinfo[m]._id).update({
+            //         data: {
+            //             tendency: false
+            //         }
+            //     });
+            // }
             tmp = 0;
 
             tmpinfo = [];
@@ -104,6 +109,7 @@ exports.main = async (event, context) => {
     };
 
     var newinfo = await scheArr(ban, users, infor);
+    console.log(newinfo)
     var failnum = 0;
     var leftban = [];
     for (var index = 0; index < ban.length; index++) {
@@ -112,20 +118,23 @@ exports.main = async (event, context) => {
                 failnum++;
             }
         }
+        console.log(failnum)
         if (failnum < ban[index].count) {
             leftban.push(ban[index]);
         }
         failnum = 0;
     }
     var leftmen = [];
+    var tag = false;
     for (var index = 0; index < users.length; index++) {
         for (var i = 0; i < newinfo.length; i++) {
             if (newinfo[i].userid === users[index]._id) {
                 tag = true;
+                break;
             }
         }
         if (tag == false) {
-            leftmen.push(user[index]);
+            leftmen.push(users[index]);
         }
         tag = false;
     }
