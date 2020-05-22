@@ -13,7 +13,8 @@ import {
     AtModalAction,
     AtModalContent,
     AtModalHeader,
-    AtToast
+    AtToast,
+    AtBadge
 } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
@@ -26,7 +27,7 @@ import { updateSchedule } from "../../redux/actions/schedule";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import { getPerscheResult, loginResult, updatescheResult } from "../../types";
+import { getPerscheResult, loginResult, updatescheResult,arrangescheResult } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
 import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
@@ -60,6 +61,13 @@ type States = {
     // 输入内容暂存区
     inputingText: string;
     inputingDate: Date;
+    showresult:boolean;
+
+    //成功info信息
+    newinfo:Array<info>
+    //失败信息
+    failman:Array<User>;
+    failclass:Array<Banci>;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -104,7 +112,11 @@ class JoinSchedule extends Component<Props, States> {
             gettag: false,
             warntag: false,
             tag: "",
-            author: false
+            author: false,
+            showresult:false,
+            failman:[],
+            failclass:[],
+            newinfo:[]
         };
     }
     config: Config = {
@@ -116,6 +128,12 @@ class JoinSchedule extends Component<Props, States> {
         if (checkIfInvolved(this.props.user._id, classid)) {
             Taro.showToast({ title: "你已经报名这个班次啦！", icon: "none", duration: 2000 });
             return;
+        }
+        if(!this.state.tag){
+          this.setState({
+            gettag : true
+          })
+          return;
         }
         Taro.showToast({ title: "报名中", icon: "loading", duration: 2000 });
         Taro.cloud
@@ -155,6 +173,22 @@ class JoinSchedule extends Component<Props, States> {
             );
     }
 
+    publicsche(){
+      var scheID = this.$router.params._id;
+      var schedule = this.props.schedules.find(sc => sc._id === scheID);
+      var newinfo = this.state.newinfo
+      Taro.cloud.callFunction({
+        name: "publicsche",
+        data: {
+            schedule: schedule,
+            info:newinfo
+        }
+      })
+      Taro.showToast({ title: "发布成功", icon: "success", duration: 2000 });
+      Taro.redirectTo({
+          url: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id
+      });
+    }
     getTag() {
         if (this.state.tag != null) {
             this.setState({ gettag: false });
@@ -262,7 +296,20 @@ class JoinSchedule extends Component<Props, States> {
                     infos: infos,
                     schedule: schedule
                 }
-            });
+            })
+            .then(res=>{
+              var resdata = (res as unknown) as arrangescheResult;
+              if(resdata.result.code === 200){
+                this.setState({
+                  showresult:true,
+                  newinfo:resdata.result.infos,
+                  failman:resdata.result.leftman,
+                  failclass:resdata.result.leftban
+                })
+              }
+             console.log(resdata.result)
+            })
+            ;
         }
     };
     updateSche = (schedule: Schedule, key: string, value: string | Date) => {
@@ -317,7 +364,8 @@ class JoinSchedule extends Component<Props, States> {
         const schedule = sc;
         const infos = infor;
         const bancis = ban;
-
+        const failman = this.state.failman
+        const failclass = this.state.failclass
         if (schedule !== undefined)
             return (
                 <View>
@@ -516,6 +564,64 @@ class JoinSchedule extends Component<Props, States> {
                         <AtModalAction>
                             <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
                             <Button onClick={() => this.updateSche(schedule, "endact", this.state.inputingDate)}>更新</Button>
+                        </AtModalAction>
+                    </AtModal>
+
+
+                    <AtModal isOpened={this.state.showresult}>
+                        <AtModalHeader>未成功信息</AtModalHeader>
+                        <AtModalContent>
+                        <View className="at-row">
+                          <View className="at-col at-col-3">
+                              <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
+                          </View>
+                          <View className="at-col at-col-6">
+                              <Text>未成功成员</Text>
+                          </View>
+                        </View>
+                        <View>
+                          {failman.length === 0 ? (
+                              <Text>全部成员匹配成功</Text>
+                          ) : (
+                          <View>
+                            {failman.map(x => {
+                                return (
+                                    <AtBadge key={x._id}>
+                                        <AtButton size="small">{x.name}</AtButton>
+                                    </AtBadge>
+                                );
+                            })}
+                          </View>
+                          )}
+                        </View>
+                        <AtDivider></AtDivider>
+                        <View className="at-row">
+                          <View className="at-col at-col-3">
+                              <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
+                          </View>
+                          <View className="at-col at-col-6">
+                              <Text>未成功班次</Text>
+                          </View>
+                        </View>
+                        <View>
+                          {failclass.length === 0 ? (
+                              <Text>全部成员匹配成功</Text>
+                          ) : (
+                          <View>
+                            {failclass.map(x => {
+                                return (
+                                    <AtBadge key={x._id}>
+                                        <AtButton size="small">{x._id}</AtButton>
+                                    </AtBadge>
+                                );
+                            })}
+                          </View>
+                          )}
+                        </View>
+                        </AtModalContent>
+                        <AtModalAction>
+                            <Button onClick={() => this.setState({ showresult: false })}>返回</Button>
+                            <Button onClick={this.publicsche}>发布班表</Button>
                         </AtModalAction>
                     </AtModal>
                 </View>

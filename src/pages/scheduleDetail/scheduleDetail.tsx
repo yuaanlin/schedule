@@ -1,7 +1,7 @@
 import { Button, Picker, Text, View } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { AtAccordion, AtBadge, AtButton, AtDivider, AtIcon, AtInput, AtList, AtListItem, AtModal, AtModalAction, AtModalContent, AtModalHeader } from "taro-ui";
+import { AtAccordion, AtBadge, AtButton, AtDivider, AtIcon, AtInput, AtList, AtListItem, AtModal, AtModalAction, AtModalContent, AtModalHeader, message } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
@@ -163,6 +163,29 @@ class ScheduleDetail extends Component<Props, States> {
         this.setState({ openbanci: true });
     }
 
+    onShareAppMessage(){
+      return {
+        title: "班表详情详情",
+        path: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id,
+        success:(res)=>{
+          if(res.errMsg==='shareAppMessage:ok'){
+            console.log(res)
+            Taro.showToast({ title: "分享成功", icon: "success", duration: 2000 });
+          }
+        },
+        fail:(res)=>{
+          console.log(res)
+          if(res.errMsg == 'shareAppMessage:fail cancel'){
+  　　　　　  Taro.showToast({ title: "取消分享", icon: "none", duration: 2000 });
+　　　　　　}else if(res.errMsg == 'shareAppMessage:fail'){
+　　　　　　　　alert("分享失败")
+　　　　　　}
+        },
+        complete: (res)=>{
+          console.log(res)
+        }
+      };
+    }
     render() {
         const schedule = this.state.schedule;
         const { infos } = this.state;

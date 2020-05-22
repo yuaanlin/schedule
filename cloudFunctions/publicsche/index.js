@@ -6,11 +6,11 @@ cloud.init({
 const db = cloud.database();
 
 const scheCollection = db.collection("schedules")
-
+const newinfoCollection = db.collection("newinfos")
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const {schedule} = event
+  const {schedule,newinfo} = event
   try{
     await scheCollection.doc(schedule._id)
       .update({
@@ -19,6 +19,18 @@ exports.main = async (event, context) => {
         }
       })
 
+    // for (var m = 0; m < newinfo.length; m++) {
+    //   await infoCollection.doc(newinfo[m]._id).update({
+    //     data: {
+    //       tendency: false
+    //     }
+    //   });
+    // }
+    await newinfoCollection.add({
+      data: {
+        newinfo
+      }
+    });
     return {
       code: 200,
       schedule: schedule
