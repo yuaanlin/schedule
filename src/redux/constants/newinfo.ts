@@ -1,0 +1,1 @@
+export const UPDATE_NEWINFO = "UPDATE_NEWINFO";

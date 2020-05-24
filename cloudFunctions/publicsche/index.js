@@ -26,14 +26,17 @@ exports.main = async (event, context) => {
     //     }
     //   });
     // }
+    await newinfo.map(x=>{
+      delete (x["_id"])
+    })
+    console.log(newinfo)
     await newinfoCollection.add({
-      data: {
-        newinfo
-      }
+      data:newinfo
     });
     return {
       code: 200,
-      schedule: schedule
+      schedule: schedule,
+      newinfo:newinfo
     }
   } catch (e) {
     return {

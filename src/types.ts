@@ -2,6 +2,7 @@ import Banci from "src/classes/banci";
 import info from "./classes/info";
 import Schedule from "./classes/schedule";
 import User from "./classes/user";
+import newinfo from "./classes/newinfo"
 
 /** 云函数 "Login" 的返回格式 */
 export interface loginResult {
@@ -83,5 +84,15 @@ export interface deleteinfoResult{
   requestID: string;
   result: {
     code: number;
+  }
+}
+
+export interface publicscheResult{
+  errMsg: string;
+  requestID: string;
+  result:{
+    code: number;
+    schedule:Schedule;
+    newinfo: Array<newinfo>;
   }
 }
