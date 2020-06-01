@@ -18,6 +18,7 @@ import {
 } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
+import newinfo from "../../classes/newinfo"
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
 import UserBadge from "../../components/UserBadge";
@@ -25,12 +26,14 @@ import { updateBanci } from "../../redux/actions/banci";
 import { deleteInfo, updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
 import { setUserData } from "../../redux/actions/user";
+import { updatenewInfo } from "../../redux/actions/newinfo";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import { getPerscheResult, loginResult, updatescheResult,arrangescheResult } from "../../types";
+import { getPerscheResult, loginResult, updatescheResult,arrangescheResult,publicscheResult } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
 import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
+
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -38,11 +41,13 @@ type Props = {
     schedules: Array<Schedule>;
     bancis: Array<Banci>;
     infos: Array<info>;
+    newinfos: Array<newinfo>;
     setUserData: (user: User) => void;
     updateInfo: (info: info) => void;
     deleteInfo: (id: string) => void;
     updateBanci: (banci: Banci) => void;
     updateSchedule: (Schedule: Schedule) => void;
+    updatenewInfo: (newinfo:newinfo) => void;
 };
 
 type States = {
@@ -76,7 +81,8 @@ function mapStateToProps(state: AppState) {
         user: state.user,
         schedules: state.schedules,
         bancis: state.bancis,
-        infos: state.infos
+        infos: state.infos,
+        newinfos:state.newinfos,
     };
 }
 
@@ -96,6 +102,9 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         },
         updateBanci: (banci: Banci) => {
             dispatch(updateBanci(banci));
+        },
+        updatenewInfo: (newinfo: newinfo)=>{
+            dispatch(updatenewInfo(newinfo));
         }
     };
 }
@@ -181,8 +190,18 @@ class JoinSchedule extends Component<Props, States> {
         name: "publicsche",
         data: {
             schedule: schedule,
-            info:newinfo
+            newinfo:newinfo
         }
+      })
+      .then(res =>{
+        var resdata = (res as unknown) as publicscheResult;
+        if (resdata.result.code === 200) {
+          resdata.result.newinfo.map(newinfo => {
+            this.props.updatenewInfo(newinfo);
+          });
+        }
+        // console.log(this.props)
+        // console.log(this.props.newinfos)
       })
       Taro.showToast({ title: "发布成功", icon: "success", duration: 2000 });
       Taro.redirectTo({

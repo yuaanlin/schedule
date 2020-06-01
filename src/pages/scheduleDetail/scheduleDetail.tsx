@@ -6,9 +6,11 @@ import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
+import newinfo from "../../classes/newinfo"
 import { updateBanci } from "../../redux/actions/banci";
 import { updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
+import { updatenewInfo } from "../../redux/actions/newinfo";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
 import { updatescheResult } from "../../types";
@@ -21,15 +23,19 @@ type Props = {
     schedules: Array<Schedule>;
     bancis: Array<Banci>;
     infos: Array<info>;
+    newinfos:Array<newinfo>;
     updateSchedule: (Schedule: Schedule) => void;
     updateBanci: (banci: Banci) => void;
     updateInfo: (info: info) => void;
+    updatenewInfo:(newinfo: newinfo) =>void;
 };
 
 type States = {
     schedule: Schedule;
     bancis: Array<Banci>;
     infos: Array<info>;
+    newinfos:Array<newinfo>;
+
     openbanci: boolean;
 
     // 当前编辑的班表信息
@@ -49,7 +55,8 @@ function mapStateToProps(state: AppState) {
         user: state.user,
         schedules: state.schedules,
         bancis: state.bancis,
-        infos: state.infos
+        infos: state.infos,
+        newinfos: state.newinfos
     };
 }
 
@@ -63,7 +70,10 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         },
         updateInfo: (info: info) => {
             dispatch(updateInfo(info));
-        }
+        },
+        updatenewInfo: (newinfo: newinfo)=>{
+          dispatch(updatenewInfo(newinfo));
+      }
     };
 }
 
@@ -74,6 +84,7 @@ class ScheduleDetail extends Component<Props, States> {
             schedule: new Schedule(),
             bancis: new Array<Banci>(),
             infos: new Array<info>(),
+            newinfos:new Array<newinfo>(),
             openbanci: false,
             openmodal: undefined,
             editing: undefined,
@@ -140,6 +151,7 @@ class ScheduleDetail extends Component<Props, States> {
     componentDidMount() {
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
+        console.log(this.props)
         /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
         if (sc === undefined) {
             Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
@@ -148,6 +160,8 @@ class ScheduleDetail extends Component<Props, States> {
             });
         } else {
             this.setState({ schedule: sc });
+            var newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID)
+            this.setState({ newinfos:newinfo })
             let infor = new Array<info>();
             let ban = this.props.bancis.filter(banci => {
                 if (sc !== undefined && banci.scheid === sc._id) {
@@ -188,7 +202,9 @@ class ScheduleDetail extends Component<Props, States> {
     }
     render() {
         const schedule = this.state.schedule;
-        const { infos } = this.state;
+        // const { infos } = this.state;
+        const { newinfos } = this.state;
+
 
         if (schedule === undefined) return <View>发生错误</View>;
 
@@ -236,11 +252,11 @@ class ScheduleDetail extends Component<Props, States> {
                                                 </View>
                                                 {/* 循环班次成员获取tag */}
                                                 <View>
-                                                    {infos.filter(info => info.classid === item._id).length === 0 ? (
+                                                    {newinfos.filter(info => info.classid === item._id).length === 0 ? (
                                                         <Text>没有成员</Text>
                                                     ) : (
                                                         <View>
-                                                            {infos.map(x => {
+                                                            {newinfos.map(x => {
                                                                 if (x.classid === item._id)
                                                                     return (
                                                                         <AtBadge key={item._id}>
