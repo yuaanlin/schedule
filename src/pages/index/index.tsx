@@ -181,7 +181,7 @@ class Index extends Component<Props, States> {
             );
         }
 
-        /** 尚未登入 */
+        /** 尚未授权 */
         if (this.props.user._id === "" && !this.state.notLoaded) {
             return (
                 <View style={{ textAlign: "center", padding: "36px" }}>
