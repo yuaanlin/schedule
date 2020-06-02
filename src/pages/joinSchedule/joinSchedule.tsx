@@ -116,7 +116,7 @@ class JoinSchedule extends Component<Props, States> {
             inputingText: "",
             inputingDate: new Date(),
             editing: undefined,
-            openbanci: false,
+            openbanci: true,
             openmodal: "",
             gettag: false,
             warntag: false,
@@ -128,6 +128,7 @@ class JoinSchedule extends Component<Props, States> {
             newinfo: []
         };
     }
+
     config: Config = {
         navigationBarTitleText: "加入班表"
     };
@@ -201,26 +202,19 @@ class JoinSchedule extends Component<Props, States> {
                         this.props.updatenewInfo(newinfo);
                     });
                 }
-                // console.log(this.props)
-                // console.log(this.props.newinfos)
             });
         Taro.showToast({ title: "发布成功", icon: "success", duration: 2000 });
         Taro.redirectTo({
             url: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id
         });
     }
+
     getTag() {
         if (this.state.tag != null) {
             this.setState({ gettag: false });
         } else {
             this.setState({ warntag: true });
         }
-    }
-
-    settag(value: string) {
-        this.setState({
-            tag: value
-        });
     }
 
     componentDidMount() {
@@ -274,7 +268,17 @@ class JoinSchedule extends Component<Props, States> {
                     }
                 });
         }
-        this.setState({ openbanci: true, gettag: true, warntag: false });
+
+        /** 如果这个用户已经报名过这个班表，自动载入 tag */
+        var exsistTag: string | undefined = undefined;
+        this.props.infos.map(i => {
+            if (!exsistTag && i.scheid === scheID && i.userid === this.props.user._id) {
+                exsistTag = i.tag;
+            }
+        });
+        if (exsistTag !== undefined) this.setState({ tag: exsistTag });
+
+        /** 检查用户是不是班表拥有者 */
         if (sc !== undefined && sc.ownerID === this.props.user._id) {
             this.setState({ author: true });
         } else {
@@ -328,10 +332,10 @@ class JoinSchedule extends Component<Props, States> {
                             failclass: resdata.result.leftban
                         });
                     }
-                    console.log(resdata.result);
                 });
         }
     };
+
     updateSche = (schedule: Schedule, key: string, value: string | Date) => {
         var newScheData = {};
         if (key === "title") {
@@ -451,23 +455,6 @@ class JoinSchedule extends Component<Props, States> {
                             <Button onClick={this.publicsche}>发布班表</Button>
                         </AtModalAction>
                     </AtModal>
-                    <AtModal isOpened={this.state.gettag}>
-                        <AtModalHeader>请先填写个人信息</AtModalHeader>
-                        <AtModalContent>
-                            <AtInput
-                                required
-                                name="tag"
-                                type="text"
-                                placeholder="输入一个方便辨认的代号"
-                                value={this.state.tag}
-                                onChange={this.settag.bind(this)}
-                            />
-                        </AtModalContent>
-                        <AtModalAction>
-                            <Button onClick={this.getTag.bind(this)}>确定</Button>
-                        </AtModalAction>
-                    </AtModal>
-                    <AtToast isOpened={this.state.warntag} text="请先填写个人信息"></AtToast>
 
                     <AtList>
                         <AtListItem
@@ -648,6 +635,25 @@ class JoinSchedule extends Component<Props, States> {
                             <Button onClick={() => this.updateSche(schedule, "endact", this.state.inputingDate)}>更新</Button>
                         </AtModalAction>
                     </AtModal>
+                    <AtModal isOpened={this.state.gettag}>
+                        <AtModalHeader>请先填写个人信息</AtModalHeader>
+                        <AtModalContent>
+                            <AtInput
+                                required
+                                name="tag"
+                                type="text"
+                                placeholder="输入一个方便辨认的代号"
+                                value={this.state.tag}
+                                onChange={value => {
+                                    this.setState({ tag: value.toString() });
+                                }}
+                            />
+                        </AtModalContent>
+                        <AtModalAction>
+                            <Button onClick={this.getTag.bind(this)}>确定</Button>
+                        </AtModalAction>
+                    </AtModal>
+                    <AtToast isOpened={this.state.warntag} text="请先填写个人信息" />
                 </View>
             );
     }
