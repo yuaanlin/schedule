@@ -36,6 +36,8 @@ type States = {
     openfinished: boolean;
     openfailed: boolean;
     openunset: boolean;
+    // true 代表程序还在尝试登入，不要急着显示授权按钮
+    notLoaded: boolean;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -97,9 +99,10 @@ class Index extends Component<Props, States> {
                                 resdata.result.bancis.map(banci => {
                                     this.props.updateBanci(banci);
                                 });
+                                this.setState({ notLoaded: false });
                             }
                         });
-                }
+                } else this.setState({ notLoaded: false });
             });
     }
 
@@ -148,7 +151,8 @@ class Index extends Component<Props, States> {
             openunfinished: true,
             openfinished: true,
             openfailed: true,
-            openunset: true
+            openunset: true,
+            notLoaded: true
         };
     }
     render() {
@@ -167,8 +171,18 @@ class Index extends Component<Props, States> {
                 ownedSches.push(sche);
             }
         });
-        /** 尚未登入 */
-        if (this.props.user._id === "") {
+
+        /** 还在登入 */
+        if (this.state.notLoaded) {
+            return (
+                <View style={{ textAlign: "center", padding: "36px" }}>
+                    <Text>努力加载中 ...</Text>
+                </View>
+            );
+        }
+
+        /** 尚未授权 */
+        if (this.props.user._id === "" && !this.state.notLoaded) {
             return (
                 <View style={{ textAlign: "center", padding: "36px" }}>
                     <Text>请先登入才能使用小程序的完整功能哦！</Text>
