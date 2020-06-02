@@ -13,12 +13,11 @@ import {
     AtModalAction,
     AtModalContent,
     AtModalHeader,
-    AtToast,
-    AtBadge
+    AtToast
 } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
-import newinfo from "../../classes/newinfo"
+import newinfo from "../../classes/newinfo";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
 import UserBadge from "../../components/UserBadge";
@@ -29,11 +28,12 @@ import { setUserData } from "../../redux/actions/user";
 import { updatenewInfo } from "../../redux/actions/newinfo";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import { getPerscheResult, loginResult, updatescheResult,arrangescheResult,publicscheResult } from "../../types";
+import { getPerscheResult, loginResult, updatescheResult, arrangescheResult, publicscheResult } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
 import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
-
+import getTimeString from "../../utils/getTimeString";
+import "./joinSchedule.scss";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -47,7 +47,7 @@ type Props = {
     deleteInfo: (id: string) => void;
     updateBanci: (banci: Banci) => void;
     updateSchedule: (Schedule: Schedule) => void;
-    updatenewInfo: (newinfo:newinfo) => void;
+    updatenewInfo: (newinfo: newinfo) => void;
 };
 
 type States = {
@@ -66,13 +66,13 @@ type States = {
     // 输入内容暂存区
     inputingText: string;
     inputingDate: Date;
-    showresult:boolean;
+    showresult: boolean;
 
     //成功info信息
-    newinfo:Array<info>
+    newinfo: Array<info>;
     //失败信息
-    failman:Array<User>;
-    failclass:Array<Banci>;
+    failman: Array<User>;
+    failclass: Array<Banci>;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -82,7 +82,7 @@ function mapStateToProps(state: AppState) {
         schedules: state.schedules,
         bancis: state.bancis,
         infos: state.infos,
-        newinfos:state.newinfos,
+        newinfos: state.newinfos
     };
 }
 
@@ -103,7 +103,7 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         updateBanci: (banci: Banci) => {
             dispatch(updateBanci(banci));
         },
-        updatenewInfo: (newinfo: newinfo)=>{
+        updatenewInfo: (newinfo: newinfo) => {
             dispatch(updatenewInfo(newinfo));
         }
     };
@@ -122,10 +122,10 @@ class JoinSchedule extends Component<Props, States> {
             warntag: false,
             tag: "",
             author: false,
-            showresult:false,
-            failman:[],
-            failclass:[],
-            newinfo:[]
+            showresult: false,
+            failman: [],
+            failclass: [],
+            newinfo: []
         };
     }
     config: Config = {
@@ -138,11 +138,11 @@ class JoinSchedule extends Component<Props, States> {
             Taro.showToast({ title: "你已经报名这个班次啦！", icon: "none", duration: 2000 });
             return;
         }
-        if(!this.state.tag){
-          this.setState({
-            gettag : true
-          })
-          return;
+        if (!this.state.tag) {
+            this.setState({
+                gettag: true
+            });
+            return;
         }
         Taro.showToast({ title: "报名中", icon: "loading", duration: 2000 });
         Taro.cloud
@@ -182,31 +182,32 @@ class JoinSchedule extends Component<Props, States> {
             );
     }
 
-    publicsche(){
-      var scheID = this.$router.params._id;
-      var schedule = this.props.schedules.find(sc => sc._id === scheID);
-      var newinfo = this.state.newinfo
-      Taro.cloud.callFunction({
-        name: "publicsche",
-        data: {
-            schedule: schedule,
-            newinfo:newinfo
-        }
-      })
-      .then(res =>{
-        var resdata = (res as unknown) as publicscheResult;
-        if (resdata.result.code === 200) {
-          resdata.result.newinfo.map(newinfo => {
-            this.props.updatenewInfo(newinfo);
-          });
-        }
-        // console.log(this.props)
-        // console.log(this.props.newinfos)
-      })
-      Taro.showToast({ title: "发布成功", icon: "success", duration: 2000 });
-      Taro.redirectTo({
-          url: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id
-      });
+    publicsche() {
+        var scheID = this.$router.params._id;
+        var schedule = this.props.schedules.find(sc => sc._id === scheID);
+        var newinfo = this.state.newinfo;
+        Taro.cloud
+            .callFunction({
+                name: "publicsche",
+                data: {
+                    schedule: schedule,
+                    newinfo: newinfo
+                }
+            })
+            .then(res => {
+                var resdata = (res as unknown) as publicscheResult;
+                if (resdata.result.code === 200) {
+                    resdata.result.newinfo.map(newinfo => {
+                        this.props.updatenewInfo(newinfo);
+                    });
+                }
+                // console.log(this.props)
+                // console.log(this.props.newinfos)
+            });
+        Taro.showToast({ title: "发布成功", icon: "success", duration: 2000 });
+        Taro.redirectTo({
+            url: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id
+        });
     }
     getTag() {
         if (this.state.tag != null) {
@@ -308,27 +309,27 @@ class JoinSchedule extends Component<Props, States> {
             const schedule = sc;
             const infos = infor;
             const bancis = ban;
-            Taro.cloud.callFunction({
-                name: "arrangesche",
-                data: {
-                    bancis: bancis,
-                    infos: infos,
-                    schedule: schedule
-                }
-            })
-            .then(res=>{
-              var resdata = (res as unknown) as arrangescheResult;
-              if(resdata.result.code === 200){
-                this.setState({
-                  showresult:true,
-                  newinfo:resdata.result.infos,
-                  failman:resdata.result.leftman,
-                  failclass:resdata.result.leftban
+            Taro.cloud
+                .callFunction({
+                    name: "arrangesche",
+                    data: {
+                        bancis: bancis,
+                        infos: infos,
+                        schedule: schedule
+                    }
                 })
-              }
-             console.log(resdata.result)
-            })
-            ;
+                .then(res => {
+                    var resdata = (res as unknown) as arrangescheResult;
+                    if (resdata.result.code === 200) {
+                        this.setState({
+                            showresult: true,
+                            newinfo: resdata.result.infos,
+                            failman: resdata.result.leftman,
+                            failclass: resdata.result.leftban
+                        });
+                    }
+                    console.log(resdata.result);
+                });
         }
     };
     updateSche = (schedule: Schedule, key: string, value: string | Date) => {
@@ -383,11 +384,73 @@ class JoinSchedule extends Component<Props, States> {
         const schedule = sc;
         const infos = infor;
         const bancis = ban;
-        const failman = this.state.failman
-        const failclass = this.state.failclass
+        const failman = this.state.failman;
+        const failclass = this.state.failclass;
         if (schedule !== undefined)
             return (
                 <View>
+                    <AtModal isOpened={this.state.showresult}>
+                        <AtModalHeader>匹配结果</AtModalHeader>
+                        <AtModalContent>
+                            <View className="at-row">
+                                <View className="at-col at-col-3">
+                                    <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
+                                </View>
+                                <View className="at-col at-col-6">
+                                    <Text>成员匹配结果</Text>
+                                </View>
+                            </View>
+                            <View>
+                                {failman.length === 0 ? (
+                                    <Text>全部成员匹配成功</Text>
+                                ) : (
+                                    <View>
+                                        以下成员未能成功排入班次：
+                                        {failman.map(x => {
+                                            return (
+                                                <AtButton className="btn" key={x._id} size="small">
+                                                    {x.name}
+                                                </AtButton>
+                                            );
+                                        })}
+                                    </View>
+                                )}
+                            </View>
+                            <AtDivider></AtDivider>
+                            <View className="at-row">
+                                <View className="at-col at-col-3">
+                                    <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
+                                </View>
+                                <View className="at-col at-col-6">
+                                    <Text>班次匹配结果</Text>
+                                </View>
+                            </View>
+                            <View>
+                                {failclass.length === 0 ? (
+                                    <Text>全部班次匹配成功</Text>
+                                ) : (
+                                    <View>
+                                        <Text>以下班次未能排入足够的成员：</Text>
+                                        {failclass.map(x => (
+                                            <AtButton
+                                                className="btn"
+                                                key={x._id}
+                                                onClick={() => {
+                                                    this.setState({ openmodal: x._id });
+                                                }}
+                                            >
+                                                {getDateString(x.startTime, true) + "" + getTimeString(x.startTime, true) + "开始的班次"}
+                                            </AtButton>
+                                        ))}
+                                    </View>
+                                )}
+                            </View>
+                        </AtModalContent>
+                        <AtModalAction>
+                            <Button onClick={() => this.setState({ showresult: false })}>返回</Button>
+                            <Button onClick={this.publicsche}>发布班表</Button>
+                        </AtModalAction>
+                    </AtModal>
                     <AtModal isOpened={this.state.gettag}>
                         <AtModalHeader>请先填写个人信息</AtModalHeader>
                         <AtModalContent>
@@ -583,64 +646,6 @@ class JoinSchedule extends Component<Props, States> {
                         <AtModalAction>
                             <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
                             <Button onClick={() => this.updateSche(schedule, "endact", this.state.inputingDate)}>更新</Button>
-                        </AtModalAction>
-                    </AtModal>
-
-
-                    <AtModal isOpened={this.state.showresult}>
-                        <AtModalHeader>未成功信息</AtModalHeader>
-                        <AtModalContent>
-                        <View className="at-row">
-                          <View className="at-col at-col-3">
-                              <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
-                          </View>
-                          <View className="at-col at-col-6">
-                              <Text>未成功成员</Text>
-                          </View>
-                        </View>
-                        <View>
-                          {failman.length === 0 ? (
-                              <Text>全部成员匹配成功</Text>
-                          ) : (
-                          <View>
-                            {failman.map(x => {
-                                return (
-                                    <AtBadge key={x._id}>
-                                        <AtButton size="small">{x.name}</AtButton>
-                                    </AtBadge>
-                                );
-                            })}
-                          </View>
-                          )}
-                        </View>
-                        <AtDivider></AtDivider>
-                        <View className="at-row">
-                          <View className="at-col at-col-3">
-                              <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
-                          </View>
-                          <View className="at-col at-col-6">
-                              <Text>未成功班次</Text>
-                          </View>
-                        </View>
-                        <View>
-                          {failclass.length === 0 ? (
-                              <Text>全部成员匹配成功</Text>
-                          ) : (
-                          <View>
-                            {failclass.map(x => {
-                                return (
-                                    <AtBadge key={x._id}>
-                                        <AtButton size="small">{x._id}</AtButton>
-                                    </AtBadge>
-                                );
-                            })}
-                          </View>
-                          )}
-                        </View>
-                        </AtModalContent>
-                        <AtModalAction>
-                            <Button onClick={() => this.setState({ showresult: false })}>返回</Button>
-                            <Button onClick={this.publicsche}>发布班表</Button>
                         </AtModalAction>
                     </AtModal>
                 </View>
