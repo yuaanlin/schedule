@@ -1,12 +1,26 @@
 import { Button, Picker, Text, View } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { AtAccordion, AtBadge, AtButton, AtDivider, AtIcon, AtInput, AtList, AtListItem, AtModal, AtModalAction, AtModalContent, AtModalHeader, message } from "taro-ui";
+import {
+    AtAccordion,
+    AtBadge,
+    AtButton,
+    AtDivider,
+    AtIcon,
+    AtInput,
+    AtList,
+    AtListItem,
+    AtModal,
+    AtModalAction,
+    AtModalContent,
+    AtModalHeader,
+    message
+} from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
-import newinfo from "../../classes/newinfo"
+import newinfo from "../../classes/newinfo";
 import { updateBanci } from "../../redux/actions/banci";
 import { updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
@@ -23,18 +37,18 @@ type Props = {
     schedules: Array<Schedule>;
     bancis: Array<Banci>;
     infos: Array<info>;
-    newinfos:Array<newinfo>;
+    newinfos: Array<newinfo>;
     updateSchedule: (Schedule: Schedule) => void;
     updateBanci: (banci: Banci) => void;
     updateInfo: (info: info) => void;
-    updatenewInfo:(newinfo: newinfo) =>void;
+    updatenewInfo: (newinfo: newinfo) => void;
 };
 
 type States = {
     schedule: Schedule;
     bancis: Array<Banci>;
     infos: Array<info>;
-    newinfos:Array<newinfo>;
+    newinfos: Array<newinfo>;
 
     openbanci: boolean;
 
@@ -71,9 +85,9 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         updateInfo: (info: info) => {
             dispatch(updateInfo(info));
         },
-        updatenewInfo: (newinfo: newinfo)=>{
-          dispatch(updatenewInfo(newinfo));
-      }
+        updatenewInfo: (newinfo: newinfo) => {
+            dispatch(updatenewInfo(newinfo));
+        }
     };
 }
 
@@ -84,7 +98,7 @@ class ScheduleDetail extends Component<Props, States> {
             schedule: new Schedule(),
             bancis: new Array<Banci>(),
             infos: new Array<info>(),
-            newinfos:new Array<newinfo>(),
+            newinfos: new Array<newinfo>(),
             openbanci: false,
             openmodal: undefined,
             editing: undefined,
@@ -146,12 +160,9 @@ class ScheduleDetail extends Component<Props, States> {
         });
     };
 
-
-
     componentDidMount() {
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
-        console.log(this.props)
         /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
         if (sc === undefined) {
             Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
@@ -160,8 +171,8 @@ class ScheduleDetail extends Component<Props, States> {
             });
         } else {
             this.setState({ schedule: sc });
-            var newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID)
-            this.setState({ newinfos:newinfo })
+            var newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID);
+            this.setState({ newinfos: newinfo });
             let infor = new Array<info>();
             let ban = this.props.bancis.filter(banci => {
                 if (sc !== undefined && banci.scheid === sc._id) {
@@ -177,34 +188,28 @@ class ScheduleDetail extends Component<Props, States> {
         this.setState({ openbanci: true });
     }
 
-    onShareAppMessage(){
-      return {
-        title: "班表详情详情",
-        path: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id,
-        success:(res)=>{
-          if(res.errMsg==='shareAppMessage:ok'){
-            console.log(res)
-            Taro.showToast({ title: "分享成功", icon: "success", duration: 2000 });
-          }
-        },
-        fail:(res)=>{
-          console.log(res)
-          if(res.errMsg == 'shareAppMessage:fail cancel'){
-  　　　　　  Taro.showToast({ title: "取消分享", icon: "none", duration: 2000 });
-　　　　　　}else if(res.errMsg == 'shareAppMessage:fail'){
-　　　　　　　　alert("分享失败")
-　　　　　　}
-        },
-        complete: (res)=>{
-          console.log(res)
-        }
-      };
+    onShareAppMessage() {
+        return {
+            title: "班表详情",
+            path: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id,
+            success: res => {
+                if (res.errMsg === "shareAppMessage:ok") {
+                    Taro.showToast({ title: "分享成功", icon: "success", duration: 2000 });
+                }
+            },
+            fail: res => {
+                if (res.errMsg == "shareAppMessage:fail cancel") {
+                    Taro.showToast({ title: "取消分享", icon: "none", duration: 2000 });
+                } else if (res.errMsg == "shareAppMessage:fail") {
+                    alert("分享失败");
+                }
+            }
+        };
     }
     render() {
         const schedule = this.state.schedule;
         // const { infos } = this.state;
         const { newinfos } = this.state;
-
 
         if (schedule === undefined) return <View>发生错误</View>;
 
@@ -212,7 +217,10 @@ class ScheduleDetail extends Component<Props, States> {
             <View>
                 <AtList>
                     <AtListItem title={schedule.title} onClick={() => this.setState({ editing: "title", inputingText: schedule.title })} />
-                    <AtListItem title={schedule.description} onClick={() => this.setState({ editing: "description", inputingText: schedule.description })} />
+                    <AtListItem
+                        title={schedule.description}
+                        onClick={() => this.setState({ editing: "description", inputingText: schedule.description })}
+                    />
                     <AtListItem
                         title={getDateString(schedule.startact, true)}
                         note="班表开始日期"
@@ -272,7 +280,9 @@ class ScheduleDetail extends Component<Props, States> {
                                                     <View className="at-col at-col-3">
                                                         <AtIcon prefixClass="icon" value="clock"></AtIcon>
                                                     </View>
-                                                    <View className="at-col at-col-6">{this.tospeTime(item.startTime) + "至" + this.tospeTime(item.endTime)}</View>
+                                                    <View className="at-col at-col-6">
+                                                        {this.tospeTime(item.startTime) + "至" + this.tospeTime(item.endTime)}
+                                                    </View>
                                                 </View>
                                                 <AtDivider></AtDivider>
                                                 <View className="at-row">
@@ -299,11 +309,14 @@ class ScheduleDetail extends Component<Props, States> {
                     </AtList>
                 </View>
 
-
                 <AtModal isOpened={this.state.editing === "title"}>
                     <AtModalHeader>修改班表标题</AtModalHeader>
                     <AtModalContent>
-                        <AtInput name="title" value={this.state.inputingText} onChange={v => this.setState({ inputingText: v.toString() })}></AtInput>
+                        <AtInput
+                            name="title"
+                            value={this.state.inputingText}
+                            onChange={v => this.setState({ inputingText: v.toString() })}
+                        ></AtInput>
                     </AtModalContent>
                     <AtModalAction>
                         <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
@@ -314,7 +327,11 @@ class ScheduleDetail extends Component<Props, States> {
                 <AtModal isOpened={this.state.editing === "description"}>
                     <AtModalHeader>修改班表描述</AtModalHeader>
                     <AtModalContent>
-                        <AtInput name="description" value={this.state.inputingText} onChange={v => this.setState({ inputingText: v.toString() })}></AtInput>
+                        <AtInput
+                            name="description"
+                            value={this.state.inputingText}
+                            onChange={v => this.setState({ inputingText: v.toString() })}
+                        ></AtInput>
                     </AtModalContent>
                     <AtModalAction>
                         <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
