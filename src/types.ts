@@ -76,6 +76,7 @@ export interface arrangescheResult{
     leftban:Array<Banci>;
     leftman: Array<User>;
     infos: Array<info>;
+    failinfo: Array<info>;
   }
 }
 

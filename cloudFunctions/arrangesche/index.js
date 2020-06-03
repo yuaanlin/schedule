@@ -18,12 +18,6 @@ exports.main = async (event, context) => {
     var users = [];
     var infor = infos;
     var ban = bancis;
-    // await scheCollection.doc(schedule._id)
-    // .update({
-    //   data:{
-    //     complete:true
-    //   }
-    // })
 
     ban.map(x => (x.choosenum = 0));
 
@@ -89,18 +83,14 @@ exports.main = async (event, context) => {
                 for (var m = 0; m < tmpinfo.length; m++) {
                     if (user[j]._id === tmpinfo[m].userid && tmp < banci[i].count) {
                         tmp++;
+                        tmpinfo[m].tendency = false;
                         newinfo.push(tmpinfo[m]);
                     }
                 }
             }
             console.log(newinfo)
-            // for (var m = 0; m < newinfo.length; m++) {
-            //     await infoCollection.doc(newinfo[m]._id).update({
-            //         data: {
-            //             tendency: false
-            //         }
-            //     });
-            // }
+            console.log(failinfo)
+
             tmp = 0;
 
             tmpinfo = [];
@@ -110,6 +100,13 @@ exports.main = async (event, context) => {
 
     var newinfo = await scheArr(ban, users, infor);
     console.log(newinfo)
+    var failinfo = [];
+    infor.map(x=>{
+      if(x.tendency===true){
+        failinfo.push(x)
+      }
+    })
+    
     var failnum = 0;
     var leftban = [];
     for (var index = 0; index < ban.length; index++) {
@@ -142,6 +139,7 @@ exports.main = async (event, context) => {
         code: 200,
         infos: newinfo,
         leftban: leftban,
-        leftman: leftmen
+        leftman: leftmen,
+        failinfo:failinfo
     };
 };

@@ -73,6 +73,7 @@ type States = {
     //失败信息
     failman: Array<User>;
     failclass: Array<Banci>;
+    failinfo:Array<info>;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -125,7 +126,8 @@ class JoinSchedule extends Component<Props, States> {
             showresult: false,
             failman: [],
             failclass: [],
-            newinfo: []
+            newinfo: [],
+            failinfo:[]
         };
     }
 
@@ -328,6 +330,7 @@ class JoinSchedule extends Component<Props, States> {
                         this.setState({
                             showresult: true,
                             newinfo: resdata.result.infos,
+                            failinfo: resdata.result.failinfo,
                             failman: resdata.result.leftman,
                             failclass: resdata.result.leftban
                         });
@@ -390,6 +393,9 @@ class JoinSchedule extends Component<Props, States> {
         const bancis = ban;
         const failman = this.state.failman;
         const failclass = this.state.failclass;
+        const failinfo = this.state.failinfo;
+        console.log(failinfo)
+        console.log(failman)
         if (schedule !== undefined)
             return (
                 <View>
@@ -405,15 +411,15 @@ class JoinSchedule extends Component<Props, States> {
                                 </View>
                             </View>
                             <View>
-                                {failman.length === 0 ? (
+                                {failinfo.length === 0 ? (
                                     <Text>全部成员匹配成功</Text>
                                 ) : (
                                     <View>
                                         以下成员未能成功排入班次：
-                                        {failman.map(x => {
+                                        {failinfo.map(x => {
                                             return (
                                                 <AtButton className="btn" key={x._id} size="small">
-                                                    {x.name}
+                                                    {x.tag}
                                                 </AtButton>
                                             );
                                         })}
