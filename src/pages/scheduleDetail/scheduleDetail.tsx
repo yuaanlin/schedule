@@ -61,6 +61,10 @@ type States = {
 
     // 当前开启 modal 的班表 id
     openmodal: string | undefined;
+
+    openattenders:boolean;
+
+    openinfo:string;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -103,7 +107,9 @@ class ScheduleDetail extends Component<Props, States> {
             openmodal: undefined,
             editing: undefined,
             inputingText: "",
-            inputingDate: new Date()
+            inputingDate: new Date(),
+            openattenders:true,
+            openinfo:"",
         };
     }
 
@@ -211,8 +217,20 @@ class ScheduleDetail extends Component<Props, States> {
         // const { infos } = this.state;
         const { newinfos } = this.state;
 
+        console.log(newinfos)
         if (schedule === undefined) return <View>发生错误</View>;
 
+        let ban = this.props.bancis.filter(banci => banci.scheid === schedule._id);
+        let infor = this.props.infos.filter(info => {
+            var bid = info.classid;
+            var found = false;
+            ban.map(b => {
+                if (b._id === bid) found = true;
+            });
+            return found;
+        });
+        // const infos = infor;
+        // const bancis = ban;
         return (
             <View>
                 <AtList>
@@ -300,6 +318,59 @@ class ScheduleDetail extends Component<Props, States> {
                                                 >
                                                     返回
                                                 </Button>
+                                            </AtModalAction>
+                                        </AtModal>
+                                    </View>
+                                );
+                            })}
+                        </AtAccordion>
+                    </AtList>
+                    <AtList>
+                        <AtAccordion
+                            open={this.state.openattenders}
+                            onClick={value => this.setState({ openattenders: value })}
+                            title="人员列表"
+                        >
+                            {newinfos.map(item => {
+                                return (
+                                    <View key={item._id}>
+                                        <AtListItem
+                                            title={item.tag}
+                                            onClick={() => {
+                                                this.setState({ openinfo: item._id });
+                                            }}
+                                        />
+                                        {/* 对应listitem生成对应的modal */}
+                                        <AtModal isOpened={this.state.openinfo === item._id}>
+                                            <AtModalHeader>{item.tag+ " 的个人信息"} </AtModalHeader>
+                                            <AtModalContent>
+                                                <View className="at-row">
+                                                    <View className="at-col at-col-3">
+                                                        <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
+                                                    </View>
+                                                    <View className="at-col at-col-6">
+                                                        <Text>参与班次</Text>
+                                                    </View>
+                                                </View>
+                                                {/* 循环班次成员获取tag
+                                                <View>
+                                                    {bancis.filter(banci => banci._id === item.classid).length === 0 ? (
+                                                        <Text>没有成员</Text>
+                                                    ) : (
+                                                        //此处应有班次渲染代码
+                                                        <UserBadge
+                                                            user={this.props.user}
+                                                            infos={infos}
+                                                            banciID={item._id}
+                                                            schedule={schedule}
+                                                            deleteInfo={this.props.deleteInfo}
+                                                        />
+                                                    )}
+                                                </View> */}
+                                                <AtDivider></AtDivider>
+                                            </AtModalContent>
+                                            <AtModalAction>
+                                                <Button onClick={() => this.setState({ openmodal: "" })}>关闭</Button>
                                             </AtModalAction>
                                         </AtModal>
                                     </View>

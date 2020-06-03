@@ -74,6 +74,10 @@ type States = {
     failman: Array<User>;
     failclass: Array<Banci>;
     failinfo:Array<info>;
+
+    openattenders:boolean;
+
+    openinfo:string;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -127,7 +131,9 @@ class JoinSchedule extends Component<Props, States> {
             failman: [],
             failclass: [],
             newinfo: [],
-            failinfo:[]
+            failinfo:[],
+            openattenders: true,
+            openinfo: "",
         };
     }
 
@@ -566,13 +572,66 @@ class JoinSchedule extends Component<Props, States> {
                                 })}
                             </AtAccordion>
                         </AtList>
+                        <AtList>
+                            <AtAccordion
+                                open={this.state.openattenders}
+                                onClick={value => this.setState({ openattenders: value })}
+                                title="人员列表"
+                            >
+                                {infos.map(item => {
+                                    return (
+                                        <View key={item._id}>
+                                            <AtListItem
+                                                title={item.tag}
+                                                onClick={() => {
+                                                    this.setState({ openinfo: item._id });
+                                                }}
+                                            />
+                                            {/* 对应listitem生成对应的modal */}
+                                            <AtModal isOpened={this.state.openinfo === item._id}>
+                                                <AtModalHeader>{item.tag+ " 的个人信息"} </AtModalHeader>
+                                                <AtModalContent>
+                                                    <View className="at-row">
+                                                        <View className="at-col at-col-3">
+                                                            <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
+                                                        </View>
+                                                        <View className="at-col at-col-6">
+                                                            <Text>参与班次</Text>
+                                                        </View>
+                                                    </View>
+                                                    {/* 循环班次成员获取tag */}
+                                                    <View>
+                                                        {bancis.filter(banci => banci._id === item.classid).length === 0 ? (
+                                                            <Text>没有成员</Text>
+                                                        ) : (
+                                                           //此处应有班次渲染代码
+                                                            <UserBadge
+                                                                user={this.props.user}
+                                                                infos={infos}
+                                                                banciID={item._id}
+                                                                schedule={schedule}
+                                                                deleteInfo={this.props.deleteInfo}
+                                                            />
+                                                        )}
+                                                    </View>
+                                                    <AtDivider></AtDivider>
+                                                </AtModalContent>
+                                                <AtModalAction>
+                                                    <Button onClick={() => this.setState({ openmodal: "" })}>关闭</Button>
+                                                </AtModalAction>
+                                            </AtModal>
+                                        </View>
+                                    );
+                                })}
+                            </AtAccordion>
+                        </AtList>
                         <View className="btn">
                             <AtButton type="primary" onClick={this.arrangeSche}>
                                 生成排班
                             </AtButton>
-                            <AtButton type="primary" openType="share">
+                            {/* <AtButton type="primary" openType="share">
                                 分享此班表
-                            </AtButton>
+                            </AtButton> */}
                         </View>
                     </View>
 
