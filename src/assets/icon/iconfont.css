@@ -22,6 +22,7 @@
 
 .icon-editor:before {
   content: "\e6f6";
+  font-size: 50px;
 }
 
 .icon-add-account:before {

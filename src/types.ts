@@ -97,3 +97,14 @@ export interface publicscheResult{
     newinfo: Array<newinfo>;
   }
 }
+
+
+export interface updateTagResult{
+  errMsg: string;
+  requestID: string;
+  result:{
+    code:number,
+    newtag:string,
+    info:Array<info>
+  }
+}
