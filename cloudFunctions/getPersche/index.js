@@ -4,6 +4,7 @@ const cloud = require("wx-server-sdk");
 cloud.init();
 const db = cloud.database();
 const scheduleform = db.collection("schedules");
+const newinfoform = db.collection("newinfos");
 // 云函数入口函数
 exports.main = async (event, context) => {
     try {
@@ -13,6 +14,7 @@ exports.main = async (event, context) => {
         let ban = [];
         let info;
         let inform;
+        let newinfo;
         let i, j;
         const wxContext = cloud.getWXContext();
         const open_id = wxContext.OPENID;
@@ -23,6 +25,11 @@ exports.main = async (event, context) => {
             })
             .get();
 
+        newinfo = await newinfoform
+        .where({
+          userid:open_id
+        }).get()
+      
         inform = await db
             .collection("infos")
             .where({
@@ -80,7 +87,8 @@ exports.main = async (event, context) => {
             code: 200,
             schedules: sche,
             infos: inform.data,
-            bancis: ban
+            bancis: ban,
+            newinfos:newinfo.data
         };
     } catch (e) {
         return {

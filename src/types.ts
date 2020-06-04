@@ -26,6 +26,7 @@ export interface getPerscheResult {
         schedules: Array<Schedule>;
         infos: Array<info>;
         bancis: Array<Banci>;
+        newinfos: Array<newinfo>;
     };
 }
 
