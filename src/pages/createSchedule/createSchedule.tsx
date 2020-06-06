@@ -86,26 +86,6 @@ class CreateSchedule extends Component<Props, State> {
         this.handleBanciChange = this.handleBanciChange.bind(this);
     }
 
-    handleTitleChange(v: string) {
-        this.setState({ Title: v });
-    }
-
-    handleDescriptionChange(v: string) {
-        this.setState({ description: v });
-    }
-
-    handleStartactChange(e: any) {
-        var newDate = new Date();
-        newDate = getDateFromString(e.detail.value);
-        this.setState({ startact: newDate });
-    }
-
-    handleEndactChange(e: any) {
-        var newDate = new Date();
-        newDate = getDateFromString(e.detail.value);
-        this.setState({ endact: newDate });
-    }
-
     handleBanciChange(e: any, index: number, key: "RepeatType" | "RepeatStart" | "RepeatEnd" | "StartTime" | "EndTime") {
         var newBancis = this.state.bancis;
         var newDate = new Date();
@@ -149,6 +129,7 @@ class CreateSchedule extends Component<Props, State> {
     }
 
     onSubmit() {
+        Taro.showToast({ title: "创建中 ...", icon: "loading", duration: 2000 });
         Taro.cloud.init();
         const title = this.state.Title;
         const description = this.state.description;
@@ -204,6 +185,7 @@ class CreateSchedule extends Component<Props, State> {
                 }
             });
     }
+
     setBancivalue(value: number, index: number) {
         var newBancis = this.state.bancis;
         newBancis[index].count = value;
@@ -224,72 +206,87 @@ class CreateSchedule extends Component<Props, State> {
 
     render() {
         return (
-            <View style={{ margin: "24px" }}>
-                <AtForm onSubmit={this.onSubmit.bind(this)} onReset={this.onReset.bind(this)}>
-                    <View className="form-lable">班表标题</View>
-                    <AtInput
-                        name="title"
-                        type="text"
-                        placeholder="请输入班表标题"
-                        value={this.state.Title}
-                        onChange={this.handleTitleChange.bind(this)}
-                    />
-                    <View className="form-lable">班表描述</View>
-                    <AtInput
-                        name="description"
-                        type="text"
-                        placeholder="请输入班表描述"
-                        value={this.state.description}
-                        onChange={this.handleDescriptionChange.bind(this)}
-                    />
-                    <View className="form-lable">班表开始日期</View>
-                    <View>
-                        <Picker
-                            value={getDateString(this.state.startact, false)}
-                            mode="date"
-                            onChange={this.handleStartactChange.bind(this)}
-                        >
-                            <View className="picker form-value">{getDateString(this.state.startact, true)}</View>
-                        </Picker>
+            <AtForm onSubmit={this.onSubmit.bind(this)} onReset={this.onReset.bind(this)}>
+                <View style={{ padding: "24px" }}>
+                    <View style={{ marginBottom: "16px" }}>
+                        <Text className="form-lable">班表标题</Text>
+                        <AtInput
+                            name="title"
+                            type="text"
+                            placeholder="请输入班表标题"
+                            value={this.state.Title}
+                            onChange={value => this.setState({ Title: value.toString() })}
+                        />
                     </View>
-                    <Text className="form-lable">班表结束日期</Text>
-                    <View>
-                        <Picker value={getDateString(this.state.endact, false)} mode="date" onChange={this.handleEndactChange.bind(this)}>
+
+                    <View style={{ marginBottom: "16px" }}>
+                        <Text className="form-lable">班表描述</Text>
+                        <AtInput
+                            name="description"
+                            type="text"
+                            placeholder="请输入班表描述"
+                            value={this.state.description}
+                            onChange={value => this.setState({ description: value.toString() })}
+                        />
+                    </View>
+
+                    <View style={{ marginBottom: "16px" }}>
+                        <Text className="form-lable">班表开始日期</Text>
+                        <View>
+                            <Picker
+                                value={getDateString(this.state.startact, false)}
+                                mode="date"
+                                onChange={e => this.setState({ startact: getDateFromString(e.detail.value) })}
+                            >
+                                <View className="picker form-value">{getDateString(this.state.startact, true)}</View>
+                            </Picker>
+                        </View>
+                    </View>
+
+                    <View style={{ marginBottom: "16px" }}>
+                        <Text className="form-lable">班表结束日期</Text>
+                        <Picker
+                            value={getDateString(this.state.endact, false)}
+                            mode="date"
+                            onChange={e => this.setState({ endact: getDateFromString(e.detail.value) })}
+                        >
                             <View className="picker form-value">{getDateString(this.state.endact, true)}</View>
                         </Picker>
                     </View>
 
                     {this.state.bancis.map((banci, index) => (
-                        <View style={{ paddingBottom: "36px" }} key={index + 1}>
-                            <Text>班次 #{index + 1}</Text>
-                            <View style={{ backgroundColor: "rgb(240,240,240)", padding: "18px" }}>
-                                <Text className="form-lable">循环模式</Text>
-                                <Picker
-                                    value={0}
-                                    mode="selector"
-                                    range={["不重复", "日循环", "周循环", "月循环"]}
-                                    onChange={e => this.handleBanciChange(e, index, "RepeatType")}
-                                >
-                                    <View className="picker form-value">{banci.repeattype}</View>
-                                </Picker>
+                        <View className="banci-card" key={index + 1}>
+                            <Text className="title">班次 #{index + 1}</Text>
+                            <View className="inner">
+                                <View className="option">
+                                    <Text className="form-lable">循环模式</Text>
+                                    <Picker
+                                        value={0}
+                                        mode="selector"
+                                        range={["不重复", "日循环", "周循环", "月循环"]}
+                                        onChange={e => this.handleBanciChange(e, index, "RepeatType")}
+                                    >
+                                        <View className="picker form-value">{banci.repeattype}</View>
+                                    </Picker>
+                                </View>
+
                                 {banci.repeattype === "不重复" ? (
-                                    <View>
+                                    <View className="option">
                                         <Text className="form-lable">班次日期</Text>
-                                        <View>
-                                            <Picker
-                                                style={{ margin: "12px" }}
-                                                value={getDateString(banci.repeatStart, false)}
-                                                mode="date"
-                                                onChange={e => this.handleBanciChange(e, index, "RepeatStart")}
-                                            >
-                                                <View className="picker form-value">{getDateString(banci.repeatStart, true)}</View>
-                                            </Picker>
-                                        </View>
+                                        <Picker
+                                            style={{ margin: "12px" }}
+                                            value={getDateString(banci.repeatStart, false)}
+                                            mode="date"
+                                            onChange={e => this.handleBanciChange(e, index, "RepeatStart")}
+                                        >
+                                            <View className="picker form-value">{getDateString(banci.repeatStart, true)}</View>
+                                        </Picker>
                                     </View>
                                 ) : (
                                     <View>
-                                        <Text className="form-lable">循环起始日</Text>
-                                        <View>
+                                        <View className="option">
+                                            <Text className="form-lable">循环起始日</Text>
+
                                             <Picker
                                                 style={{ margin: "12px" }}
                                                 value={getDateString(banci.repeatStart, false)}
@@ -299,8 +296,8 @@ class CreateSchedule extends Component<Props, State> {
                                                 <View className="picker form-value">{getDateString(banci.repeatStart, true)}</View>
                                             </Picker>
                                         </View>
-                                        <Text className="form-lable">循环终止日</Text>
-                                        <View>
+                                        <View className="option">
+                                            <Text className="form-lable">循环终止日</Text>
                                             <Picker
                                                 style={{ margin: "12px" }}
                                                 value={getDateString(banci.repeatEnd, false)}
@@ -312,19 +309,23 @@ class CreateSchedule extends Component<Props, State> {
                                         </View>
                                     </View>
                                 )}
-                                <Text className="form-lable">需要人数</Text>
-                                <View>
-                                    <AtInputNumber
-                                        type="number"
-                                        value={this.state.bancis[index].count}
-                                        onChange={value => {
-                                            this.setBancivalue(value, index);
-                                        }}
-                                        step={1}
-                                    ></AtInputNumber>
+
+                                <View className="option">
+                                    <Text className="form-lable">需要人数</Text>
+                                    <View style={{ padding: "18px" }}>
+                                        <AtInputNumber
+                                            type="number"
+                                            value={this.state.bancis[index].count}
+                                            onChange={value => {
+                                                this.setBancivalue(value, index);
+                                            }}
+                                            step={1}
+                                        />
+                                    </View>
                                 </View>
-                                <Text className="form-lable">班次开始时间</Text>
-                                <View>
+
+                                <View className="option">
+                                    <Text className="form-lable">班次开始时间</Text>
                                     <Picker
                                         style={{ margin: "12px" }}
                                         value={getTimeString(banci.startTime, false)}
@@ -334,8 +335,9 @@ class CreateSchedule extends Component<Props, State> {
                                         <View className="picker form-value">{getTimeString(banci.startTime, true)}</View>
                                     </Picker>
                                 </View>
-                                <Text className="form-lable">班次结束时间</Text>
-                                <View>
+
+                                <View className="option">
+                                    <Text className="form-lable">班次结束时间</Text>
                                     <Picker
                                         style={{ margin: "12px" }}
                                         value={getTimeString(banci.endTime, false)}
@@ -357,8 +359,8 @@ class CreateSchedule extends Component<Props, State> {
 
                     <AtButton formType="submit">提交</AtButton>
                     <AtButton formType="reset">重置</AtButton>
-                </AtForm>
-            </View>
+                </View>
+            </AtForm>
         );
     }
 }

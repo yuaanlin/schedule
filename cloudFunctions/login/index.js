@@ -14,8 +14,8 @@ exports.main = async () => {
         if (!userInfo)
             return {
                 code: 404,
-                user:{
-                  _id:OPENID
+                user: {
+                    _id: OPENID
                 }
             };
         // 有记录，回传记录
@@ -30,9 +30,9 @@ exports.main = async () => {
                 }
             };
     } catch (e) {
-        console.error(e);
         return {
-            code: 500
+            code: 500,
+            msg: e
         };
     }
 };

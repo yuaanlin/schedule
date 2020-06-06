@@ -148,7 +148,7 @@ class Index extends Component<Props, States> {
     }
 
     deletesche(scheid: string, ownerid: string, userid: string) {
-        Taro.showToast({ title: "移除中", icon: "loading", duration: 2000 });
+        Taro.showToast({ title: "移除中", icon: "loading", duration: 5000 });
         if (ownerid === userid) {
             Taro.cloud
                 .callFunction({
@@ -160,9 +160,11 @@ class Index extends Component<Props, States> {
                 .then(res => {
                     const resdata = (res as unknown) as deletescheResult;
                     if (resdata.result.code === 200) {
+                        this.props.deleteSchedule(scheid);
                         Taro.showToast({ title: "移除成功", icon: "success", duration: 2000 });
+                    } else {
+                        Taro.showToast({ title: "移除失败", icon: "none", duration: 2000 });
                     }
-                    this.props.deleteSchedule(scheid);
                 });
         } else {
             Taro.showToast({ title: "您无权限删除该班表噢", icon: "none", duration: 2000 });
@@ -192,6 +194,7 @@ class Index extends Component<Props, States> {
             notLoaded: true
         };
     }
+
     render() {
         /** 我参加的班表 */
         var joinedSches = new Array<Schedule>();
@@ -259,13 +262,12 @@ class Index extends Component<Props, States> {
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
-
                                             let userid = this.props.user._id;
-
                                             var nums = getAttendersNumber(item._id);
 
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
                                                     options={[
                                                         {
@@ -277,7 +279,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText={"报名状态 " + nums.joined_num + "/" + nums.need_num}
@@ -308,6 +309,7 @@ class Index extends Component<Props, States> {
                                             let userid = this.props.user._id;
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
                                                     options={[
                                                         {
@@ -319,7 +321,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"
@@ -352,6 +353,7 @@ class Index extends Component<Props, States> {
                                             let userid = this.props.user._id;
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
                                                     options={[
                                                         {
@@ -363,7 +365,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"
@@ -398,6 +399,7 @@ class Index extends Component<Props, States> {
                                             let userid = this.props.user._id;
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
                                                     options={[
                                                         {
@@ -409,7 +411,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"
@@ -441,6 +442,7 @@ class Index extends Component<Props, States> {
                                             let end = getDateString(item.endact, true);
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, this.props.user._id)}
                                                     options={[
                                                         {
@@ -452,7 +454,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"
@@ -484,6 +485,7 @@ class Index extends Component<Props, States> {
                                             let end = getDateString(item.endact, true);
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, this.props.user._id)}
                                                     options={[
                                                         {
@@ -495,7 +497,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"

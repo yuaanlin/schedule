@@ -37,10 +37,9 @@ exports.main = async event => {
                 }
             }));
     } catch (e) {
-        console.error(e);
         return {
             code: 500,
-            message: "服务器错误"
+            message: e
         };
     }
 };

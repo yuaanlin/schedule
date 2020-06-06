@@ -9,25 +9,24 @@ const newinfoform = db.collection("newinfos");
 // 云函数入口函数
 exports.main = async event => {
     try {
-        
-        
-      const allUser = (await userCollection.get()).data;
-      const [userInfo] = allUser.filter(v => v._id === OPENID); let a;let b;
-        let c= [];
+        const allUser = (await userCollection.get()).data;
+        const [userInfo] = allUser.filter(v => v._id === OPENID);
+        let a;
+        let b;
+        let c = [];
         let i;
         let newinfo;
         const wxContext = cloud.getWXContext();
         const { scheid } = event;
 
-        b = await scheduleform
-            .doc(scheid)
-            .get();
+        b = await scheduleform.doc(scheid).get();
 
         newinfo = await newinfoform
-          .where({
-            scheid:b._id
-          }).get();
-          
+            .where({
+                scheid: b._id
+            })
+            .get();
+
         await db
             .collection("bancis")
             .aggregate()
@@ -43,8 +42,7 @@ exports.main = async event => {
             .end()
             .then(res => {
                 a = res;
-            })
-            .catch(err => console.error(err));
+            });
 
         for (i = 0; i < a.list.length; i++) c = c.concat(a.list[i].userlist);
         return {
@@ -52,7 +50,7 @@ exports.main = async event => {
             schedule: b.data,
             bancis: a.list,
             userinfo: c,
-            newinfo:newinfo
+            newinfo: newinfo
         };
     } catch (e) {
         return { code: 500, msg: e };
