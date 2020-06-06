@@ -10,8 +10,9 @@ interface Props {
     user: User;
     infos: Array<info>;
     banciID: string;
-    schedule:Schedule;
+    schedule: Schedule;
     deleteInfo: (id: string) => void;
+    updateAttendersNumber: () => void;
 }
 
 export default class UserBadge extends Component<Props> {
@@ -31,6 +32,7 @@ export default class UserBadge extends Component<Props> {
                         Taro.showToast({ title: "移除成功", icon: "success", duration: 2000 });
                     }
                     this.props.deleteInfo(info_id);
+                    this.props.updateAttendersNumber();
                 });
         } else {
             Taro.showToast({ title: "您无权限编辑他人的班次选择噢", icon: "none", duration: 2000 });
@@ -38,6 +40,7 @@ export default class UserBadge extends Component<Props> {
     }
 
     render() {
+        if (this.props.infos === undefined) return <View />;
         return (
           this.props.infos?(
             <View>

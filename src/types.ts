@@ -2,7 +2,7 @@ import Banci from "src/classes/banci";
 import info from "./classes/info";
 import Schedule from "./classes/schedule";
 import User from "./classes/user";
-import newinfo from "./classes/newinfo"
+import newinfo from "./classes/newinfo";
 
 /** 云函数 "Login" 的返回格式 */
 export interface loginResult {
@@ -69,47 +69,43 @@ export interface updatescheResult {
     };
 }
 
-export interface arrangescheResult{
-  errMsg: string;
-  requestID: string;
-  result:{
-    code:number;
-    leftban:Array<Banci>;
-    leftman: Array<User>;
-    infos: Array<info>;
-    failinfo: Array<info>;
-  }
+export interface arrangescheResult {
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+        leftban: Array<Banci>;
+        leftman: Array<User>;
+        infos: Array<info>;
+        failinfo: Array<info>;
+    };
 }
 
-export interface deleteinfoResult{
-  errMsg: string;
-  requestID: string;
-  result: {
-    code: number;
-  }
+export interface deleteinfoResult {
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+    };
 }
 
-export interface publicscheResult{
-  errMsg: string;
-  requestID: string;
-  result:{
-    code: number;
-    schedule:Schedule;
-    newinfo: Array<newinfo>;
-  }
+export interface publicscheResult {
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+        schedule: Schedule;
+        newinfo: Array<newinfo>;
+    };
 }
 
-
-export interface updateTagResult{
-  errMsg: string;
-  requestID: string;
-  result:{
-    code:number,
-    data:{
-      newtag:string,
-      info:Array<info>
-    }
-  }
+export interface newinfoResult {
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+        data: info;
+    };
 }
 
 
@@ -119,4 +115,14 @@ export interface deletescheResult{
   result:{
     code: number;
   }
+}
+
+export interface updateTagResult {
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+        newtag: string;
+        info: Array<info>;
+    };
 }
