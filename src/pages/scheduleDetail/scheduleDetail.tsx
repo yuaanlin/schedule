@@ -196,7 +196,7 @@ class ScheduleDetail extends Component<Props, States> {
             this.setState({ infos: infor });
         }
         this.setState({ openbanci: true });
-        console.log(this.props)
+        // console.log(this.props)
     }
 
     onShareAppMessage() {
@@ -231,9 +231,9 @@ class ScheduleDetail extends Component<Props, States> {
       }).then(res => {
         var resdata = (res as unknown) as updateTagResult;
         if(resdata.result.code === 200){
-          console.log(resdata.result)
+          // console.log(resdata.result)
           resdata.result.info.map(x=>this.props.updateInfo(x))
-          console.log(this.props.infos)
+          // console.log(this.props.infos)
           Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
         }else{
           Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
@@ -245,7 +245,7 @@ class ScheduleDetail extends Component<Props, States> {
         // const { infos } = this.state;
         const { newinfos } = this.state;
 
-        console.log(newinfos)
+        // console.log(newinfos)
         if (schedule === undefined) return <View>发生错误</View>;
 
         let ban = this.props.bancis.filter(banci => banci.scheid === schedule._id);
@@ -258,7 +258,7 @@ class ScheduleDetail extends Component<Props, States> {
             });
             return found;
         });
-        console.log(this.props)
+        // console.log(this.props)
         // const infos = infor;
         // const bancis = ban;
         return (

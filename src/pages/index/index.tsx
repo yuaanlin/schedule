@@ -1,7 +1,7 @@
 import { Button, Text, View } from "@tarojs/components";
 import { connect, Provider } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { AtAccordion, AtCard, AtFab, AtList, AtSearchBar, AtTabBar, AtTabs, AtTabsPane } from "taro-ui";
+import { AtAccordion, AtCard, AtFab, AtList, AtSearchBar, AtTabBar, AtTabs, AtTabsPane,AtSwipeAction ,AtListItem} from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
@@ -9,12 +9,12 @@ import User from "../../classes/user";
 import newinfo from "../../classes/newinfo"
 import { updateBanci } from "../../redux/actions/banci";
 import { updateInfo } from "../../redux/actions/info";
-import { updateSchedule } from "../../redux/actions/schedule";
+import { updateSchedule , deleteSchedule} from "../../redux/actions/schedule";
 import { updatenewInfo } from "../../redux/actions/newinfo";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import { getPerscheResult, loginResult, postUserInfoResult } from "../../types";
+import { getPerscheResult, loginResult, postUserInfoResult, deletescheResult} from "../../types";
 import getDateString from "../../utils/getDateString";
 import "./index.scss";
 
@@ -26,6 +26,7 @@ type Props = {
     infos: Array<info>;
     setUserData: (user: User) => void;
     updateSchedule: (Schedule: Schedule) => void;
+    deleteSchedule: (id:string) => void;
     updateBanci: (banci: Banci) => void;
     updateInfo: (info: info) => void;
     updatenewInfo: (newinfo: newinfo) => void;
@@ -70,6 +71,9 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         },
         updatenewInfo: (newinfo: newinfo) => {
             dispatch(updatenewInfo(newinfo));
+        },
+        deleteSchedule: (id: string)=>{
+            dispatch(deleteSchedule(id));
         }
     };
 }
@@ -141,6 +145,31 @@ class Index extends Component<Props, States> {
         });
     }
 
+    deletesche(scheid:string,ownerid:string,userid:string){
+      console.log(userid)
+      console.log(ownerid)
+      console.log(this.props)
+      console.log(scheid)
+      Taro.showToast({ title: "移除中", icon: "loading", duration: 2000 });
+      if(ownerid===userid){
+        Taro.cloud
+        .callFunction({
+          name: "deletesche",
+          data: {
+            scheid:scheid
+          }
+        }).then(res=>{
+          const resdata = (res as unknown) as deletescheResult;
+          if (resdata.result.code === 200) {
+              Taro.showToast({ title: "移除成功", icon: "success", duration: 2000 });
+          }
+          this.props.deleteSchedule(scheid);
+        })
+      }else{
+        Taro.showToast({ title: "您无权限删除该班表噢", icon: "none", duration: 2000 });
+      }
+
+    }
     handlebarClick(value: number) {
         this.setState({
             tabcurrent: value
@@ -168,19 +197,29 @@ class Index extends Component<Props, States> {
     render() {
         /** 我参加的班表 */
         var joinedSches = new Array<Schedule>();
-        this.props.schedules.map(sche => {
+        if(this.props.schedules){
+          this.props.schedules.map(sche => {
             if (sche.ownerID !== this.props.user._id && sche.attenders.includes(this.props.user._id)) {
                 joinedSches.push(sche);
             }
-        });
+          });
+        }else{
+          joinedSches = []
+        }
+
 
         /** 我组织的班表 */
         var ownedSches = new Array<Schedule>();
-        this.props.schedules.map(sche => {
+        if(this.props.schedules){
+          this.props.schedules.map(sche => {
             if (sche.ownerID === this.props.user._id) {
                 ownedSches.push(sche);
             }
-        });
+          });
+        }else{
+          ownedSches = []
+        }
+
 
         /** 还在登入 */
         if (this.state.notLoaded) {
@@ -206,6 +245,7 @@ class Index extends Component<Props, States> {
         /** 已经登入 */
         const tabList = [{ title: "我组织的" }, { title: "我参与的" }];
 
+        console.log(this.props)
         return (
             <Provider store={store}>
                 <AtSearchBar value={this.state.searchvalue} onChange={value => this.setState({ searchvalue: value })} />
@@ -225,17 +265,27 @@ class Index extends Component<Props, States> {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
                                             return (
-                                                <AtCard
+                                              <AtSwipeAction options={[
+                                                {
+                                                  text:'删除',
+                                                  style: {
+                                                    backgroundColor: '#6190E8'
+                                                  }
+                                                }
+                                              ]}
+                                              >
+                                                <AtListItem
                                                     key={item._id}
                                                     note={start + " 到 " + end}
                                                     title={item.title}
-                                                    extra="填写人数"
+                                                    extraText="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
                                                             url: "../joinSchedule/joinSchedule?_id=" + item._id
                                                         });
                                                     }}
                                                 />
+                                              </AtSwipeAction>
                                             );
                                         })}
                                 </AtList>
@@ -253,19 +303,29 @@ class Index extends Component<Props, States> {
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
+                                            let userid = this.props.user._id
                                             return (
-                                                <AtCard
+                                              <AtSwipeAction onClick={this.deletesche.bind(this,item._id,item.ownerID,userid)} options={[
+                                                {
+                                                  text:'删除',
+                                                  style: {
+                                                    backgroundColor: '#6190E8'
+                                                  }
+                                                }
+                                              ]}
+                                              >
+                                                <AtListItem
                                                     key={item._id}
                                                     note={start + " 到 " + end}
                                                     title={item.title}
-                                                    extra="填写人数"
+                                                    extraText="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
                                                             url: "../scheduleDetail/scheduleDetail?_id=" + item._id
                                                         });
                                                     }}
                                                 />
-                                            );
+                                              </AtSwipeAction>                                            );
                                         })}
                                 </AtList>
                             </AtAccordion>
@@ -285,11 +345,12 @@ class Index extends Component<Props, States> {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
                                             return (
-                                                <AtCard
+
+                                                <AtListItem
                                                     key={item._id}
                                                     note={start + " 到 " + end}
                                                     title={item.title}
-                                                    extra="填写人数"
+                                                    extraText="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
                                                             url: "../scheduleDetail/scheduleDetail?_id=" + item._id
@@ -318,11 +379,11 @@ class Index extends Component<Props, States> {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
                                             return (
-                                                <AtCard
+                                                <AtListItem
                                                     key={item._id}
                                                     note={start + " 到 " + end}
                                                     title={item.title}
-                                                    extra="填写人数"
+                                                    extraText="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
                                                             url: "../joinSchedule/joinSchedule?_id=" + item._id
@@ -349,11 +410,11 @@ class Index extends Component<Props, States> {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
                                             return (
-                                                <AtCard
+                                                <AtListItem
                                                     key={item._id}
                                                     note={start + " 到 " + end}
                                                     title={item.title}
-                                                    extra="填写人数"
+                                                    extraText="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
                                                             url: "../scheduleDetail/scheduleDetail?_id=" + item._id
@@ -380,11 +441,11 @@ class Index extends Component<Props, States> {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
                                             return (
-                                                <AtCard
+                                                <AtListItem
                                                     key={item._id}
                                                     note={start + " 到 " + end}
                                                     title={item.title}
-                                                    extra="填写人数"
+                                                    extraText="填写人数"
                                                     onClick={() => {
                                                         Taro.navigateTo({
                                                             url: "../scheduleDetail/scheduleDetail?_id=" + item._id
