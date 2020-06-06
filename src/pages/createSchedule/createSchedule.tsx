@@ -227,12 +227,28 @@ class CreateSchedule extends Component<Props, State> {
             <View style={{ margin: "24px" }}>
                 <AtForm onSubmit={this.onSubmit.bind(this)} onReset={this.onReset.bind(this)}>
                     <View className="form-lable">班表标题</View>
-                    <AtInput name="title" type="text" placeholder="请输入班表标题" value={this.state.Title} onChange={this.handleTitleChange.bind(this)} />
+                    <AtInput
+                        name="title"
+                        type="text"
+                        placeholder="请输入班表标题"
+                        value={this.state.Title}
+                        onChange={this.handleTitleChange.bind(this)}
+                    />
                     <View className="form-lable">班表描述</View>
-                    <AtInput name="description" type="text" placeholder="请输入班表描述" value={this.state.description} onChange={this.handleDescriptionChange.bind(this)} />
+                    <AtInput
+                        name="description"
+                        type="text"
+                        placeholder="请输入班表描述"
+                        value={this.state.description}
+                        onChange={this.handleDescriptionChange.bind(this)}
+                    />
                     <View className="form-lable">班表开始日期</View>
                     <View>
-                        <Picker value={getDateString(this.state.startact, false)} mode="date" onChange={this.handleStartactChange.bind(this)}>
+                        <Picker
+                            value={getDateString(this.state.startact, false)}
+                            mode="date"
+                            onChange={this.handleStartactChange.bind(this)}
+                        >
                             <View className="picker form-value">{getDateString(this.state.startact, true)}</View>
                         </Picker>
                     </View>
@@ -248,7 +264,12 @@ class CreateSchedule extends Component<Props, State> {
                             <Text>班次 #{index + 1}</Text>
                             <View style={{ backgroundColor: "rgb(240,240,240)", padding: "18px" }}>
                                 <Text className="form-lable">循环模式</Text>
-                                <Picker value={0} mode="selector" range={["不重复", "日循环", "周循环", "月循环"]} onChange={e => this.handleBanciChange(e, index, "RepeatType")}>
+                                <Picker
+                                    value={0}
+                                    mode="selector"
+                                    range={["不重复", "日循环", "周循环", "月循环"]}
+                                    onChange={e => this.handleBanciChange(e, index, "RepeatType")}
+                                >
                                     <View className="picker form-value">{banci.repeattype}</View>
                                 </Picker>
                                 {banci.repeattype === "不重复" ? (
