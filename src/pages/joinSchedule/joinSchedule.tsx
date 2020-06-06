@@ -36,6 +36,7 @@ import {
     arrangescheResult,
     publicscheResult,
     updateTagResult,
+    updateTipsResult,
     newinfoResult
 } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
@@ -65,6 +66,7 @@ type States = {
     gettag: boolean;
     warntag: boolean;
     tag: string;
+    tips:string;
     author: boolean;
 
     // 正在编辑的项目
@@ -139,6 +141,7 @@ class JoinSchedule extends Component<Props, States> {
             gettag: false,
             warntag: false,
             tag: "",
+            tips:"",
             author: false,
             showresult: false,
             failclass: [],
@@ -422,6 +425,35 @@ class JoinSchedule extends Component<Props, States> {
                 }
             });
     };
+    updateTips = (banci:Banci,tips:string)=>{
+      if(banci.tips)
+          banci.tips = [...banci.tips,tips]
+      else
+          banci.tips = ["",tips]
+      console.log(banci)
+      Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
+      this.setState({tips:""})
+      Taro.cloud
+        .callFunction({
+            name: "updateTips",
+            data: {
+                _id:banci._id,
+                tips:banci.tips,
+            }
+        })
+        .then(res => {
+            var resdata = (res as unknown) as updateTipsResult;
+            console.log(resdata)
+            if (resdata.result.code === 200) {
+                this.props.updateBanci(resdata.result.newban)
+                Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
+
+            } else {
+                Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+
+            }
+        });
+    }
 
     render() {
         var scheID = this.$router.params._id;
@@ -636,11 +668,46 @@ class JoinSchedule extends Component<Props, States> {
                                                     </View>
                                                     <AtDivider></AtDivider>
                                                     <View className="at-row">
-                                                        <View className="at-col at-col-3">
+                                                        <View className="at-col at-col-1">
                                                             <AtIcon prefixClass="icon" value="suggest"></AtIcon>
                                                         </View>
-                                                        <View className="at-col at-col-6">{<Text>注意事项之类的</Text>}</View>
+                                                        <View className="at-col at-col-8">
+                                                          {item.tips===undefined||null?(
+                                                            <AtInput
+                                                              name="tips"
+                                                              maxLength={10}
+                                                              placeholder='班次共享备注'
+                                                              value={this.state.tips}
+                                                              onChange={v => {
+                                                                  this.setState({ tips: v.toString() });
+                                                              }}
+                                                          ></AtInput>
+                                                          ):(
+                                                            <View key={item._id+1}>
+                                                              {item.tips.map(x=>{
+                                                                console.log(item.tips)
+                                                                return(
+                                                                  <AtInput
+                                                                    name="tips"
+                                                                    value={x}
+                                                                    onChange={v => {
+                                                                        this.setState({ tips: v.toString() });
+                                                                    }}
+                                                                ></AtInput>
+                                                                )
+                                                              })}
+                                                            </View>
+                                                          )}
+                                                        </View>
+                                                        <View className="at-col at-col-3">
+                                                            <AtBadge>
+                                                                <AtButton size="small" onClick={() => this.updateTips(item, this.state.tips)}>
+                                                                    添加
+                                                                </AtButton>
+                                                            </AtBadge>
+                                                        </View>
                                                     </View>
+
                                                 </AtModalContent>
                                                 <AtModalAction>
                                                     <Button onClick={() => this.setState({ openmodal: "" })}>关闭</Button>

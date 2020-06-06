@@ -18,12 +18,16 @@ export default class Banci {
     // 班次结束时间
     endTime: Date;
 
+    //班次内tips
+    tips: Array<string>;
+
     constructor(banci: Banci = defaultBanci) {
         this._id = banci._id;
         this.count = banci.count;
         this.scheid = banci.scheid;
         this.startTime = new Date(banci.startTime);
         this.endTime = new Date(banci.endTime);
+        this.tips = banci.tips;
     }
 }
 
@@ -32,5 +36,6 @@ const defaultBanci = {
     scheid: "",
     count: 0,
     startTime: new Date(),
-    endTime: new Date()
+    endTime: new Date(),
+    tips: [],
 };

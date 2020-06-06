@@ -126,3 +126,12 @@ export interface updateTagResult {
         info: Array<info>;
     };
 }
+
+export interface updateTipsResult {
+  errMsg: string;
+  requestID: string;
+  result: {
+    code: number;
+    newban:Banci;
+  }
+}
