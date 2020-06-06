@@ -264,12 +264,13 @@ class Index extends Component<Props, States> {
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
+                                            let userid = this.props.user._id
                                             return (
-                                              <AtSwipeAction options={[
+                                              <AtSwipeAction onClick={this.deletesche.bind(this,item._id,item.ownerID,userid)} options={[
                                                 {
                                                   text:'删除',
                                                   style: {
-                                                    backgroundColor: '#6190E8'
+                                                    backgroundColor: '#79a8a9'
                                                   }
                                                 }
                                               ]}
@@ -309,7 +310,7 @@ class Index extends Component<Props, States> {
                                                 {
                                                   text:'删除',
                                                   style: {
-                                                    backgroundColor: '#6190E8'
+                                                    backgroundColor: '#79a8a9'
                                                   }
                                                 }
                                               ]}
@@ -344,19 +345,30 @@ class Index extends Component<Props, States> {
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
+                                            let userid = this.props.user._id
                                             return (
+                                                <AtSwipeAction onClick={this.deletesche.bind(this,item._id,item.ownerID,userid)} options={[
+                                                {
+                                                    text:'删除',
+                                                    style: {
+                                                        backgroundColor: '#79a8a9'
+                                                    }
+                                                }
+                                                ]}
+                                                >
 
-                                                <AtListItem
-                                                    key={item._id}
-                                                    note={start + " 到 " + end}
-                                                    title={item.title}
-                                                    extraText="填写人数"
-                                                    onClick={() => {
-                                                        Taro.navigateTo({
-                                                            url: "../scheduleDetail/scheduleDetail?_id=" + item._id
-                                                        });
-                                                    }}
-                                                />
+                                                    <AtListItem
+                                                        key={item._id}
+                                                        note={start + " 到 " + end}
+                                                        title={item.title}
+                                                        extraText="填写人数"
+                                                        onClick={() => {
+                                                            Taro.navigateTo({
+                                                                url: "../scheduleDetail/scheduleDetail?_id=" + item._id
+                                                            });
+                                                        }}
+                                                    />
+                                                </AtSwipeAction>
                                             );
                                         })}
                                 </AtList>
@@ -378,18 +390,29 @@ class Index extends Component<Props, States> {
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
+                                            let userid = this.props.user._id
                                             return (
-                                                <AtListItem
-                                                    key={item._id}
-                                                    note={start + " 到 " + end}
-                                                    title={item.title}
-                                                    extraText="填写人数"
-                                                    onClick={() => {
-                                                        Taro.navigateTo({
-                                                            url: "../joinSchedule/joinSchedule?_id=" + item._id
-                                                        });
-                                                    }}
-                                                />
+                                                <AtSwipeAction onClick={this.deletesche.bind(this,item._id,item.ownerID,userid)} options={[
+                                                    {
+                                                    text:'删除',
+                                                    style: {
+                                                        backgroundColor: '#79a8a9'
+                                                    }
+                                                }
+                                                ]}
+                                                >
+                                                    <AtListItem
+                                                        key={item._id}
+                                                        note={start + " 到 " + end}
+                                                        title={item.title}
+                                                        extraText="填写人数"
+                                                        onClick={() => {
+                                                            Taro.navigateTo({
+                                                                url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                            });
+                                                        }}
+                                                    />
+                                                </AtSwipeAction>
                                             );
                                         })}
                                 </AtList>
@@ -410,17 +433,27 @@ class Index extends Component<Props, States> {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
                                             return (
-                                                <AtListItem
-                                                    key={item._id}
-                                                    note={start + " 到 " + end}
-                                                    title={item.title}
-                                                    extraText="填写人数"
-                                                    onClick={() => {
-                                                        Taro.navigateTo({
-                                                            url: "../scheduleDetail/scheduleDetail?_id=" + item._id
-                                                        });
-                                                    }}
-                                                />
+                                                <AtSwipeAction onClick={this.deletesche.bind(this,item._id,item.ownerID,userid)} options={[
+                                                    {
+                                                    text:'删除',
+                                                    style: {
+                                                        backgroundColor: '#79a8a9'
+                                                    }
+                                                }
+                                                ]}
+                                                >
+                                                    <AtListItem
+                                                        key={item._id}
+                                                        note={start + " 到 " + end}
+                                                        title={item.title}
+                                                        extraText="填写人数"
+                                                        onClick={() => {
+                                                            Taro.navigateTo({
+                                                                url: "../scheduleDetail/scheduleDetail?_id=" + item._id
+                                                            });
+                                                        }}
+                                                    />
+                                                </AtSwipeAction>
                                             );
                                         })}
                                 </AtList>
@@ -441,6 +474,15 @@ class Index extends Component<Props, States> {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
                                             return (
+                                                <AtSwipeAction onClick={this.deletesche.bind(this,item._id,item.ownerID,userid)} options={[
+                                                    {
+                                                    text:'删除',
+                                                    style: {
+                                                        backgroundColor: '#79a8a9'
+                                                    }
+                                                }
+                                                ]}
+                                                >
                                                 <AtListItem
                                                     key={item._id}
                                                     note={start + " 到 " + end}
@@ -452,6 +494,7 @@ class Index extends Component<Props, States> {
                                                         });
                                                     }}
                                                 />
+                                            </AtSwipeAction>
                                             );
                                         })}
                                 </AtList>
