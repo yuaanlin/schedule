@@ -6,7 +6,7 @@ import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
-import newinfo from "../../classes/newinfo"
+import newinfo from "../../classes/newinfo";
 import { updateBanci } from "../../redux/actions/banci";
 import { updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
@@ -17,6 +17,7 @@ import { AppState } from "../../redux/types";
 import { getPerscheResult, loginResult, postUserInfoResult } from "../../types";
 import getDateString from "../../utils/getDateString";
 import "./index.scss";
+import getAttendersNumber from "../../utils/getAttendersNumber";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -50,7 +51,7 @@ function mapStateToProps(state: AppState) {
         schedules: state.schedules,
         bancis: state.bancis,
         infos: state.infos,
-        newinfo: state.newinfos,
+        newinfo: state.newinfos
     };
 }
 
@@ -104,7 +105,7 @@ class Index extends Component<Props, States> {
                                     this.props.updateInfo(info);
                                 });
                                 resdata.result.newinfos.map(newinfo => {
-                                  this.props.updatenewInfo(newinfo);
+                                    this.props.updatenewInfo(newinfo);
                                 });
                                 resdata.result.bancis.map(banci => {
                                     this.props.updateBanci(banci);
@@ -224,12 +225,13 @@ class Index extends Component<Props, States> {
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
+                                            var nums = getAttendersNumber(item._id);
                                             return (
                                                 <AtCard
                                                     key={item._id}
                                                     note={start + " 到 " + end}
                                                     title={item.title}
-                                                    extra="填写人数"
+                                                    extra={"报名状态 " + nums.joined_num + "/" + nums.need_num}
                                                     onClick={() => {
                                                         Taro.navigateTo({
                                                             url: "../joinSchedule/joinSchedule?_id=" + item._id
