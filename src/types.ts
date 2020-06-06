@@ -26,6 +26,7 @@ export interface getPerscheResult {
         schedules: Array<Schedule>;
         infos: Array<info>;
         bancis: Array<Banci>;
+        newinfos: Array<newinfo>;
     };
 }
 
@@ -76,6 +77,7 @@ export interface arrangescheResult{
     leftban:Array<Banci>;
     leftman: Array<User>;
     infos: Array<info>;
+    failinfo: Array<info>;
   }
 }
 
@@ -94,5 +96,16 @@ export interface publicscheResult{
     code: number;
     schedule:Schedule;
     newinfo: Array<newinfo>;
+  }
+}
+
+
+export interface updateTagResult{
+  errMsg: string;
+  requestID: string;
+  result:{
+    code:number,
+    newtag:string,
+    info:Array<info>
   }
 }

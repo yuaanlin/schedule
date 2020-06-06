@@ -6,9 +6,11 @@ import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
+import newinfo from "../../classes/newinfo"
 import { updateBanci } from "../../redux/actions/banci";
 import { updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
+import { updatenewInfo } from "../../redux/actions/newinfo";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
@@ -26,6 +28,7 @@ type Props = {
     updateSchedule: (Schedule: Schedule) => void;
     updateBanci: (banci: Banci) => void;
     updateInfo: (info: info) => void;
+    updatenewInfo: (newinfo: newinfo) => void;
 };
 
 type States = {
@@ -46,7 +49,8 @@ function mapStateToProps(state: AppState) {
         user: state.user,
         schedules: state.schedules,
         bancis: state.bancis,
-        infos: state.infos
+        infos: state.infos,
+        newinfo: state.newinfos,
     };
 }
 
@@ -63,6 +67,9 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         },
         updateBanci: (banci: Banci) => {
             dispatch(updateBanci(banci));
+        },
+        updatenewInfo: (newinfo: newinfo) => {
+            dispatch(updatenewInfo(newinfo));
         }
     };
 }
@@ -95,6 +102,9 @@ class Index extends Component<Props, States> {
                                 });
                                 resdata.result.infos.map(info => {
                                     this.props.updateInfo(info);
+                                });
+                                resdata.result.newinfos.map(newinfo => {
+                                  this.props.updatenewInfo(newinfo);
                                 });
                                 resdata.result.bancis.map(banci => {
                                     this.props.updateBanci(banci);
