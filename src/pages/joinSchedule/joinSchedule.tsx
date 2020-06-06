@@ -29,7 +29,15 @@ import { setUserData } from "../../redux/actions/user";
 import { updatenewInfo } from "../../redux/actions/newinfo";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import { getPerscheResult, loginResult, updatescheResult, arrangescheResult, publicscheResult, updateTagResult } from "../../types";
+import {
+    getPerscheResult,
+    loginResult,
+    updatescheResult,
+    arrangescheResult,
+    publicscheResult,
+    updateTagResult,
+    newinfoResult
+} from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
 import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
@@ -69,16 +77,19 @@ type States = {
     inputingDate: Date;
     showresult: boolean;
 
-    //成功info信息
+    // 成功info信息
     newinfo: Array<info>;
-    //失败信息
-    failman: Array<User>;
+    // 失败信息
     failclass: Array<Banci>;
     failinfo: Array<info>;
 
     openattenders: boolean;
 
     openinfo: string;
+
+    // 班表当前人数
+    need_attenders_number: number;
+    joined_attenders_number: number;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -129,12 +140,13 @@ class JoinSchedule extends Component<Props, States> {
             tag: "",
             author: false,
             showresult: false,
-            failman: [],
             failclass: [],
             newinfo: [],
             failinfo: [],
             openattenders: true,
-            openinfo: ""
+            openinfo: "",
+            need_attenders_number: 0,
+            joined_attenders_number: 0
         };
     }
 
@@ -164,32 +176,19 @@ class JoinSchedule extends Component<Props, States> {
                     scheid: scheID
                 }
             })
-            .then(() =>
-                Taro.cloud
-                    .callFunction({
-                        name: "getPersche"
-                    })
-                    .then(res => {
-                        var resdata = (res as unknown) as getPerscheResult;
-                        if (resdata.result.code === 200) {
-                            resdata.result.schedules.map(sche => {
-                                this.props.updateSchedule(sche);
-                            });
-                            resdata.result.infos.map(info => {
-                                this.props.updateInfo(info);
-                            });
-                            resdata.result.bancis.map(banci => {
-                                this.props.updateBanci(banci);
-                            });
-                            Taro.showToast({ title: "报名成功", icon: "success", duration: 2000 });
-                        } else {
-                            Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
-                            Taro.redirectTo({
-                                url: "../index/index"
-                            });
-                        }
-                    })
-            );
+            .then(res => {
+                var resdata = (res as unknown) as newinfoResult;
+                if (resdata.result.code === 200) {
+                    this.props.updateInfo(resdata.result.data);
+                    this.updateAttendersNumber();
+                    Taro.showToast({ title: "报名成功", icon: "success", duration: 2000 });
+                } else {
+                    Taro.showToast({ title: "班表失败", icon: "none", duration: 2000 });
+                    Taro.redirectTo({
+                        url: "../index/index"
+                    });
+                }
+            });
     }
 
     publicsche() {
@@ -293,7 +292,25 @@ class JoinSchedule extends Component<Props, States> {
         } else {
             this.setState({ author: false });
         }
+
+        this.updateAttendersNumber();
     }
+
+    /** 计算班表人数数据 */
+    updateAttendersNumber = () => {
+        var scheID = this.$router.params._id;
+        var need_num = 0;
+        this.props.bancis.map(b => {
+            if (b.scheid === scheID) need_num += b.count;
+            return null;
+        });
+        var joined_num = 0;
+        this.props.infos.map(i => {
+            if (i.scheid === scheID) joined_num++;
+            return null;
+        });
+        this.setState({ need_attenders_number: need_num, joined_attenders_number: joined_num });
+    };
 
     onShareAppMessage() {
         return {
@@ -338,7 +355,6 @@ class JoinSchedule extends Component<Props, States> {
                             showresult: true,
                             newinfo: resdata.result.infos,
                             failinfo: resdata.result.failinfo,
-                            failman: resdata.result.leftman,
                             failclass: resdata.result.leftban
                         });
                     }
@@ -546,6 +562,10 @@ class JoinSchedule extends Component<Props, States> {
                                     this.setState({ editing: "endact", inputingDate: schedule.endact });
                             }}
                         />
+                        <AtListItem
+                            title={"当前已有 " + this.state.joined_attenders_number + " 个空缺被报名"}
+                            note={"总共有 " + this.state.need_attenders_number + " 个空缺"}
+                        />
                         <AtListItem note="该班表正在报名阶段，您可以从下方选择要报名的班次来参加。" />
                     </AtList>
                     <View style={{ marginTop: "32px" }}>
@@ -599,6 +619,7 @@ class JoinSchedule extends Component<Props, States> {
                                                                 banciID={item._id}
                                                                 schedule={schedule}
                                                                 deleteInfo={this.props.deleteInfo}
+                                                                updateAttendersNumber={this.updateAttendersNumber}
                                                             />
                                                         )}
                                                     </View>
