@@ -43,6 +43,7 @@ import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
 import getTimeString from "../../utils/getTimeString";
 import "./joinSchedule.scss";
+import getAttendersNumber from "../../utils/getAttendersNumber";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -298,18 +299,8 @@ class JoinSchedule extends Component<Props, States> {
 
     /** 计算班表人数数据 */
     updateAttendersNumber = () => {
-        var scheID = this.$router.params._id;
-        var need_num = 0;
-        this.props.bancis.map(b => {
-            if (b.scheid === scheID) need_num += b.count;
-            return null;
-        });
-        var joined_num = 0;
-        this.props.infos.map(i => {
-            if (i.scheid === scheID) joined_num++;
-            return null;
-        });
-        this.setState({ need_attenders_number: need_num, joined_attenders_number: joined_num });
+        var nums = getAttendersNumber(this.$router.params._id);
+        this.setState({ need_attenders_number: nums.need_num, joined_attenders_number: nums.joined_num });
     };
 
     onShareAppMessage() {
