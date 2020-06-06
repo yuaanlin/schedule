@@ -108,6 +108,15 @@ export interface newinfoResult {
     };
 }
 
+
+export interface deletescheResult{
+  errMsg: string;
+  requestID: string;
+  result:{
+    code: number;
+  }
+}
+
 export interface updateTagResult {
     errMsg: string;
     requestID: string;

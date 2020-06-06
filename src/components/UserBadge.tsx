@@ -42,6 +42,7 @@ export default class UserBadge extends Component<Props> {
     render() {
         if (this.props.infos === undefined) return <View />;
         return (
+          this.props.infos?(
             <View>
                 {this.props.infos.map(x => {
                     if (x.classid === this.props.banciID)
@@ -54,6 +55,10 @@ export default class UserBadge extends Component<Props> {
                         );
                 })}
             </View>
+          ):(
+            <View></View>
+          )
+
         );
     }
 }

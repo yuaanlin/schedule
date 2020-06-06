@@ -400,7 +400,6 @@ class JoinSchedule extends Component<Props, States> {
             }
         });
     };
-
     updateTag = (info: info, value: string) => {
         var scheID = this.$router.params._id;
         Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });

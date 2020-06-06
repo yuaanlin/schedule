@@ -241,7 +241,6 @@ class ScheduleDetail extends Component<Props, States> {
         const schedule = this.state.schedule;
         // const { infos } = this.state;
         const { newinfos } = this.state;
-
         if (schedule === undefined) return <View>发生错误</View>;
 
         let ban = this.props.bancis.filter(banci => banci.scheid === schedule._id);

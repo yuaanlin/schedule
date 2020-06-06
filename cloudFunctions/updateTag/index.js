@@ -31,8 +31,10 @@ try{
   console.log(info)
   return {
     code: 200,
-    newtag,
-    info:info.data
+    data:{
+      newtag:newtag,
+      info:info.data
+    }
   }
 }catch(e){
   console.log(e)
