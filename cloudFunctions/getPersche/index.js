@@ -26,10 +26,11 @@ exports.main = async (event, context) => {
             .get();
 
         newinfo = await newinfoform
-        .where({
-          userid:open_id
-        }).get()
-      
+            .where({
+                userid: open_id
+            })
+            .get();
+
         inform = await db
             .collection("infos")
             .where({
@@ -65,8 +66,7 @@ exports.main = async (event, context) => {
             .end()
             .then(res => {
                 info = res;
-            })
-            .catch(err => console.error(err));
+            });
         sche = sche.data;
         for (i = 0; i < info.list.length; i++) {
             ban = ban.concat(info.list[i].bancilist);
@@ -88,7 +88,7 @@ exports.main = async (event, context) => {
             schedules: sche,
             infos: inform.data,
             bancis: ban,
-            newinfos:newinfo.data
+            newinfos: newinfo.data
         };
     } catch (e) {
         return {

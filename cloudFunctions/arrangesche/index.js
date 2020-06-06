@@ -7,7 +7,7 @@ const db = cloud.database();
 const infoCollection = db.collection("infos");
 const userCollection = db.collection("users");
 const banciCollection = db.collection("bancis");
-const scheCollection = db.collection("schedules")
+const scheCollection = db.collection("schedules");
 
 // 云函数入口函数
 exports.main = async (event, context) => {
@@ -69,16 +69,12 @@ exports.main = async (event, context) => {
         var tmp = 0;
         var newinfo = [];
         var tmpinfo = [];
-      console.log(banci)
-      console.log(info)
-      console.log(user)
         for (var i = 0; i < banci.length; i++) {
             for (var k = 0; k < info.length; k++) {
                 if (banci[i]._id === info[k].classid && info[k].tendency == true) {
                     tmpinfo.push(info[k]);
                 }
             }
-            console.log(tmpinfo)
             for (var j = 0; j < user.length; j++) {
                 for (var m = 0; m < tmpinfo.length; m++) {
                     if (user[j]._id === tmpinfo[m].userid && tmp < banci[i].count) {
@@ -88,25 +84,20 @@ exports.main = async (event, context) => {
                     }
                 }
             }
-            console.log(newinfo)
-            console.log(failinfo)
-
             tmp = 0;
-
             tmpinfo = [];
         }
         return newinfo;
     };
 
     var newinfo = await scheArr(ban, users, infor);
-    console.log(newinfo)
     var failinfo = [];
-    infor.map(x=>{
-      if(x.tendency===true){
-        failinfo.push(x)
-      }
-    })
-    
+    infor.map(x => {
+        if (x.tendency === true) {
+            failinfo.push(x);
+        }
+    });
+
     var failnum = 0;
     var leftban = [];
     for (var index = 0; index < ban.length; index++) {
@@ -115,7 +106,6 @@ exports.main = async (event, context) => {
                 failnum++;
             }
         }
-        console.log(failnum)
         if (failnum < ban[index].count) {
             leftban.push(ban[index]);
         }
@@ -140,6 +130,6 @@ exports.main = async (event, context) => {
         infos: newinfo,
         leftban: leftban,
         leftman: leftmen,
-        failinfo:failinfo
+        failinfo: failinfo
     };
 };
