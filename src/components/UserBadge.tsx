@@ -40,6 +40,7 @@ export default class UserBadge extends Component<Props> {
     }
 
     render() {
+        if (this.props.infos === undefined) return <View />;
         return (
             <View>
                 {this.props.infos.map(x => {
