@@ -429,9 +429,9 @@ class JoinSchedule extends Component<Props, States> {
             });
             return found;
         });
-        let showinfo;
+        let showinfo: info[] = [];
         infor.map(x => {
-            let exist = null;
+            let exist: info | undefined = undefined;
             let selfdata = infor.find(x => x.userid === this.props.user._id);
 
             if (showinfo === undefined) {
@@ -447,7 +447,6 @@ class JoinSchedule extends Component<Props, States> {
         const schedule = sc;
         const infos = infor;
         const bancis = ban;
-        const failman = this.state.failman;
         const failclass = this.state.failclass;
         const failinfo = this.state.failinfo;
         if (schedule !== undefined)

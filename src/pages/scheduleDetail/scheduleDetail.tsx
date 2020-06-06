@@ -13,8 +13,7 @@ import {
     AtModal,
     AtModalAction,
     AtModalContent,
-    AtModalHeader,
-    message
+    AtModalHeader
 } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
@@ -434,7 +433,7 @@ class ScheduleDetail extends Component<Props, States> {
                                                     ) : (
                                                         <View>
                                                             {ban.map(x => {
-                                                                let e1;
+                                                                let e1: {} | null;
                                                                 if (x._id === item.classid) {
                                                                     e1 = (
                                                                         <AtButton
