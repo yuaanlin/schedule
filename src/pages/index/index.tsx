@@ -259,13 +259,12 @@ class Index extends Component<Props, States> {
                                         .map(item => {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
-
                                             let userid = this.props.user._id;
-
                                             var nums = getAttendersNumber(item._id);
 
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
                                                     options={[
                                                         {
@@ -277,7 +276,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText={"报名状态 " + nums.joined_num + "/" + nums.need_num}
@@ -308,6 +306,7 @@ class Index extends Component<Props, States> {
                                             let userid = this.props.user._id;
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
                                                     options={[
                                                         {
@@ -319,7 +318,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"
@@ -352,6 +350,7 @@ class Index extends Component<Props, States> {
                                             let userid = this.props.user._id;
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
                                                     options={[
                                                         {
@@ -363,7 +362,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"
@@ -398,6 +396,7 @@ class Index extends Component<Props, States> {
                                             let userid = this.props.user._id;
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
                                                     options={[
                                                         {
@@ -409,7 +408,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"
@@ -441,6 +439,7 @@ class Index extends Component<Props, States> {
                                             let end = getDateString(item.endact, true);
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, this.props.user._id)}
                                                     options={[
                                                         {
@@ -452,7 +451,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"
@@ -484,6 +482,7 @@ class Index extends Component<Props, States> {
                                             let end = getDateString(item.endact, true);
                                             return (
                                                 <AtSwipeAction
+                                                    key={item._id}
                                                     onClick={this.deletesche.bind(this, item._id, item.ownerID, this.props.user._id)}
                                                     options={[
                                                         {
@@ -495,7 +494,6 @@ class Index extends Component<Props, States> {
                                                     ]}
                                                 >
                                                     <AtListItem
-                                                        key={item._id}
                                                         note={start + " 到 " + end}
                                                         title={item.title}
                                                         extraText="填写人数"
