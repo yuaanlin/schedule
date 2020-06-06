@@ -148,7 +148,7 @@ class Index extends Component<Props, States> {
     }
 
     deletesche(scheid: string, ownerid: string, userid: string) {
-        Taro.showToast({ title: "移除中", icon: "loading", duration: 2000 });
+        Taro.showToast({ title: "移除中", icon: "loading", duration: 5000 });
         if (ownerid === userid) {
             Taro.cloud
                 .callFunction({
@@ -160,9 +160,11 @@ class Index extends Component<Props, States> {
                 .then(res => {
                     const resdata = (res as unknown) as deletescheResult;
                     if (resdata.result.code === 200) {
+                        this.props.deleteSchedule(scheid);
                         Taro.showToast({ title: "移除成功", icon: "success", duration: 2000 });
+                    } else {
+                        Taro.showToast({ title: "移除失败", icon: "none", duration: 2000 });
                     }
-                    this.props.deleteSchedule(scheid);
                 });
         } else {
             Taro.showToast({ title: "您无权限删除该班表噢", icon: "none", duration: 2000 });
@@ -192,6 +194,7 @@ class Index extends Component<Props, States> {
             notLoaded: true
         };
     }
+
     render() {
         /** 我参加的班表 */
         var joinedSches = new Array<Schedule>();
