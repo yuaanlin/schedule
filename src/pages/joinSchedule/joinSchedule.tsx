@@ -14,6 +14,7 @@ import {
     AtModalAction,
     AtModalContent,
     AtModalHeader,
+    AtSwipeAction,
     AtToast
 } from "taro-ui";
 import Banci from "../../classes/banci";
@@ -22,7 +23,7 @@ import newinfo from "../../classes/newinfo";
 import Schedule from "../../classes/schedule";
 import User from "../../classes/user";
 import UserBadge from "../../components/UserBadge";
-import { updateBanci } from "../../redux/actions/banci";
+import { updateBanci, deleteBanci } from "../../redux/actions/banci";
 import { deleteInfo, updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
 import { setUserData } from "../../redux/actions/user";
@@ -37,7 +38,8 @@ import {
     publicscheResult,
     updateTagResult,
     updateTipsResult,
-    newinfoResult
+    newinfoResult,
+    deletebanResult
 } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
 import getDateFromString from "../../utils/getDateFromString";
@@ -56,6 +58,7 @@ type Props = {
     setUserData: (user: User) => void;
     updateInfo: (info: info) => void;
     deleteInfo: (id: string) => void;
+    deleteBanci: (id: string) => void;
     updateBanci: (banci: Banci) => void;
     updateSchedule: (Schedule: Schedule) => void;
     updatenewInfo: (newinfo: newinfo) => void;
@@ -122,6 +125,9 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         },
         updateBanci: (banci: Banci) => {
             dispatch(updateBanci(banci));
+        },
+        deleteBanci: (id: string) => {
+            dispatch(deleteBanci(id));
         },
         updatenewInfo: (newinfo: newinfo) => {
             dispatch(updatenewInfo(newinfo));
@@ -454,7 +460,31 @@ class JoinSchedule extends Component<Props, States> {
             }
         });
     }
+    deleteban(classid:string, ownerid: string, userid: string) {
+      Taro.showToast({ title: "移除中", icon: "loading", duration: 5000 });
+      if (ownerid === userid) {
+          Taro.cloud
+              .callFunction({
+                  name: "deletebanci",
+                  data: {
+                      classid: classid
+                  }
+              })
+              .then(res => {
 
+                  const resdata = (res as unknown) as deletebanResult;
+                  console.log(resdata)
+                  if (resdata.result.code === 200) {
+                      this.props.deleteBanci(classid);
+                      Taro.showToast({ title: "移除成功", icon: "success", duration: 2000 });
+                  } else {
+                      Taro.showToast({ title: "移除失败", icon: "none", duration: 2000 });
+                  }
+              });
+      } else {
+          Taro.showToast({ title: "您无权限删除该班表噢", icon: "none", duration: 2000 });
+      }
+  }
     render() {
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
@@ -601,18 +631,31 @@ class JoinSchedule extends Component<Props, States> {
                                 {bancis.map(item => {
                                     return (
                                         <View key={item._id}>
-                                            <AtListItem
-                                                title={
-                                                    getDateString(item.startTime, true) +
-                                                    "" +
-                                                    getTimeString(item.startTime, true) +
-                                                    " 开始的班次"
-                                                }
-                                                note={"共需要" + item.count.toString() + "人"}
-                                                onClick={() => {
-                                                    this.setState({ openmodal: item._id });
-                                                }}
-                                            />
+                                          <AtSwipeAction
+                                              key={item._id}
+                                              onClick={this.deleteban.bind(this, item._id, schedule.ownerID, this.props.user._id)}
+                                              options={[
+                                                  {
+                                                      text: "删除",
+                                                      style: {
+                                                          backgroundColor: "#79a8a9"
+                                                      }
+                                                  }
+                                              ]}
+                                          >
+                                              <AtListItem
+                                                  title={
+                                                      getDateString(item.startTime, true) +
+                                                      "" +
+                                                      getTimeString(item.startTime, true) +
+                                                      " 开始的班次"
+                                                  }
+                                                  note={"共需要" + item.count.toString() + "人"}
+                                                  onClick={() => {
+                                                      this.setState({ openmodal: item._id });
+                                                  }}
+                                              />
+                                            </AtSwipeAction>
                                             {/* 对应listitem生成对应的modal */}
                                             <AtModal isOpened={this.state.openmodal === item._id}>
                                                 <AtModalHeader>
@@ -690,6 +733,7 @@ class JoinSchedule extends Component<Props, States> {
                                                                   <AtInput
                                                                     name="tips"
                                                                     value={x}
+                                                                    disabled = {x===""?(false):(true)}
                                                                     onChange={v => {
                                                                         this.setState({ tips: v.toString() });
                                                                     }}
@@ -710,7 +754,7 @@ class JoinSchedule extends Component<Props, States> {
 
                                                 </AtModalContent>
                                                 <AtModalAction>
-                                                    <Button onClick={() => this.setState({ openmodal: "" })}>关闭</Button>
+                                                    <Button onClick={() => this.setState({ openmodal: "",tips:"" })}>关闭</Button>
                                                     <Button onClick={this.getInvolved.bind(this, item._id)}>加入该班次</Button>
                                                 </AtModalAction>
                                             </AtModal>
