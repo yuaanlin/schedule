@@ -1,7 +1,7 @@
 import { Picker, Text, View } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
-import { AtButton, AtFab, AtForm, AtInput, AtInputNumber } from "taro-ui";
+import { AtButton, AtFab, AtForm, AtInput, AtInputNumber, AtIcon } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
 import Schedule from "../../classes/Schedule";
@@ -204,6 +204,13 @@ class CreateSchedule extends Component<Props, State> {
         });
     }
 
+    removeBanci = (index: number) => {
+        var newBancis = [...this.state.bancis];
+        newBancis.splice(index, 1);
+        this.setState({ bancis: newBancis });
+        Taro.showToast({ title: "班次已移除", icon: "success", duration: 1500 });
+    };
+
     render() {
         return (
             <AtForm onSubmit={this.onSubmit.bind(this)} onReset={this.onReset.bind(this)}>
@@ -257,6 +264,11 @@ class CreateSchedule extends Component<Props, State> {
                     {this.state.bancis.map((banci, index) => (
                         <View className="banci-card" key={index + 1}>
                             <Text className="title">班次 #{index + 1}</Text>
+                            <View style={{ float: "right" }}>
+                                <AtButton type="secondary" size="small" circle={true} onClick={() => this.removeBanci(index)}>
+                                    <AtIcon value="trash" color="rgb(121, 168, 170)" />
+                                </AtButton>
+                            </View>
                             <View className="inner">
                                 <View className="option">
                                     <Text className="form-lable">循环模式</Text>
