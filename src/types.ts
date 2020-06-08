@@ -109,11 +109,22 @@ export interface newinfoResult {
 }
 
 
-export interface deletescheResult{
+export interface deletescheResult {
   errMsg: string;
   requestID: string;
   result:{
     code: number;
+  }
+}
+
+export interface deletebanResult {
+  errMsg: string;
+  requestID: string;
+  result: {
+    code: number;
+    banci;
+    info;
+    newinfo;
   }
 }
 
@@ -125,4 +136,13 @@ export interface updateTagResult {
         newtag: string;
         info: Array<info>;
     };
+}
+
+export interface updateTipsResult {
+  errMsg: string;
+  requestID: string;
+  result: {
+    code: number;
+    newban:Banci;
+  }
 }
