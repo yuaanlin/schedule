@@ -328,6 +328,7 @@ class JoinSchedule extends Component<Props, States> {
     }
 
     arrangeSche = () => {
+        Taro.showToast({ title: "智能排班中 ...", icon: "loading", duration: 5000 });
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
         if (this.state.author === false) {
@@ -359,29 +360,19 @@ class JoinSchedule extends Component<Props, States> {
                 .then(res => {
                     var resdata = (res as unknown) as arrangescheResult;
                     if (resdata.result.code === 200) {
+                        Taro.showToast({ title: "排班完成", icon: "success", duration: 1000 });
                         this.setState({
                             showresult: true,
                             newinfo: resdata.result.infos,
                             failinfo: resdata.result.failinfo,
                             failclass: resdata.result.leftban
                         });
+                    } else {
+                        Taro.showToast({ title: "排班失败", duration: 1000 });
                     }
                 });
         }
     };
-
-    tospeTime(date: Date) {
-        date = new Date(date);
-        var Month = date.getMonth() + 1;
-        var Day = date.getDate();
-        var Hour = date.getHours();
-        var min = date.getSeconds();
-        var M = Month < 10 ? "0" + Month + "." : Month + ".";
-        var D = Day + 1 < 10 ? "0" + Day + " " : Day + " ";
-        var H = Hour + 1 < 10 ? "0" + Hour + ":" : Hour + ":";
-        var Min = min + 1 < 10 ? "0" + min : min;
-        return M + D + H + Min;
-    }
 
     updateSche = (schedule: Schedule, key: string, value: string | Date) => {
         var newScheData = {};
@@ -443,16 +434,20 @@ class JoinSchedule extends Component<Props, States> {
     };
 
     updateTips = (banci: Banci, tips: string) => {
-        if (banci.tips) banci.tips = [...banci.tips, tips];
-        else banci.tips = ["", tips];
         Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
-        this.setState({ tips: "" });
+
+        var newBanciTips: string[];
+        if (banci.tips) newBanciTips = [...banci.tips];
+        else newBanciTips = [];
+
+        newBanciTips.push(tips);
+
         Taro.cloud
             .callFunction({
                 name: "updateTips",
                 data: {
                     _id: banci._id,
-                    tips: banci.tips
+                    tips: newBanciTips
                 }
             })
             .then(res => {
@@ -460,6 +455,7 @@ class JoinSchedule extends Component<Props, States> {
                 if (resdata.result.code === 200) {
                     this.props.updateBanci(resdata.result.newban);
                     Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
+                    this.setState({ tips: "" });
                 } else {
                     Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
                 }
@@ -739,18 +735,13 @@ class JoinSchedule extends Component<Props, States> {
                                                                 ></AtInput>
                                                             ) : (
                                                                 <View key={item._id + 1}>
+                                                                    <AtInput
+                                                                        name="tips"
+                                                                        value={this.state.tips}
+                                                                        onChange={v => this.setState({ tips: v.toString() })}
+                                                                    />
                                                                     {item.tips.map(x => {
-                                                                        console.log(item.tips);
-                                                                        return (
-                                                                            <AtInput
-                                                                                name="tips"
-                                                                                value={x}
-                                                                                disabled={x === "" ? false : true}
-                                                                                onChange={v => {
-                                                                                    this.setState({ tips: v.toString() });
-                                                                                }}
-                                                                            ></AtInput>
-                                                                        );
+                                                                        return <View>{x}</View>;
                                                                     })}
                                                                 </View>
                                                             )}
