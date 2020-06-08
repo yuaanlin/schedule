@@ -723,28 +723,29 @@ class JoinSchedule extends Component<Props, States> {
                                                             <AtIcon prefixClass="icon" value="suggest"></AtIcon>
                                                         </View>
                                                         <View className="at-col at-col-8">
-                                                            {item.tips === undefined || null ? (
+                                                            <AtInput
+                                                                name="tips"
+                                                                maxLength={10}
+                                                                placeholder="班次共享备注"
+                                                                value={this.state.tips}
+                                                                onChange={v => {
+                                                                    this.setState({ tips: v.toString() });
+                                                                }}
+                                                            ></AtInput>
+                                                            <View key={item._id + 1}>
                                                                 <AtInput
                                                                     name="tips"
-                                                                    maxLength={10}
-                                                                    placeholder="班次共享备注"
                                                                     value={this.state.tips}
-                                                                    onChange={v => {
-                                                                        this.setState({ tips: v.toString() });
-                                                                    }}
-                                                                ></AtInput>
-                                                            ) : (
-                                                                <View key={item._id + 1}>
-                                                                    <AtInput
-                                                                        name="tips"
-                                                                        value={this.state.tips}
-                                                                        onChange={v => this.setState({ tips: v.toString() })}
-                                                                    />
-                                                                    {item.tips.map(x => {
+                                                                    onChange={v => this.setState({ tips: v.toString() })}
+                                                                />
+                                                                {item.tips ? (
+                                                                    item.tips.map(x => {
                                                                         return <View>{x}</View>;
-                                                                    })}
-                                                                </View>
-                                                            )}
+                                                                    })
+                                                                ) : (
+                                                                    <View />
+                                                                )}
+                                                            </View>
                                                         </View>
                                                         <View className="at-col at-col-3">
                                                             <AtBadge>
