@@ -490,7 +490,9 @@ class JoinSchedule extends Component<Props, States> {
     render() {
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
-        let ban = this.props.bancis.filter(banci => banci.scheid === scheID);
+        let ban = this.props.bancis
+            .filter(banci => banci.scheid === scheID)
+            .sort((b1, b2) => b1.startTime.getTime() - b2.startTime.getTime());
         let infor = this.props.infos.filter(info => {
             var bid = info.classid;
             var found = false;
@@ -732,20 +734,13 @@ class JoinSchedule extends Component<Props, States> {
                                                                     this.setState({ tips: v.toString() });
                                                                 }}
                                                             ></AtInput>
-                                                            <View key={item._id + 1}>
-                                                                <AtInput
-                                                                    name="tips"
-                                                                    value={this.state.tips}
-                                                                    onChange={v => this.setState({ tips: v.toString() })}
-                                                                />
-                                                                {item.tips ? (
-                                                                    item.tips.map(x => {
-                                                                        return <View>{x}</View>;
-                                                                    })
-                                                                ) : (
-                                                                    <View />
-                                                                )}
-                                                            </View>
+                                                            {item.tips ? (
+                                                                item.tips.map((x, index) => {
+                                                                    return <View key={index}>{x}</View>;
+                                                                })
+                                                            ) : (
+                                                                <View />
+                                                            )}
                                                         </View>
                                                         <View className="at-col at-col-3">
                                                             <AtBadge>
