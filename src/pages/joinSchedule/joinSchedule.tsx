@@ -69,7 +69,7 @@ type States = {
     gettag: boolean;
     warntag: boolean;
     tag: string;
-    tips:string;
+    tips: string;
     author: boolean;
 
     // 正在编辑的项目
@@ -147,7 +147,7 @@ class JoinSchedule extends Component<Props, States> {
             gettag: false,
             warntag: false,
             tag: "",
-            tips:"",
+            tips: "",
             author: false,
             showresult: false,
             failclass: [],
@@ -313,13 +313,22 @@ class JoinSchedule extends Component<Props, States> {
     };
 
     onShareAppMessage() {
-        return {
-            title: "班表详情预览",
-            path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
-        };
+        var scheID = this.$router.params._id;
+        var sc = this.props.schedules.find(sc => sc._id === scheID);
+        if (sc !== undefined)
+            return {
+                title: "我为 " + sc.title + " 创建了一个新的排班，大家快来报名吧！",
+                path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
+            };
+        else
+            return {
+                title: "我创建了一个新的排班，大家快来报名吧！",
+                path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
+            };
     }
 
     arrangeSche = () => {
+        Taro.showToast({ title: "智能排班中 ...", icon: "loading", duration: 5000 });
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
         if (this.state.author === false) {
@@ -351,29 +360,20 @@ class JoinSchedule extends Component<Props, States> {
                 .then(res => {
                     var resdata = (res as unknown) as arrangescheResult;
                     if (resdata.result.code === 200) {
+                        Taro.showToast({ title: "排班完成", icon: "success", duration: 1000 });
                         this.setState({
                             showresult: true,
                             newinfo: resdata.result.infos,
                             failinfo: resdata.result.failinfo,
                             failclass: resdata.result.leftban
                         });
+                    } else {
+                        Taro.showToast({ title: "排班失败", duration: 1000 });
                     }
                 });
         }
     };
 
-    tospeTime(date: Date) {
-        date = new Date(date);
-        var Month = date.getMonth() + 1;
-        var Day = date.getDate();
-        var Hour = date.getHours();
-        var min = date.getSeconds();
-        var M = Month < 10 ? "0" + Month + "." : Month + ".";
-        var D = Day + 1 < 10 ? "0" + Day + " " : Day + " ";
-        var H = Hour + 1 < 10 ? "0" + Hour + ":" : Hour + ":";
-        var Min = min + 1 < 10 ? "0" + min : min;
-        return M + D + H + Min;
-    }
     updateSche = (schedule: Schedule, key: string, value: string | Date) => {
         var newScheData = {};
         if (key === "title") {
@@ -409,6 +409,7 @@ class JoinSchedule extends Component<Props, States> {
             }
         });
     };
+
     updateTag = (info: info, value: string) => {
         var scheID = this.$router.params._id;
         Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
@@ -431,64 +432,67 @@ class JoinSchedule extends Component<Props, States> {
                 }
             });
     };
-    updateTips = (banci:Banci,tips:string)=>{
-      if(banci.tips)
-          banci.tips = [...banci.tips,tips]
-      else
-          banci.tips = ["",tips]
-      console.log(banci)
-      Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
-      this.setState({tips:""})
-      Taro.cloud
-        .callFunction({
-            name: "updateTips",
-            data: {
-                _id:banci._id,
-                tips:banci.tips,
-            }
-        })
-        .then(res => {
-            var resdata = (res as unknown) as updateTipsResult;
-            console.log(resdata)
-            if (resdata.result.code === 200) {
-                this.props.updateBanci(resdata.result.newban)
-                Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
 
-            } else {
-                Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+    updateTips = (banci: Banci, tips: string) => {
+        Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
 
-            }
-        });
+        var newBanciTips: string[];
+        if (banci.tips) newBanciTips = [...banci.tips];
+        else newBanciTips = [];
+
+        newBanciTips.push(tips);
+
+        Taro.cloud
+            .callFunction({
+                name: "updateTips",
+                data: {
+                    _id: banci._id,
+                    tips: newBanciTips
+                }
+            })
+            .then(res => {
+                var resdata = (res as unknown) as updateTipsResult;
+                if (resdata.result.code === 200) {
+                    this.props.updateBanci(resdata.result.newban);
+                    Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
+                    this.setState({ tips: "" });
+                } else {
+                    Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                }
+            });
+    };
+
+    deleteban(classid: string, ownerid: string, userid: string) {
+        Taro.showToast({ title: "移除中", icon: "loading", duration: 5000 });
+        if (ownerid === userid) {
+            Taro.cloud
+                .callFunction({
+                    name: "deletebanci",
+                    data: {
+                        classid: classid
+                    }
+                })
+                .then(res => {
+                    const resdata = (res as unknown) as deletebanResult;
+                    console.log(resdata);
+                    if (resdata.result.code === 200) {
+                        this.props.deleteBanci(classid);
+                        Taro.showToast({ title: "移除成功", icon: "success", duration: 2000 });
+                    } else {
+                        Taro.showToast({ title: "移除失败", icon: "none", duration: 2000 });
+                    }
+                });
+        } else {
+            Taro.showToast({ title: "您无权限删除该班表噢", icon: "none", duration: 2000 });
+        }
     }
-    deleteban(classid:string, ownerid: string, userid: string) {
-      Taro.showToast({ title: "移除中", icon: "loading", duration: 5000 });
-      if (ownerid === userid) {
-          Taro.cloud
-              .callFunction({
-                  name: "deletebanci",
-                  data: {
-                      classid: classid
-                  }
-              })
-              .then(res => {
 
-                  const resdata = (res as unknown) as deletebanResult;
-                  console.log(resdata)
-                  if (resdata.result.code === 200) {
-                      this.props.deleteBanci(classid);
-                      Taro.showToast({ title: "移除成功", icon: "success", duration: 2000 });
-                  } else {
-                      Taro.showToast({ title: "移除失败", icon: "none", duration: 2000 });
-                  }
-              });
-      } else {
-          Taro.showToast({ title: "您无权限删除该班表噢", icon: "none", duration: 2000 });
-      }
-  }
     render() {
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
-        let ban = this.props.bancis.filter(banci => banci.scheid === scheID);
+        let ban = this.props.bancis
+            .filter(banci => banci.scheid === scheID)
+            .sort((b1, b2) => b1.startTime.getTime() - b2.startTime.getTime());
         let infor = this.props.infos.filter(info => {
             var bid = info.classid;
             var found = false;
@@ -618,7 +622,13 @@ class JoinSchedule extends Component<Props, States> {
                             title={"当前已有 " + this.state.joined_attenders_number + " 个空缺被报名"}
                             note={"总共有 " + this.state.need_attenders_number + " 个空缺"}
                         />
-                        <AtListItem note="该班表正在报名阶段，您可以从下方选择要报名的班次来参加。" />
+                        <AtListItem
+                            note={
+                                this.state.author
+                                    ? "该班表正在报名阶段，请从右上角将这个页面分享出去，让其他人报名您的班表。"
+                                    : "该班表正在报名阶段，您可以从下方选择要报名的班次来参加。"
+                            }
+                        />
                     </AtList>
                     <View style={{ marginTop: "32px" }}>
                         <AtList>
@@ -631,30 +641,30 @@ class JoinSchedule extends Component<Props, States> {
                                 {bancis.map(item => {
                                     return (
                                         <View key={item._id}>
-                                          <AtSwipeAction
-                                              key={item._id}
-                                              onClick={this.deleteban.bind(this, item._id, schedule.ownerID, this.props.user._id)}
-                                              options={[
-                                                  {
-                                                      text: "删除",
-                                                      style: {
-                                                          backgroundColor: "#79a8a9"
-                                                      }
-                                                  }
-                                              ]}
-                                          >
-                                              <AtListItem
-                                                  title={
-                                                      getDateString(item.startTime, true) +
-                                                      "" +
-                                                      getTimeString(item.startTime, true) +
-                                                      " 开始的班次"
-                                                  }
-                                                  note={"共需要" + item.count.toString() + "人"}
-                                                  onClick={() => {
-                                                      this.setState({ openmodal: item._id });
-                                                  }}
-                                              />
+                                            <AtSwipeAction
+                                                key={item._id}
+                                                onClick={this.deleteban.bind(this, item._id, schedule.ownerID, this.props.user._id)}
+                                                options={[
+                                                    {
+                                                        text: "删除",
+                                                        style: {
+                                                            backgroundColor: "#79a8a9"
+                                                        }
+                                                    }
+                                                ]}
+                                            >
+                                                <AtListItem
+                                                    title={
+                                                        getDateString(item.startTime, true) +
+                                                        "" +
+                                                        getTimeString(item.startTime, true) +
+                                                        " 开始的班次"
+                                                    }
+                                                    note={"共需要" + item.count.toString() + "人"}
+                                                    onClick={() => {
+                                                        this.setState({ openmodal: item._id });
+                                                    }}
+                                                />
                                             </AtSwipeAction>
                                             {/* 对应listitem生成对应的modal */}
                                             <AtModal isOpened={this.state.openmodal === item._id}>
@@ -715,46 +725,37 @@ class JoinSchedule extends Component<Props, States> {
                                                             <AtIcon prefixClass="icon" value="suggest"></AtIcon>
                                                         </View>
                                                         <View className="at-col at-col-8">
-                                                          {item.tips===undefined||null?(
                                                             <AtInput
-                                                              name="tips"
-                                                              maxLength={10}
-                                                              placeholder='班次共享备注'
-                                                              value={this.state.tips}
-                                                              onChange={v => {
-                                                                  this.setState({ tips: v.toString() });
-                                                              }}
-                                                          ></AtInput>
-                                                          ):(
-                                                            <View key={item._id+1}>
-                                                              {item.tips.map(x=>{
-                                                                console.log(item.tips)
-                                                                return(
-                                                                  <AtInput
-                                                                    name="tips"
-                                                                    value={x}
-                                                                    disabled = {x===""?(false):(true)}
-                                                                    onChange={v => {
-                                                                        this.setState({ tips: v.toString() });
-                                                                    }}
-                                                                ></AtInput>
-                                                                )
-                                                              })}
-                                                            </View>
-                                                          )}
+                                                                name="tips"
+                                                                maxLength={10}
+                                                                placeholder="班次共享备注"
+                                                                value={this.state.tips}
+                                                                onChange={v => {
+                                                                    this.setState({ tips: v.toString() });
+                                                                }}
+                                                            ></AtInput>
+                                                            {item.tips ? (
+                                                                item.tips.map((x, index) => {
+                                                                    return <View key={index}>{x}</View>;
+                                                                })
+                                                            ) : (
+                                                                <View />
+                                                            )}
                                                         </View>
                                                         <View className="at-col at-col-3">
                                                             <AtBadge>
-                                                                <AtButton size="small" onClick={() => this.updateTips(item, this.state.tips)}>
+                                                                <AtButton
+                                                                    size="small"
+                                                                    onClick={() => this.updateTips(item, this.state.tips)}
+                                                                >
                                                                     添加
                                                                 </AtButton>
                                                             </AtBadge>
                                                         </View>
                                                     </View>
-
                                                 </AtModalContent>
                                                 <AtModalAction>
-                                                    <Button onClick={() => this.setState({ openmodal: "",tips:"" })}>关闭</Button>
+                                                    <Button onClick={() => this.setState({ openmodal: "", tips: "" })}>关闭</Button>
                                                     <Button onClick={this.getInvolved.bind(this, item._id)}>加入该班次</Button>
                                                 </AtModalAction>
                                             </AtModal>
