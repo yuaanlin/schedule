@@ -3,6 +3,7 @@ import info from "./classes/info";
 import Schedule from "./classes/schedule";
 import User from "./classes/user";
 import newinfo from "./classes/newinfo";
+import newinfo from "./classes/newinfo";
 
 /** 云函数 "Login" 的返回格式 */
 export interface loginResult {
@@ -28,6 +29,19 @@ export interface getPerscheResult {
         bancis: Array<Banci>;
         newinfos: Array<newinfo>;
     };
+}
+
+/**云函数"getschedule" 的返回格式 */
+export interface getScheResult {
+  errMsg: string;
+  requestID: string;
+  result: {
+    code: number;
+    schedule: Schedule;
+    banci: Array<Banci>;
+    info: Array<info>;
+    newinfo: Array<newinfo>
+  }
 }
 
 /** 云函数 "postUserInfo" 的返回格式 */
@@ -155,3 +169,4 @@ export interface pushAttenderResult {
     addlist:Array<info>;
   }
 }
+

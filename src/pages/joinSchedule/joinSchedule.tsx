@@ -42,6 +42,7 @@ import {
     updateTipsResult,
     newinfoResult,
     deletebanResult,
+    getScheResult,
     pushAttenderResult
 } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
@@ -274,18 +275,19 @@ class JoinSchedule extends Component<Props, States> {
         if (sc === undefined) {
             Taro.cloud
                 .callFunction({
-                    name: "scheid"
+                    name: "getschedule",
+                    data:{
+                      scheid:scheID
+                    }
                 })
                 .then(res => {
-                    var resdata = (res as unknown) as getPerscheResult;
+                    var resdata = (res as unknown) as getScheResult;
                     if (resdata.result.code === 200) {
-                        resdata.result.schedules.map(sche => {
-                            this.props.updateSchedule(sche);
-                        });
-                        resdata.result.infos.map(info => {
+                        this.props.updateSchedule(resdata.result.schedule);
+                        resdata.result.info.map(info => {
                             this.props.updateInfo(info);
                         });
-                        resdata.result.bancis.map(banci => {
+                        resdata.result.banci.map(banci => {
                             this.props.updateBanci(banci);
                         });
                     } else {
