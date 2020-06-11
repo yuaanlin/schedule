@@ -201,28 +201,15 @@ class Index extends Component<Props, States> {
     }
 
     render() {
-        /** 我参加的班表 */
-        var joinedSches = new Array<Schedule>();
+        var schesToShow = new Array<Schedule>();
         if (this.props.schedules) {
             this.props.schedules.map(sche => {
-                if (sche.ownerID !== this.props.user._id && sche.attenders.includes(this.props.user._id)) {
-                    joinedSches.push(sche);
+                if (sche.ownerID === this.props.user._id || sche.attenders.includes(this.props.user._id)) {
+                    schesToShow.push(sche);
                 }
             });
         } else {
-            joinedSches = [];
-        }
-
-        /** 我组织的班表 */
-        var ownedSches = new Array<Schedule>();
-        if (this.props.schedules) {
-            this.props.schedules.map(sche => {
-                if (sche.ownerID === this.props.user._id) {
-                    ownedSches.push(sche);
-                }
-            });
-        } else {
-            ownedSches = [];
+            schesToShow = [];
         }
 
         /** 还在登入 */
@@ -249,279 +236,137 @@ class Index extends Component<Props, States> {
             );
         }
 
-        /** 已经登入 */
-        const tabList = [{ title: "我组织的" }, { title: "我参与的" }];
-
         return (
             <Provider store={store}>
                 <AtSearchBar value={this.state.searchvalue} onChange={value => this.setState({ searchvalue: value })} />
-                <AtTabs current={this.state.current} tabList={tabList} onClick={value => this.setState({ current: value })}>
-                    <AtTabsPane current={this.state.current} index={0}>
-                        <View>
-                            <AtAccordion
-                                open={this.state.openunset}
-                                onClick={value => this.setState({ openunset: value })}
-                                title="组织中的排班"
-                            >
-                                <AtList hasBorder={false}>
-                                    {ownedSches
-                                        .filter(sc => !sc.complete)
-                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
-                                        .map(item => {
-                                            let start = getDateString(item.startact, true);
-                                            let end = getDateString(item.endact, true);
-                                            let userid = this.props.user._id;
-                                            var nums = getAttendersNumber(item._id);
 
-                                            return (
-                                                <AtSwipeAction
-                                                    key={item._id}
-                                                    onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
-                                                    options={[
-                                                        {
-                                                            text: "删除",
-                                                            style: {
-                                                                backgroundColor: "#79a8a9"
-                                                            }
-                                                        }
-                                                    ]}
-                                                >
-                                                    <AtListItem
-                                                        note={start + " 到 " + end}
-                                                        title={item.title}
-                                                        extraText={"报名状态 " + nums.joined_num + "/" + nums.need_num}
-                                                        onClick={() => {
-                                                            Taro.navigateTo({
-                                                                url: "../joinSchedule/joinSchedule?_id=" + item._id
-                                                            });
-                                                        }}
-                                                    />
-                                                </AtSwipeAction>
-                                            );
-                                        })}
-                                </AtList>
-                            </AtAccordion>
-                            <AtAccordion
-                                open={this.state.openunfinished}
-                                onClick={value => this.setState({ openunfinished: value })}
-                                title="进行中的排班"
-                            >
-                                <AtList hasBorder={false}>
-                                    {ownedSches
-                                        .filter(sc => sc.complete)
-                                        .filter(sc => sc.endact.getTime() > new Date().getTime())
-                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
-                                        .map(item => {
-                                            let start = getDateString(item.startact, true);
-                                            let end = getDateString(item.endact, true);
-                                            let userid = this.props.user._id;
-                                            var nums = getAttendersNumber(item._id);
-                                            return (
-                                                <AtSwipeAction
-                                                    key={item._id}
-                                                    onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
-                                                    options={[
-                                                        {
-                                                            text: "删除",
-                                                            style: {
-                                                                backgroundColor: "#79a8a9"
-                                                            }
-                                                        }
-                                                    ]}
-                                                >
-                                                    <AtListItem
-                                                        note={start + " 到 " + end}
-                                                        title={item.title}
-                                                        extraText={"参与情况 " + nums.joined_num + "/" + nums.need_num}
-                                                        onClick={() => {
-                                                            Taro.navigateTo({
-                                                                url: "../scheduleDetail/scheduleDetail?_id=" + item._id
-                                                            });
-                                                        }}
-                                                    />
-                                                </AtSwipeAction>
-                                            );
-                                        })}
-                                </AtList>
-                            </AtAccordion>
-                        </View>
-                        <View>
-                            <AtAccordion
-                                open={this.state.openfinished}
-                                onClick={value => this.setState({ openfinished: value })}
-                                title="已结束的排班"
-                            >
-                                <AtList hasBorder={false}>
-                                    {ownedSches
-                                        .filter(sc => sc.complete)
-                                        .filter(sc => sc.endact.getTime() < new Date().getTime())
-                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
-                                        .map(item => {
-                                            let start = getDateString(item.startact, true);
-                                            let end = getDateString(item.endact, true);
-                                            let userid = this.props.user._id;
-                                            return (
-                                                <AtSwipeAction
-                                                    key={item._id}
-                                                    onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
-                                                    options={[
-                                                        {
-                                                            text: "删除",
-                                                            style: {
-                                                                backgroundColor: "#79a8a9"
-                                                            }
-                                                        }
-                                                    ]}
-                                                >
-                                                    <AtListItem
-                                                        note={start + " 到 " + end}
-                                                        title={item.title}
-                                                        onClick={() => {
-                                                            Taro.navigateTo({
-                                                                url: "../scheduleDetail/scheduleDetail?_id=" + item._id
-                                                            });
-                                                        }}
-                                                    />
-                                                </AtSwipeAction>
-                                            );
-                                        })}
-                                </AtList>
-                            </AtAccordion>
-                        </View>
-                    </AtTabsPane>
+                <View>
+                    <AtAccordion open={this.state.openunset} onClick={value => this.setState({ openunset: value })} title="组织中的排班">
+                        <AtList hasBorder={false}>
+                            {schesToShow
+                                .filter(sc => !sc.complete)
+                                .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
+                                .map(item => {
+                                    let start = getDateString(item.startact, true);
+                                    let end = getDateString(item.endact, true);
+                                    let userid = this.props.user._id;
+                                    var nums = getAttendersNumber(item._id);
 
-                    <AtTabsPane current={this.state.current} index={1}>
-                        <View>
-                            <AtAccordion
-                                open={this.state.openunset}
-                                onClick={value => this.setState({ openunset: value })}
-                                title="组织中的排班"
-                            >
-                                <AtList hasBorder={false}>
-                                    {joinedSches
-                                        .filter(sc => !sc.complete)
-                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
-                                        .map(item => {
-                                            let start = getDateString(item.startact, true);
-                                            let end = getDateString(item.endact, true);
-                                            let userid = this.props.user._id;
-                                            return (
-                                                <AtSwipeAction
-                                                    key={item._id}
-                                                    onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
-                                                    options={[
-                                                        {
-                                                            text: "删除",
-                                                            style: {
-                                                                backgroundColor: "#79a8a9"
-                                                            }
-                                                        }
-                                                    ]}
-                                                >
-                                                    <AtListItem
-                                                        note={start + " 到 " + end}
-                                                        title={item.title}
-                                                        extraText="填写人数"
-                                                        onClick={() => {
-                                                            Taro.navigateTo({
-                                                                url: "../joinSchedule/joinSchedule?_id=" + item._id
-                                                            });
-                                                        }}
-                                                    />
-                                                </AtSwipeAction>
-                                            );
-                                        })}
-                                </AtList>
-                            </AtAccordion>
-                        </View>
-                        <View>
-                            <AtAccordion
-                                open={this.state.openunfinished}
-                                onClick={value => this.setState({ openunfinished: value })}
-                                title="进行中的排班"
-                            >
-                                <AtList hasBorder={false}>
-                                    {ownedSches
-                                        .filter(sc => sc.complete)
-                                        .filter(sc => sc.endact.getTime() > new Date().getTime())
-                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
-                                        .map(item => {
-                                            let start = getDateString(item.startact, true);
-                                            let end = getDateString(item.endact, true);
-                                            return (
-                                                <AtSwipeAction
-                                                    key={item._id}
-                                                    onClick={this.deletesche.bind(this, item._id, item.ownerID, this.props.user._id)}
-                                                    options={[
-                                                        {
-                                                            text: "删除",
-                                                            style: {
-                                                                backgroundColor: "#79a8a9"
-                                                            }
-                                                        }
-                                                    ]}
-                                                >
-                                                    <AtListItem
-                                                        note={start + " 到 " + end}
-                                                        title={item.title}
-                                                        extraText="填写人数"
-                                                        onClick={() => {
-                                                            Taro.navigateTo({
-                                                                url: "../scheduleDetail/scheduleDetail?_id=" + item._id
-                                                            });
-                                                        }}
-                                                    />
-                                                </AtSwipeAction>
-                                            );
-                                        })}
-                                </AtList>
-                            </AtAccordion>
-                        </View>
-                        <View>
-                            <AtAccordion
-                                open={this.state.openfinished}
-                                onClick={value => this.setState({ openfinished: value })}
-                                title="已结束的排班"
-                            >
-                                <AtList hasBorder={false}>
-                                    {ownedSches
-                                        .filter(sc => sc.complete)
-                                        .filter(sc => sc.endact.getTime() < new Date().getTime())
-                                        .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
-                                        .map(item => {
-                                            let start = getDateString(item.startact, true);
-                                            let end = getDateString(item.endact, true);
-                                            return (
-                                                <AtSwipeAction
-                                                    key={item._id}
-                                                    onClick={this.deletesche.bind(this, item._id, item.ownerID, this.props.user._id)}
-                                                    options={[
-                                                        {
-                                                            text: "删除",
-                                                            style: {
-                                                                backgroundColor: "#79a8a9"
-                                                            }
-                                                        }
-                                                    ]}
-                                                >
-                                                    <AtListItem
-                                                        note={start + " 到 " + end}
-                                                        title={item.title}
-                                                        extraText="填写人数"
-                                                        onClick={() => {
-                                                            Taro.navigateTo({
-                                                                url: "../scheduleDetail/scheduleDetail?_id=" + item._id
-                                                            });
-                                                        }}
-                                                    />
-                                                </AtSwipeAction>
-                                            );
-                                        })}
-                                </AtList>
-                            </AtAccordion>
-                        </View>
-                    </AtTabsPane>
-                </AtTabs>
+                                    return (
+                                        <AtSwipeAction
+                                            key={item._id}
+                                            onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
+                                            options={[
+                                                {
+                                                    text: "删除",
+                                                    style: {
+                                                        backgroundColor: "#79a8a9"
+                                                    }
+                                                }
+                                            ]}
+                                        >
+                                            <AtListItem
+                                                note={start + " 到 " + end}
+                                                title={(item.ownerID === this.props.user._id ? "(我的班表) " : "") + item.title}
+                                                extraText={"报名状态 " + nums.joined_num + "/" + nums.need_num}
+                                                onClick={() => {
+                                                    Taro.navigateTo({
+                                                        url: "../joinSchedule/joinSchedule?_id=" + item._id
+                                                    });
+                                                }}
+                                            />
+                                        </AtSwipeAction>
+                                    );
+                                })}
+                        </AtList>
+                    </AtAccordion>
+                    <AtAccordion
+                        open={this.state.openunfinished}
+                        onClick={value => this.setState({ openunfinished: value })}
+                        title="进行中的排班"
+                    >
+                        <AtList hasBorder={false}>
+                            {schesToShow
+                                .filter(sc => sc.complete)
+                                .filter(sc => sc.endact.getTime() > new Date().getTime())
+                                .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
+                                .map(item => {
+                                    let start = getDateString(item.startact, true);
+                                    let end = getDateString(item.endact, true);
+                                    let userid = this.props.user._id;
+                                    var nums = getAttendersNumber(item._id);
+                                    return (
+                                        <AtSwipeAction
+                                            key={item._id}
+                                            onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
+                                            options={[
+                                                {
+                                                    text: "删除",
+                                                    style: {
+                                                        backgroundColor: "#79a8a9"
+                                                    }
+                                                }
+                                            ]}
+                                        >
+                                            <AtListItem
+                                                note={start + " 到 " + end}
+                                                title={(item.ownerID === this.props.user._id ? "(我的班表) " : "") + item.title}
+                                                extraText={"参与情况 " + nums.joined_num + "/" + nums.need_num}
+                                                onClick={() => {
+                                                    Taro.navigateTo({
+                                                        url: "../scheduleDetail/scheduleDetail?_id=" + item._id
+                                                    });
+                                                }}
+                                            />
+                                        </AtSwipeAction>
+                                    );
+                                })}
+                        </AtList>
+                    </AtAccordion>
+                </View>
+                <View>
+                    <AtAccordion
+                        open={this.state.openfinished}
+                        onClick={value => this.setState({ openfinished: value })}
+                        title="已结束的排班"
+                    >
+                        <AtList hasBorder={false}>
+                            {schesToShow
+                                .filter(sc => sc.complete)
+                                .filter(sc => sc.endact.getTime() < new Date().getTime())
+                                .filter(sc => (this.state.searchvalue === "" ? true : sc.title.includes(this.state.searchvalue)))
+                                .map(item => {
+                                    let start = getDateString(item.startact, true);
+                                    let end = getDateString(item.endact, true);
+                                    let userid = this.props.user._id;
+                                    return (
+                                        <AtSwipeAction
+                                            key={item._id}
+                                            onClick={this.deletesche.bind(this, item._id, item.ownerID, userid)}
+                                            options={[
+                                                {
+                                                    text: "删除",
+                                                    style: {
+                                                        backgroundColor: "#79a8a9"
+                                                    }
+                                                }
+                                            ]}
+                                        >
+                                            <AtListItem
+                                                note={start + " 到 " + end}
+                                                title={(item.ownerID === this.props.user._id ? "(我的班表) " : "") + item.title}
+                                                onClick={() => {
+                                                    Taro.navigateTo({
+                                                        url: "../scheduleDetail/scheduleDetail?_id=" + item._id
+                                                    });
+                                                }}
+                                            />
+                                        </AtSwipeAction>
+                                    );
+                                })}
+                        </AtList>
+                    </AtAccordion>
+                </View>
                 <AtTabBar
                     fixed
                     tabList={[
