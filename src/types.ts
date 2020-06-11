@@ -30,6 +30,18 @@ export interface getPerscheResult {
     };
 }
 
+export interface getscheduleResult {
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+        schedule: Schedule;
+        infos: Array<info>;
+        bancis: Array<Banci>;
+        newinfos: Array<newinfo>;
+    };
+}
+
 /** 云函数 "postUserInfo" 的返回格式 */
 export interface postUserInfoResult {
     errMsg: string;
@@ -108,24 +120,23 @@ export interface newinfoResult {
     };
 }
 
-
 export interface deletescheResult {
-  errMsg: string;
-  requestID: string;
-  result:{
-    code: number;
-  }
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+    };
 }
 
 export interface deletebanResult {
-  errMsg: string;
-  requestID: string;
-  result: {
-    code: number;
-    banci;
-    info;
-    newinfo;
-  }
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+        banci;
+        info;
+        newinfo;
+    };
 }
 
 export interface updateTagResult {
@@ -139,10 +150,10 @@ export interface updateTagResult {
 }
 
 export interface updateTipsResult {
-  errMsg: string;
-  requestID: string;
-  result: {
-    code: number;
-    newban:Banci;
-  }
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+        newban: Banci;
+    };
 }

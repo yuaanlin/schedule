@@ -16,8 +16,7 @@ import {
     AtModalHeader,
     AtSwipeAction,
     AtToast,
-    AtFab,
-    AtCheckbox,
+    AtCheckbox
 } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
@@ -41,7 +40,8 @@ import {
     updateTagResult,
     updateTipsResult,
     newinfoResult,
-    deletebanResult
+    deletebanResult,
+    getscheduleResult
 } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
 import getDateFromString from "../../utils/getDateFromString";
@@ -49,7 +49,6 @@ import getDateString from "../../utils/getDateString";
 import getTimeString from "../../utils/getTimeString";
 import "./joinSchedule.scss";
 import getAttendersNumber from "../../utils/getAttendersNumber";
-import Taro from "@tarojs/taro";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -79,8 +78,8 @@ type States = {
     editing: string | undefined;
 
     //添加成员
-    addattender:string;
-    attenderlist:Array<string>;
+    addattender: string;
+    attenderlist: Array<string>;
 
     // 当前查看的班次 ID
     openmodal: string;
@@ -151,7 +150,7 @@ class JoinSchedule extends Component<Props, States> {
             editing: undefined,
             openbanci: true,
             openmodal: "",
-            addattender:"",
+            addattender: "",
             attenderlist: [],
             gettag: false,
             warntag: false,
@@ -273,25 +272,26 @@ class JoinSchedule extends Component<Props, States> {
         if (sc === undefined) {
             Taro.cloud
                 .callFunction({
-                    name: "scheid"
+                    name: "getschedule",
+                    data: {
+                        scheid: scheID
+                    }
                 })
                 .then(res => {
-                    var resdata = (res as unknown) as getPerscheResult;
+                    var resdata = (res as unknown) as getscheduleResult;
                     if (resdata.result.code === 200) {
-                        resdata.result.schedules.map(sche => {
-                            this.props.updateSchedule(sche);
+                        this.props.updateSchedule(resdata.result.schedule);
+                        resdata.result.bancis.map(banci => {
+                            this.props.updateBanci(banci);
                         });
                         resdata.result.infos.map(info => {
                             this.props.updateInfo(info);
                         });
-                        resdata.result.bancis.map(banci => {
-                            this.props.updateBanci(banci);
-                        });
                     } else {
-                        Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
                         Taro.redirectTo({
                             url: "../index/index"
                         });
+                        Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
                     }
                 });
         }
@@ -471,10 +471,10 @@ class JoinSchedule extends Component<Props, States> {
             });
     };
 
-    addattender (value){
-      this.setState({
-        attenderlist:value
-      })
+    addattender(value) {
+        this.setState({
+            attenderlist: value
+        });
     }
 
     deleteban(classid: string, ownerid: string, userid: string) {
@@ -502,14 +502,21 @@ class JoinSchedule extends Component<Props, States> {
         }
     }
 
-    pushattender = (classid:string,attenderlist)=>{
-      console.log(classid)
-      console.log(attenderlist)
-    }
+    pushattender = (classid: string, attenderlist) => {
+        console.log(classid);
+        console.log(attenderlist);
+    };
 
     render() {
         var scheID = this.$router.params._id;
         var sc = this.props.schedules.find(sc => sc._id === scheID);
+        if (sc === undefined)
+            return (
+                <View style={{ textAlign: "center", marginTop: "36px" }}>
+                    <Text>努力查找这个班表中 ...</Text>
+                </View>
+            );
+
         let ban = this.props.bancis
             .filter(banci => banci.scheid === scheID)
             .sort((b1, b2) => b1.startTime.getTime() - b2.startTime.getTime());
@@ -536,16 +543,14 @@ class JoinSchedule extends Component<Props, States> {
             }
         });
         if (!showinfo) showinfo = [];
-        var showattender
+        var showattender;
 
-        if(showinfo){
-          showinfo.map(x=>{
-            let item = {value:x._id,label:x.tag}
-            if(showattender)
-              showattender=[...showattender,item]
-            else
-              showattender = [item]
-          })
+        if (showinfo) {
+            showinfo.map(x => {
+                let item = { value: x._id, label: x.tag };
+                if (showattender) showattender = [...showattender, item];
+                else showattender = [item];
+            });
         }
         // console.log(showattender)
         const schedule = sc;
@@ -618,8 +623,6 @@ class JoinSchedule extends Component<Props, States> {
                             <Button onClick={this.publicsche}>发布班表</Button>
                         </AtModalAction>
                     </AtModal>
-
-
 
                     <AtList>
                         <AtListItem
@@ -733,11 +736,11 @@ class JoinSchedule extends Component<Props, States> {
                                                                 />
                                                             )}
                                                         </View>
-                                                        <View className="at-col at-col-3" >
+                                                        <View className="at-col at-col-3">
                                                             <AtBadge>
                                                                 <AtButton
                                                                     size="small"
-                                                                    onClick={() => this.setState({addattender:item._id,openmodal:""})}
+                                                                    onClick={() => this.setState({ addattender: item._id, openmodal: "" })}
                                                                 >
                                                                     添加
                                                                 </AtButton>
@@ -783,7 +786,7 @@ class JoinSchedule extends Component<Props, States> {
                                                             <AtList>
                                                                 {item.tips ? (
                                                                     item.tips.map((x, index) => {
-                                                                        return <AtListItem key={"tips"+index} title={x}/>;
+                                                                        return <AtListItem key={"tips" + index} title={x} />;
                                                                     })
                                                                 ) : (
                                                                     <View />
@@ -808,20 +811,22 @@ class JoinSchedule extends Component<Props, States> {
                                                 </AtModalAction>
                                             </AtModal>
 
-                                            <AtModal isOpened={this.state.addattender===""?(false):(true)}>
-                                              <AtModalHeader>添加成员</AtModalHeader>
-                                              <AtModalContent>
-                                                  <AtCheckbox
-                                                    options={showattender}
-                                                    selectedList={this.state.attenderlist}
-                                                    onChange={this.addattender.bind(this)}
-                                                  />
-                                              </AtModalContent>
-                                              <AtModalAction>
-                                                  <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
-                                                  <Button onClick={() => this.pushattender(item._id,this.state.attenderlist)}>添加成员</Button>
-                                              </AtModalAction>
-                                          </AtModal>
+                                            <AtModal isOpened={this.state.addattender === "" ? false : true}>
+                                                <AtModalHeader>添加成员</AtModalHeader>
+                                                <AtModalContent>
+                                                    <AtCheckbox
+                                                        options={showattender}
+                                                        selectedList={this.state.attenderlist}
+                                                        onChange={this.addattender.bind(this)}
+                                                    />
+                                                </AtModalContent>
+                                                <AtModalAction>
+                                                    <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
+                                                    <Button onClick={() => this.pushattender(item._id, this.state.attenderlist)}>
+                                                        添加成员
+                                                    </Button>
+                                                </AtModalAction>
+                                            </AtModal>
                                         </View>
                                     );
                                 })}
