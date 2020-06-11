@@ -69,7 +69,7 @@ type States = {
     openinfo: string;
 
     tag: string;
-    tips:string;
+    tips: string;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -119,7 +119,7 @@ class ScheduleDetail extends Component<Props, States> {
             openattenders: true,
             openinfo: "",
             tag: "",
-            tips:"",
+            tips: ""
         };
     }
 
@@ -286,33 +286,33 @@ class ScheduleDetail extends Component<Props, States> {
             });
     };
     updateTips = (banci: Banci, tips: string) => {
-      Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
+        Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
 
-      var newBanciTips: string[];
-      if (banci.tips) newBanciTips = [...banci.tips];
-      else newBanciTips = [];
+        var newBanciTips: string[];
+        if (banci.tips) newBanciTips = [...banci.tips];
+        else newBanciTips = [];
 
-      newBanciTips.push(tips);
+        newBanciTips.push(tips);
 
-      Taro.cloud
-          .callFunction({
-              name: "updateTips",
-              data: {
-                  _id: banci._id,
-                  tips: newBanciTips
-              }
-          })
-          .then(res => {
-              var resdata = (res as unknown) as updateTipsResult;
-              if (resdata.result.code === 200) {
-                  this.props.updateBanci(resdata.result.newban);
-                  Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
-                  this.setState({ tips: "" });
-              } else {
-                  Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
-              }
-          });
-      };
+        Taro.cloud
+            .callFunction({
+                name: "updateTips",
+                data: {
+                    _id: banci._id,
+                    tips: newBanciTips
+                }
+            })
+            .then(res => {
+                var resdata = (res as unknown) as updateTipsResult;
+                if (resdata.result.code === 200) {
+                    this.props.updateBanci(resdata.result.newban);
+                    Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
+                    this.setState({ tips: "" });
+                } else {
+                    Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                }
+            });
+    };
     render() {
         const schedule = this.state.schedule;
         // const { infos } = this.state;
@@ -472,10 +472,7 @@ class ScheduleDetail extends Component<Props, States> {
                                                     </View>
                                                     <View className="at-col at-col-3">
                                                         <AtBadge>
-                                                            <AtButton
-                                                                size="small"
-                                                                onClick={() => this.updateTips(item, this.state.tips)}
-                                                            >
+                                                            <AtButton size="small" onClick={() => this.updateTips(item, this.state.tips)}>
                                                                 添加
                                                             </AtButton>
                                                         </AtBadge>

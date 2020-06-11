@@ -3,7 +3,6 @@ import info from "./classes/info";
 import Schedule from "./classes/schedule";
 import User from "./classes/user";
 import newinfo from "./classes/newinfo";
-import newinfo from "./classes/newinfo";
 
 /** 云函数 "Login" 的返回格式 */
 export interface loginResult {
@@ -122,24 +121,23 @@ export interface newinfoResult {
     };
 }
 
-
 export interface deletescheResult {
-  errMsg: string;
-  requestID: string;
-  result:{
-    code: number;
-  }
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+    };
 }
 
 export interface deletebanResult {
-  errMsg: string;
-  requestID: string;
-  result: {
-    code: number;
-    banci;
-    info;
-    newinfo;
-  }
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+        banci;
+        info;
+        newinfo;
+    };
 }
 
 export interface updateTagResult {
@@ -153,12 +151,12 @@ export interface updateTagResult {
 }
 
 export interface updateTipsResult {
-  errMsg: string;
-  requestID: string;
-  result: {
-    code: number;
-    newban:Banci;
-  }
+    errMsg: string;
+    requestID: string;
+    result: {
+        code: number;
+        newban: Banci;
+    };
 }
 
 export interface pushAttenderResult {
