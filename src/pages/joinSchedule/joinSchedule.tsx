@@ -32,7 +32,6 @@ import { updatenewInfo } from "../../redux/actions/newinfo";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
 import {
-    getPerscheResult,
     loginResult,
     updatescheResult,
     arrangescheResult,
@@ -198,7 +197,6 @@ class JoinSchedule extends Component<Props, States> {
             })
             .then(res => {
                 var resdata = (res as unknown) as newinfoResult;
-                console.log(resdata.result);
                 if (resdata.result.code === 200) {
                     this.props.updateInfo(resdata.result.data);
                     this.updateAttendersNumber();
@@ -449,7 +447,6 @@ class JoinSchedule extends Component<Props, States> {
                 })
                 .then(res => {
                     var resdata = (res as unknown) as updateTagResult;
-                    console.log(resdata.result);
                     if (resdata.result.code === 200) {
                         resdata.result.data.info.map(x => this.props.updateInfo(x));
                         Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
@@ -491,8 +488,7 @@ class JoinSchedule extends Component<Props, States> {
             });
     };
 
-    addattender(value) {
-        console.log(value);
+    addattender(value: string[]) {
         this.setState({
             attenderlist: value
         });
@@ -510,7 +506,6 @@ class JoinSchedule extends Component<Props, States> {
                 })
                 .then(res => {
                     const resdata = (res as unknown) as deletebanResult;
-                    console.log(resdata);
                     if (resdata.result.code === 200) {
                         this.props.deleteBanci(classid);
                         Taro.showToast({ title: "移除成功", icon: "success", duration: 2000 });
@@ -523,13 +518,16 @@ class JoinSchedule extends Component<Props, States> {
         }
     }
 
-    pushattender(classid: string, attenderlist) {
-        console.log(classid);
-        console.log(attenderlist);
+    pushattender(classid: string, attenderlist: string[]) {
+        if (attenderlist === undefined || attenderlist.length === 0) {
+            Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
+            return;
+        }
+
         this.setState({ addattender: "" });
         let exist = false;
         Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
-        attenderlist.map(item => {
+        attenderlist.map((item: string) => {
             this.props.infos.map(x => {
                 if (x.classid === classid && item === x.userid) {
                     exist = true;
@@ -550,11 +548,11 @@ class JoinSchedule extends Component<Props, States> {
                 .then(res => {
                     var resdata = (res as unknown) as pushAttenderResult;
                     if (resdata.result.code === 200) {
-                        Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
                         resdata.result.addlist.map(newinfo => {
                             this.props.updateInfo(newinfo);
                         });
                         this.updateAttendersNumber();
+                        Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
                     } else {
                         Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
                     }
@@ -598,7 +596,7 @@ class JoinSchedule extends Component<Props, States> {
             }
         });
         if (!showinfo) showinfo = [];
-        var showattender;
+        var showattender: Array<{ value: string; label: string }>;
 
         if (showinfo) {
             showinfo.map(x => {
@@ -606,15 +604,12 @@ class JoinSchedule extends Component<Props, States> {
                 if (showattender) showattender = [...showattender, item];
                 else showattender = [item];
             });
-            // console.log(showattender)
         }
-        // console.log(showattender)
         const schedule = sc;
         const infos = infor;
         const bancis = ban;
         const failclass = this.state.failclass;
         const failinfo = this.state.failinfo;
-        // console.log(bancis)
         if (schedule !== undefined)
             return (
                 <View>
