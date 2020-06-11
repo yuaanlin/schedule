@@ -522,47 +522,57 @@ class JoinSchedule extends Component<Props, States> {
     pushattender(classid: string, attenderlist: string[]) {
         const sc = this.$router.params
         const scheID = sc._id
-        console.log(scheID)
-        if (attenderlist === undefined || attenderlist.length === 0) {
-            Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
-            return;
+        let owner = false
+        console.log(this.props.schedules)
+        var curSche = this.props.schedules.filter(x=>x._id===scheID)
+        if(curSche[0].ownerID=== this.props.user._id){
+          owner = true
+        }
+        if(owner){
+            if (attenderlist === undefined || attenderlist.length === 0) {
+              Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
+              return;
+          }
+
+          this.setState({ addattender: "" });
+          let exist = false;
+          Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
+          attenderlist.map((item: string) => {
+              this.props.infos.map(x => {
+                  if (x.classid === classid && item === x.userid) {
+                      exist = true;
+                  }
+              });
+          });
+          if (exist) {
+              Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
+          } else {
+              Taro.cloud
+                  .callFunction({
+                      name: "addattender",
+                      data: {
+                          classid: classid,
+                          attenderlist: attenderlist,
+                          scheid:scheID
+                      }
+                  })
+                  .then(res => {
+                      var resdata = (res as unknown) as pushAttenderResult;
+                      if (resdata.result.code === 200) {
+                          resdata.result.addlist.map(newinfo => {
+                              this.props.updateInfo(newinfo);
+                          });
+                          this.updateAttendersNumber();
+                          Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
+                      } else {
+                          Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                      }
+                  });
+          }
+        }else{
+          Taro.showToast({ title: "宁无权进行该操作噢", icon: "none", duration: 2000 });
         }
 
-        this.setState({ addattender: "" });
-        let exist = false;
-        Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
-        attenderlist.map((item: string) => {
-            this.props.infos.map(x => {
-                if (x.classid === classid && item === x.userid) {
-                    exist = true;
-                }
-            });
-        });
-        if (exist) {
-            Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
-        } else {
-            Taro.cloud
-                .callFunction({
-                    name: "addattender",
-                    data: {
-                        classid: classid,
-                        attenderlist: attenderlist,
-                        scheid:scheID
-                    }
-                })
-                .then(res => {
-                    var resdata = (res as unknown) as pushAttenderResult;
-                    if (resdata.result.code === 200) {
-                        resdata.result.addlist.map(newinfo => {
-                            this.props.updateInfo(newinfo);
-                        });
-                        this.updateAttendersNumber();
-                        Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
-                    } else {
-                        Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
-                    }
-                });
-        }
     }
 
     render() {
