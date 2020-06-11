@@ -429,13 +429,14 @@ class JoinSchedule extends Component<Props, States> {
     };
 
     updateTag = (info: info, value: string) => {
-        var scheID = this.$router.params._id;
+        var scheID = info.scheid;
         let flag = true;
-        Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
+        console.log(scheID)
         this.props.infos.map(x => {
             if (x.tag === value) flag = false;
         });
         if (flag) {
+          Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
             Taro.cloud
                 .callFunction({
                     name: "updateTag",
@@ -519,6 +520,9 @@ class JoinSchedule extends Component<Props, States> {
     }
 
     pushattender(classid: string, attenderlist: string[]) {
+        const sc = this.$router.params
+        const scheID = sc._id
+        console.log(scheID)
         if (attenderlist === undefined || attenderlist.length === 0) {
             Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
             return;
@@ -542,7 +546,8 @@ class JoinSchedule extends Component<Props, States> {
                     name: "addattender",
                     data: {
                         classid: classid,
-                        attenderlist: attenderlist
+                        attenderlist: attenderlist,
+                        scheid:scheID
                     }
                 })
                 .then(res => {

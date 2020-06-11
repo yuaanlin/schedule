@@ -212,7 +212,7 @@ class ScheduleDetail extends Component<Props, States> {
                   var resdata = (res as unknown) as getScheResult;
                   if (resdata.result.code === 200) {
                       this.props.updateSchedule(resdata.result.schedule);
-                      resdata.result.info.map(info => {
+                      resdata.result.newinfo.map(info => {
                           this.props.updateInfo(info);
                       });
                       resdata.result.banci.map(banci => {

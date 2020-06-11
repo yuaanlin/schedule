@@ -11,6 +11,7 @@ exports.main = async (event, context) => {
     const wxContext = cloud.getWXContext();
     const { newtag, userid, scheid } = event;
     try {
+        console.log(userid,scheid)
         await infoCollection
             .where({
                 userid: userid,
@@ -27,6 +28,7 @@ exports.main = async (event, context) => {
                 scheid: scheid
             })
             .get();
+          console.log(info)
         return {
             code: 200,
             data: {
