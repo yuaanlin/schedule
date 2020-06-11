@@ -42,7 +42,7 @@ import {
     newinfoResult,
     deletebanResult,
     pushAttenderResult,
-    getscheduleResult,
+    getScheResult,
 
 } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
@@ -187,6 +187,7 @@ class JoinSchedule extends Component<Props, States> {
             return;
         }
         Taro.showToast({ title: "报名中", icon: "loading", duration: 2000 });
+
         Taro.cloud
             .callFunction({
                 name: "newinfo",
@@ -198,7 +199,9 @@ class JoinSchedule extends Component<Props, States> {
             })
             .then(res => {
                 var resdata = (res as unknown) as newinfoResult;
+                console.log(resdata.result)
                 if (resdata.result.code === 200) {
+
                     this.props.updateInfo(resdata.result.data);
                     this.updateAttendersNumber();
                     Taro.showToast({ title: "报名成功", icon: "success", duration: 2000 });
@@ -238,11 +241,20 @@ class JoinSchedule extends Component<Props, States> {
     }
 
     getTag() {
-        if (this.state.tag != null) {
+        var flag = true
+        this.props.infos.map(x=>{
+          if(x.tag===this.state.tag)flag
+        })
+        if(flag){
+          if (this.state.tag != null) {
             this.setState({ gettag: false });
-        } else {
+          } else {
             this.setState({ warntag: true });
+          }
+        }else{
+          Taro.showToast({ title: "该tag已被占用啦", icon: "none", duration: 2000 });
         }
+
     }
 
     componentDidMount() {
@@ -280,13 +292,13 @@ class JoinSchedule extends Component<Props, States> {
                     }
                 })
                 .then(res => {
-                    var resdata = (res as unknown) as getscheduleResult;
+                    var resdata = (res as unknown) as getScheResult;
                     if (resdata.result.code === 200) {
                         this.props.updateSchedule(resdata.result.schedule);
-                        resdata.result.bancis.map(banci => {
+                        resdata.result.banci.map(banci => {
                             this.props.updateBanci(banci);
                         });
-                        resdata.result.infos.map(info => {
+                        resdata.result.info.map(info => {
                             this.props.updateInfo(info);
                         });
                     } else {
@@ -423,8 +435,13 @@ class JoinSchedule extends Component<Props, States> {
 
     updateTag = (info: info, value: string) => {
         var scheID = this.$router.params._id;
+        let flag = true
         Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
-        Taro.cloud
+        this.props.infos.map(x=>{
+          if(x.tag===value)flag = false
+        })
+        if(flag){
+          Taro.cloud
             .callFunction({
                 name: "updateTag",
                 data: {
@@ -435,13 +452,18 @@ class JoinSchedule extends Component<Props, States> {
             })
             .then(res => {
                 var resdata = (res as unknown) as updateTagResult;
+                console.log(resdata.result)
                 if (resdata.result.code === 200) {
-                    resdata.result.info.map(x => this.props.updateInfo(x));
+                    resdata.result.data.info.map(x => this.props.updateInfo(x));
                     Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
                 } else {
                     Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
                 }
             });
+        }else{
+          Taro.showToast({ title: "该tag已被使用啦，请换一个tag吧", icon: "none", duration: 2000 });
+        }
+
     };
 
     updateTips = (banci: Banci, tips: string) => {
@@ -474,6 +496,7 @@ class JoinSchedule extends Component<Props, States> {
     };
 
     addattender(value) {
+      console.log(value)
         this.setState({
             attenderlist: value
         });
@@ -507,13 +530,13 @@ class JoinSchedule extends Component<Props, States> {
 
     pushattender (classid:string,attenderlist){
       console.log(classid)
-      // console.log(attenderlist)
+      console.log(attenderlist)
       this.setState({addattender:""})
       let exist = false;
       Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
       attenderlist.map(item=>{
         this.props.infos.map(x=>{
-          if(x.classid===classid&&item===x._id){
+          if(x.classid===classid&&item===x.userid){
             exist = true;
           }
         })
@@ -583,10 +606,11 @@ class JoinSchedule extends Component<Props, States> {
 
         if (showinfo) {
             showinfo.map(x => {
-                let item = { value: x._id, label: x.tag };
+                let item = { value: x.userid, label: x.tag };
                 if (showattender) showattender = [...showattender, item];
                 else showattender = [item];
             });
+            // console.log(showattender)
         }
         // console.log(showattender)
         const schedule = sc;

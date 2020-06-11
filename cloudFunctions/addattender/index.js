@@ -15,9 +15,13 @@ exports.main = async (event, context) => {
   try{
       var i = 0
       for(;i<attenderlist.length;i++){
-      var target = await infoform.doc(attenderlist[i]).get()
+      var target = await infoform
+        .where({
+          userid:attenderlist[i]
+        })
+        .get()
       var addlist = []
-      target = target.data
+      target = target.data[0]
       console.log(target)
       var newinfo = {
         _id: generateUUID(),

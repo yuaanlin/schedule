@@ -30,16 +30,17 @@ export interface getPerscheResult {
     };
 }
 
-export interface getscheduleResult {
-    errMsg: string;
-    requestID: string;
-    result: {
-        code: number;
-        schedule: Schedule;
-        infos: Array<info>;
-        bancis: Array<Banci>;
-        newinfos: Array<newinfo>;
-    };
+/**云函数"getschedule" 的返回格式 */
+export interface getScheResult {
+  errMsg: string;
+  requestID: string;
+  result: {
+    code: number;
+    schedule: Schedule;
+    banci: Array<Banci>;
+    info: Array<info>;
+    newinfo: Array<newinfo>
+  }
 }
 
 /** 云函数 "postUserInfo" 的返回格式 */
@@ -144,8 +145,11 @@ export interface updateTagResult {
     requestID: string;
     result: {
         code: number;
-        newtag: string;
-        info: Array<info>;
+        data:{
+          newtag: string;
+          info: Array<info>;
+        }
+
     };
 }
 
@@ -166,3 +170,4 @@ export interface pushAttenderResult {
     addlist:Array<info>;
   }
 }
+

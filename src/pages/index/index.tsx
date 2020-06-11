@@ -307,6 +307,7 @@ class Index extends Component<Props, States> {
                                             let start = getDateString(item.startact, true);
                                             let end = getDateString(item.endact, true);
                                             let userid = this.props.user._id;
+                                            var nums = getAttendersNumber(item._id);
                                             return (
                                                 <AtSwipeAction
                                                     key={item._id}
@@ -323,7 +324,7 @@ class Index extends Component<Props, States> {
                                                     <AtListItem
                                                         note={start + " 到 " + end}
                                                         title={item.title}
-                                                        extraText="填写人数"
+                                                        extraText={"参与情况 " + nums.joined_num + "/" + nums.need_num}
                                                         onClick={() => {
                                                             Taro.navigateTo({
                                                                 url: "../scheduleDetail/scheduleDetail?_id=" + item._id
@@ -367,7 +368,6 @@ class Index extends Component<Props, States> {
                                                     <AtListItem
                                                         note={start + " 到 " + end}
                                                         title={item.title}
-                                                        extraText="填写人数"
                                                         onClick={() => {
                                                             Taro.navigateTo({
                                                                 url: "../scheduleDetail/scheduleDetail?_id=" + item._id

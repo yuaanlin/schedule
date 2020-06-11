@@ -24,9 +24,10 @@ import { updateBanci } from "../../redux/actions/banci";
 import { updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
 import { updatenewInfo } from "../../redux/actions/newinfo";
+import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import { updatescheResult, updateTagResult, updateTipsResult } from "../../types";
+import { updatescheResult, updateTagResult,updateTipsResult,loginResult,getScheResult } from "../../types";
 import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
 import getTimeString from "../../utils/getTimeString";
@@ -38,6 +39,7 @@ type Props = {
     bancis: Array<Banci>;
     infos: Array<info>;
     newinfos: Array<newinfo>;
+    setUserData: (user: User) => void;
     updateSchedule: (Schedule: Schedule) => void;
     updateBanci: (banci: Banci) => void;
     updateInfo: (info: info) => void;
@@ -83,6 +85,9 @@ function mapStateToProps(state: AppState) {
 
 function mapDispatchToProps(dispatch: typeof store.dispatch) {
     return {
+        setUserData: (user: User) => {
+          dispatch(setUserData(user));
+        },
         updateSchedule: (schedule: Schedule) => {
             dispatch(updateSchedule(schedule));
         },
@@ -172,15 +177,56 @@ class ScheduleDetail extends Component<Props, States> {
     };
 
     componentDidMount() {
-        var scheID = this.$router.params._id;
-        var sc = this.props.schedules.find(sc => sc._id === scheID);
-        /** 检查当前查看的班表有没有被下载了，没有的话代表用户试图访问和他无关的班表 */
-        if (sc === undefined) {
-            Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
-            Taro.navigateTo({
-                url: "../index/index"
-            });
-        } else {
+        /** 通过分享链接进来的人要先登入 */
+        if (this.props.user._id === "") {
+          Taro.cloud
+              .callFunction({
+                  name: "login"
+              })
+              .then(res => {
+                  var resdata = (res as unknown) as loginResult;
+                  if (resdata.result.code === 200) {
+                      this.props.setUserData(resdata.result.user);
+                  } else {
+                      // 第一次进来，请先去 Index 做用户数据入库
+                      Taro.redirectTo({
+                          url: "../index/index"
+                      });
+                  }
+              });
+      }
+
+      var scheID = this.$router.params._id;
+      var sc = this.props.schedules.find(sc => sc._id === scheID);
+
+      /** 前端找不到班表，先下载请求的班表数据 */
+      if (sc === undefined) {
+          Taro.cloud
+              .callFunction({
+                  name: "getschedule",
+                  data:{
+                    scheid:scheID
+                  }
+              })
+              .then(res => {
+                  var resdata = (res as unknown) as getScheResult;
+                  if (resdata.result.code === 200) {
+                      this.props.updateSchedule(resdata.result.schedule);
+                      resdata.result.info.map(info => {
+                          this.props.updateInfo(info);
+                      });
+                      resdata.result.banci.map(banci => {
+                          this.props.updateBanci(banci);
+                      });
+                  } else {
+                      Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
+                      Taro.redirectTo({
+                          url: "../index/index"
+                      });
+                  }
+              });
+      }
+         else {
             this.setState({ schedule: sc });
             var newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID);
             this.setState({ newinfos: newinfo });
@@ -232,7 +278,7 @@ class ScheduleDetail extends Component<Props, States> {
             .then(res => {
                 var resdata = (res as unknown) as updateTagResult;
                 if (resdata.result.code === 200) {
-                    resdata.result.info.map(x => this.props.updateInfo(x));
+                    resdata.result.data.info.map(x => this.props.updateInfo(x));
                     Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
                 } else {
                     Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
@@ -283,6 +329,32 @@ class ScheduleDetail extends Component<Props, States> {
             });
             return found;
         });
+        let showinfo: newinfo[] = [];
+        infor.map(x => {
+            let exist: newinfo | undefined = undefined;
+            let selfdata = infor.find(x => x.userid === this.props.user._id);
+
+            if (showinfo === undefined) {
+                selfdata ? (showinfo = [selfdata]) : (showinfo = [x]);
+            } else {
+                exist = showinfo.find(y => y.userid === x.userid);
+                if (!exist) {
+                    showinfo.push(x);
+                }
+            }
+        });
+        if (!showinfo) showinfo = [];
+        var showattender
+
+        if(showinfo){
+          showinfo.map(x=>{
+            let item = {value:x._id,label:x.tag}
+            if(showattender)
+              showattender=[...showattender,item]
+            else
+              showattender = [item]
+          })
+        }
         return (
             <View>
                 <AtList>
@@ -390,8 +462,8 @@ class ScheduleDetail extends Component<Props, States> {
                                                         ></AtInput>
                                                         <AtList>
                                                             {item.tips ? (
-                                                                item.tips.map(x => {
-                                                                    return <AtListItem title={x} />;
+                                                                item.tips.map((x, index) => {
+                                                                    return <AtListItem key={"tips"+index} title={x}/>;
                                                                 })
                                                             ) : (
                                                                 <View />
@@ -428,7 +500,7 @@ class ScheduleDetail extends Component<Props, States> {
                             onClick={value => this.setState({ openattenders: value })}
                             title="人员列表"
                         >
-                            {infor.map(item => {
+                            {showinfo.map(item => {
                                 return (
                                     <View key={item._id}>
                                         <AtListItem
@@ -510,7 +582,7 @@ class ScheduleDetail extends Component<Props, States> {
                                                                 } else {
                                                                     e1 = null;
                                                                 }
-                                                                return <View>{e1}</View>;
+                                                                return <View key={item.classid}>{e1}</View>;
                                                             })}
                                                         </View>
                                                     )}
