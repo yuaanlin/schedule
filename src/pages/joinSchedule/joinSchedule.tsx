@@ -41,7 +41,9 @@ import {
     updateTipsResult,
     newinfoResult,
     deletebanResult,
-    getscheduleResult
+    pushAttenderResult,
+    getscheduleResult,
+
 } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
 import getDateFromString from "../../utils/getDateFromString";
@@ -502,10 +504,44 @@ class JoinSchedule extends Component<Props, States> {
         }
     }
 
-    pushattender = (classid: string, attenderlist) => {
-        console.log(classid);
-        console.log(attenderlist);
-    };
+
+    pushattender (classid:string,attenderlist){
+      console.log(classid)
+      // console.log(attenderlist)
+      this.setState({addattender:""})
+      let exist = false;
+      Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
+      attenderlist.map(item=>{
+        this.props.infos.map(x=>{
+          if(x.classid===classid&&item===x._id){
+            exist = true;
+          }
+        })
+      })
+      if(exist){
+        Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
+      }else{
+        Taro.cloud.callFunction({
+          name:"addattender",
+          data:{
+            classid:classid,
+            attenderlist:attenderlist
+          }
+        }).then(res => {
+          var resdata = (res as unknown) as pushAttenderResult;
+          if(resdata.result.code===200){
+            Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
+            resdata.result.addlist.map(newinfo => {
+              this.props.updatenewInfo(newinfo);
+            });
+            console.log(this.props.infos)
+            this.updateAttendersNumber();
+          }else{
+            Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+          }
+        })
+      }
+    }
 
     render() {
         var scheID = this.$router.params._id;
@@ -558,6 +594,7 @@ class JoinSchedule extends Component<Props, States> {
         const bancis = ban;
         const failclass = this.state.failclass;
         const failinfo = this.state.failinfo;
+        // console.log(bancis)
         if (schedule !== undefined)
             return (
                 <View>
@@ -811,22 +848,22 @@ class JoinSchedule extends Component<Props, States> {
                                                 </AtModalAction>
                                             </AtModal>
 
-                                            <AtModal isOpened={this.state.addattender === "" ? false : true}>
-                                                <AtModalHeader>添加成员</AtModalHeader>
-                                                <AtModalContent>
-                                                    <AtCheckbox
+
+                                            <AtModal isOpened={this.state.addattender===item._id}>
+                                              <AtModalHeader>添加成员</AtModalHeader>
+                                                  <AtModalContent>
+                                                      <AtCheckbox
                                                         options={showattender}
                                                         selectedList={this.state.attenderlist}
                                                         onChange={this.addattender.bind(this)}
-                                                    />
-                                                </AtModalContent>
-                                                <AtModalAction>
-                                                    <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
-                                                    <Button onClick={() => this.pushattender(item._id, this.state.attenderlist)}>
-                                                        添加成员
-                                                    </Button>
-                                                </AtModalAction>
-                                            </AtModal>
+                                                      />
+                                                  </AtModalContent>
+                                                  <AtModalAction>
+                                                      <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
+                                                      <Button onClick={ this.pushattender.bind(this,item._id,this.state.attenderlist)}>添加成员</Button>
+                                                  </AtModalAction>
+                                              </AtModal>
+
                                         </View>
                                     );
                                 })}
