@@ -503,16 +503,16 @@ class JoinSchedule extends Component<Props, States> {
         }
     }
 
-    pushattender = (classid:string,attenderlist)=>{
+    pushattender (classid:string,attenderlist){
       console.log(classid)
-      console.log(attenderlist)
+      // console.log(attenderlist)
+      this.setState({addattender:""})
       let exist = false;
       Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
       attenderlist.map(item=>{
         this.props.infos.map(x=>{
-          if(x._id===item.value){
+          if(x.classid===classid&&item===x._id){
             exist = true;
-            console.log(item)
           }
         })
       })
@@ -533,6 +533,7 @@ class JoinSchedule extends Component<Props, States> {
               this.props.updatenewInfo(newinfo);
             });
             console.log(this.props.infos)
+            this.updateAttendersNumber();
           }else{
             Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
           }
@@ -586,6 +587,7 @@ class JoinSchedule extends Component<Props, States> {
         const bancis = ban;
         const failclass = this.state.failclass;
         const failinfo = this.state.failinfo;
+        // console.log(bancis)
         if (schedule !== undefined)
             return (
                 <View>
@@ -841,20 +843,20 @@ class JoinSchedule extends Component<Props, States> {
                                                 </AtModalAction>
                                             </AtModal>
 
-                                            <AtModal isOpened={this.state.addattender===""?(false):(true)}>
+                                            <AtModal isOpened={this.state.addattender===item._id}>
                                               <AtModalHeader>添加成员</AtModalHeader>
-                                              <AtModalContent>
-                                                  <AtCheckbox
-                                                    options={showattender}
-                                                    selectedList={this.state.attenderlist}
-                                                    onChange={this.addattender.bind(this)}
-                                                  />
-                                              </AtModalContent>
-                                              <AtModalAction>
-                                                  <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
-                                                  <Button onClick={() =>{ this.pushattender(item._id,this.state.attenderlist);this.setState({addattender:''})}}>添加成员</Button>
-                                              </AtModalAction>
-                                          </AtModal>
+                                                  <AtModalContent>
+                                                      <AtCheckbox
+                                                        options={showattender}
+                                                        selectedList={this.state.attenderlist}
+                                                        onChange={this.addattender.bind(this)}
+                                                      />
+                                                  </AtModalContent>
+                                                  <AtModalAction>
+                                                      <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
+                                                      <Button onClick={ this.pushattender.bind(this,item._id,this.state.attenderlist)}>添加成员</Button>
+                                                  </AtModalAction>
+                                              </AtModal>
                                         </View>
                                     );
                                 })}
