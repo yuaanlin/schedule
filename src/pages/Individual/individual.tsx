@@ -1,7 +1,7 @@
 import { Image, View } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component } from "@tarojs/taro";
-import { AtList, AtListItem, AtTabBar } from "taro-ui";
+import { AtList, AtListItem, AtTabBar, AtButton } from "taro-ui";
 import User from "../../classes/user";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
@@ -60,7 +60,14 @@ class Individual extends Component<Props, States> {
                 {/* <View className='at-row'> */}
                 <View className="logged-mine">
                     <Image src={this.props.user.avatarUrl} className="mine-avatar" onClick={this.onImageClick} />
-                    <View className="mine-nickName">{this.props.user.name ? this.props.user.name : "勤小创"}</View>
+                    <View className="mine-nickName">{this.props.user.name ? this.props.user.name : "尚未登入"}</View>
+                    {this.props.user.name ? (
+                        <View />
+                    ) : (
+                        <AtButton customStyle={{ margin: "16px" }} onClick={() => Taro.navigateTo({ url: "../index/index" })}>
+                            立即登入
+                        </AtButton>
+                    )}
                 </View>
                 <View className="myteam">
                     <AtList>

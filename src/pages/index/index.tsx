@@ -44,6 +44,8 @@ type States = {
     openunset: boolean;
     // true 代表程序还在尝试登入，不要急着显示授权按钮
     notLoaded: boolean;
+
+    skip_register: boolean;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -141,11 +143,13 @@ class Index extends Component<Props, States> {
             });
     }
 
-    createsche() {
-        Taro.navigateTo({
-            url: "../createSchedule/createSchedule"
-        });
-    }
+    createsche = () => {
+        if (this.state.skip_register) this.setState({ skip_register: false });
+        else
+            Taro.navigateTo({
+                url: "../createSchedule/createSchedule"
+            });
+    };
 
     deletesche(scheid: string, ownerid: string, userid: string) {
         Taro.showToast({ title: "移除中", icon: "loading", duration: 5000 });
@@ -191,7 +195,8 @@ class Index extends Component<Props, States> {
             openfinished: true,
             openfailed: true,
             openunset: true,
-            notLoaded: true
+            notLoaded: true,
+            skip_register: false
         };
     }
 
@@ -230,12 +235,15 @@ class Index extends Component<Props, States> {
         }
 
         /** 尚未授权 */
-        if (this.props.user._id === "" && !this.state.notLoaded) {
+        if (this.props.user._id === "" && !this.state.notLoaded && !this.state.skip_register) {
             return (
                 <View style={{ textAlign: "center", padding: "36px" }}>
                     <Text>请先登入才能使用小程序的完整功能哦！</Text>
                     <Button style={{ marginTop: "60px" }} openType="getUserInfo" onGetUserInfo={this.getUserInfo}>
                         透过微信授权登入
+                    </Button>
+                    <Button style={{ marginTop: "24px" }} onClick={() => this.setState({ skip_register: true })}>
+                        暂不登入，进去晃晃
                     </Button>
                 </View>
             );
