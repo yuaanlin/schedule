@@ -145,8 +145,11 @@ export interface updateTagResult {
     requestID: string;
     result: {
         code: number;
-        newtag: string;
-        info: Array<info>;
+        data:{
+          newtag: string;
+          info: Array<info>;
+        }
+
     };
 }
 

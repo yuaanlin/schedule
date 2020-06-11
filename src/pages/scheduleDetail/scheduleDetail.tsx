@@ -278,7 +278,7 @@ class ScheduleDetail extends Component<Props, States> {
             .then(res => {
                 var resdata = (res as unknown) as updateTagResult;
                 if (resdata.result.code === 200) {
-                    resdata.result.info.map(x => this.props.updateInfo(x));
+                    resdata.result.data.info.map(x => this.props.updateInfo(x));
                     Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
                 } else {
                     Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
