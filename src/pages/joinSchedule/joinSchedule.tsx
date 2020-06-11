@@ -15,7 +15,9 @@ import {
     AtModalContent,
     AtModalHeader,
     AtSwipeAction,
-    AtToast
+    AtToast,
+    AtFab,
+    AtCheckbox,
 } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
@@ -47,6 +49,7 @@ import getDateString from "../../utils/getDateString";
 import getTimeString from "../../utils/getTimeString";
 import "./joinSchedule.scss";
 import getAttendersNumber from "../../utils/getAttendersNumber";
+import Taro from "@tarojs/taro";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -74,6 +77,10 @@ type States = {
 
     // 正在编辑的项目
     editing: string | undefined;
+
+    //添加成员
+    addattender:string;
+    attenderlist:Array<string>;
 
     // 当前查看的班次 ID
     openmodal: string;
@@ -144,6 +151,8 @@ class JoinSchedule extends Component<Props, States> {
             editing: undefined,
             openbanci: true,
             openmodal: "",
+            addattender:"",
+            attenderlist: [],
             gettag: false,
             warntag: false,
             tag: "",
@@ -318,7 +327,7 @@ class JoinSchedule extends Component<Props, States> {
         if (sc !== undefined)
             return {
                 title: "我为 " + sc.title + " 创建了一个新的排班，大家快来报名吧！",
-                path: "/pages/joinSchedule/joinSchedule?_id=" + this.$router.params._id
+                path: "/pages/joinSchedule/joinSchedule?_id=" + scheID
             };
         else
             return {
@@ -462,6 +471,12 @@ class JoinSchedule extends Component<Props, States> {
             });
     };
 
+    addattender (value){
+      this.setState({
+        attenderlist:value
+      })
+    }
+
     deleteban(classid: string, ownerid: string, userid: string) {
         Taro.showToast({ title: "移除中", icon: "loading", duration: 5000 });
         if (ownerid === userid) {
@@ -485,6 +500,11 @@ class JoinSchedule extends Component<Props, States> {
         } else {
             Taro.showToast({ title: "您无权限删除该班表噢", icon: "none", duration: 2000 });
         }
+    }
+
+    pushattender = (classid:string,attenderlist)=>{
+      console.log(classid)
+      console.log(attenderlist)
     }
 
     render() {
@@ -516,6 +536,18 @@ class JoinSchedule extends Component<Props, States> {
             }
         });
         if (!showinfo) showinfo = [];
+        var showattender
+
+        if(showinfo){
+          showinfo.map(x=>{
+            let item = {value:x._id,label:x.tag}
+            if(showattender)
+              showattender=[...showattender,item]
+            else
+              showattender = [item]
+          })
+        }
+        // console.log(showattender)
         const schedule = sc;
         const infos = infor;
         const bancis = ban;
@@ -586,6 +618,8 @@ class JoinSchedule extends Component<Props, States> {
                             <Button onClick={this.publicsche}>发布班表</Button>
                         </AtModalAction>
                     </AtModal>
+
+
 
                     <AtList>
                         <AtListItem
@@ -684,19 +718,31 @@ class JoinSchedule extends Component<Props, States> {
                                                         </View>
                                                     </View>
                                                     {/* 循环班次成员获取tag */}
-                                                    <View>
-                                                        {infos.filter(info => info.classid === item._id).length === 0 ? (
-                                                            <Text>没有成员</Text>
-                                                        ) : (
-                                                            <UserBadge
-                                                                user={this.props.user}
-                                                                infos={infos}
-                                                                banciID={item._id}
-                                                                schedule={schedule}
-                                                                deleteInfo={this.props.deleteInfo}
-                                                                updateAttendersNumber={this.updateAttendersNumber}
-                                                            />
-                                                        )}
+                                                    <View className="at-row">
+                                                        <View className="at-col at-col-9">
+                                                            {infos.filter(info => info.classid === item._id).length === 0 ? (
+                                                                <Text>没有成员</Text>
+                                                            ) : (
+                                                                <UserBadge
+                                                                    user={this.props.user}
+                                                                    infos={infos}
+                                                                    banciID={item._id}
+                                                                    schedule={schedule}
+                                                                    deleteInfo={this.props.deleteInfo}
+                                                                    updateAttendersNumber={this.updateAttendersNumber}
+                                                                />
+                                                            )}
+                                                        </View>
+                                                        <View className="at-col at-col-3" >
+                                                            <AtBadge>
+                                                                <AtButton
+                                                                    size="small"
+                                                                    onClick={() => this.setState({addattender:item._id,openmodal:""})}
+                                                                >
+                                                                    添加
+                                                                </AtButton>
+                                                            </AtBadge>
+                                                        </View>
                                                     </View>
                                                     <AtDivider></AtDivider>
                                                     <View className="at-row">
@@ -761,6 +807,21 @@ class JoinSchedule extends Component<Props, States> {
                                                     <Button onClick={this.getInvolved.bind(this, item._id)}>加入该班次</Button>
                                                 </AtModalAction>
                                             </AtModal>
+
+                                            <AtModal isOpened={this.state.addattender===""?(false):(true)}>
+                                              <AtModalHeader>添加成员</AtModalHeader>
+                                              <AtModalContent>
+                                                  <AtCheckbox
+                                                    options={showattender}
+                                                    selectedList={this.state.attenderlist}
+                                                    onChange={this.addattender.bind(this)}
+                                                  />
+                                              </AtModalContent>
+                                              <AtModalAction>
+                                                  <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
+                                                  <Button onClick={() => this.pushattender(item._id,this.state.attenderlist)}>添加成员</Button>
+                                              </AtModalAction>
+                                          </AtModal>
                                         </View>
                                     );
                                 })}
