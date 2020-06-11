@@ -146,3 +146,12 @@ export interface updateTipsResult {
     newban:Banci;
   }
 }
+
+export interface pushAttenderResult {
+  errMsg: string;
+  requestID: string;
+  result:{
+    code: number;
+    addlist:Array<info>;
+  }
+}

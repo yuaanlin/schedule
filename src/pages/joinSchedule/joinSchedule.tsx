@@ -41,7 +41,8 @@ import {
     updateTagResult,
     updateTipsResult,
     newinfoResult,
-    deletebanResult
+    deletebanResult,
+    pushAttenderResult
 } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
 import getDateFromString from "../../utils/getDateFromString";
@@ -505,6 +506,38 @@ class JoinSchedule extends Component<Props, States> {
     pushattender = (classid:string,attenderlist)=>{
       console.log(classid)
       console.log(attenderlist)
+      let exist = false;
+      Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
+      attenderlist.map(item=>{
+        this.props.infos.map(x=>{
+          if(x._id===item.value){
+            exist = true;
+            console.log(item)
+          }
+        })
+      })
+      if(exist){
+        Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
+      }else{
+        Taro.cloud.callFunction({
+          name:"addattender",
+          data:{
+            classid:classid,
+            attenderlist:attenderlist
+          }
+        }).then(res => {
+          var resdata = (res as unknown) as pushAttenderResult;
+          if(resdata.result.code===200){
+            Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
+            resdata.result.addlist.map(newinfo => {
+              this.props.updatenewInfo(newinfo);
+            });
+            console.log(this.props.infos)
+          }else{
+            Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+          }
+        })
+      }
     }
 
     render() {
@@ -819,7 +852,7 @@ class JoinSchedule extends Component<Props, States> {
                                               </AtModalContent>
                                               <AtModalAction>
                                                   <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
-                                                  <Button onClick={() => this.pushattender(item._id,this.state.attenderlist)}>添加成员</Button>
+                                                  <Button onClick={() =>{ this.pushattender(item._id,this.state.attenderlist);this.setState({addattender:''})}}>添加成员</Button>
                                               </AtModalAction>
                                           </AtModal>
                                         </View>
