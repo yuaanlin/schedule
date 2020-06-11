@@ -734,13 +734,15 @@ class JoinSchedule extends Component<Props, States> {
                                                                     this.setState({ tips: v.toString() });
                                                                 }}
                                                             ></AtInput>
-                                                            {item.tips ? (
-                                                                item.tips.map((x, index) => {
-                                                                    return <View key={index}>{x}</View>;
-                                                                })
-                                                            ) : (
-                                                                <View />
-                                                            )}
+                                                            <AtList>
+                                                                {item.tips ? (
+                                                                    item.tips.map((x, index) => {
+                                                                        return <AtListItem key={"tips"+index} title={x}/>;
+                                                                    })
+                                                                ) : (
+                                                                    <View />
+                                                                )}
+                                                            </AtList>
                                                         </View>
                                                         <View className="at-col at-col-3">
                                                             <AtBadge>
@@ -852,7 +854,7 @@ class JoinSchedule extends Component<Props, States> {
                                                                     } else {
                                                                         e1 = null;
                                                                     }
-                                                                    return <Block>{e1}</Block>;
+                                                                    return <Block key={item.classid}>{e1}</Block>;
                                                                 })}
                                                             </View>
                                                         )}
