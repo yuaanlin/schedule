@@ -42,8 +42,7 @@ import {
     newinfoResult,
     deletebanResult,
     pushAttenderResult,
-    getScheResult,
-
+    getScheResult
 } from "../../types";
 import checkIfInvolved from "../../utils/checkIfInvolved";
 import getDateFromString from "../../utils/getDateFromString";
@@ -199,9 +198,8 @@ class JoinSchedule extends Component<Props, States> {
             })
             .then(res => {
                 var resdata = (res as unknown) as newinfoResult;
-                console.log(resdata.result)
+                console.log(resdata.result);
                 if (resdata.result.code === 200) {
-
                     this.props.updateInfo(resdata.result.data);
                     this.updateAttendersNumber();
                     Taro.showToast({ title: "报名成功", icon: "success", duration: 2000 });
@@ -241,20 +239,19 @@ class JoinSchedule extends Component<Props, States> {
     }
 
     getTag() {
-        var flag = true
-        this.props.infos.map(x=>{
-          if(x.tag===this.state.tag)flag
-        })
-        if(flag){
-          if (this.state.tag != null) {
-            this.setState({ gettag: false });
-          } else {
-            this.setState({ warntag: true });
-          }
-        }else{
-          Taro.showToast({ title: "该tag已被占用啦", icon: "none", duration: 2000 });
+        var flag = true;
+        this.props.infos.map(x => {
+            if (x.tag === this.state.tag) flag;
+        });
+        if (flag) {
+            if (this.state.tag != null) {
+                this.setState({ gettag: false });
+            } else {
+                this.setState({ warntag: true });
+            }
+        } else {
+            Taro.showToast({ title: "该tag已被占用啦", icon: "none", duration: 2000 });
         }
-
     }
 
     componentDidMount() {
@@ -435,35 +432,34 @@ class JoinSchedule extends Component<Props, States> {
 
     updateTag = (info: info, value: string) => {
         var scheID = this.$router.params._id;
-        let flag = true
+        let flag = true;
         Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
-        this.props.infos.map(x=>{
-          if(x.tag===value)flag = false
-        })
-        if(flag){
-          Taro.cloud
-            .callFunction({
-                name: "updateTag",
-                data: {
-                    userid: info.userid,
-                    newtag: value,
-                    scheid: scheID
-                }
-            })
-            .then(res => {
-                var resdata = (res as unknown) as updateTagResult;
-                console.log(resdata.result)
-                if (resdata.result.code === 200) {
-                    resdata.result.data.info.map(x => this.props.updateInfo(x));
-                    Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
-                } else {
-                    Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
-                }
-            });
-        }else{
-          Taro.showToast({ title: "该tag已被使用啦，请换一个tag吧", icon: "none", duration: 2000 });
+        this.props.infos.map(x => {
+            if (x.tag === value) flag = false;
+        });
+        if (flag) {
+            Taro.cloud
+                .callFunction({
+                    name: "updateTag",
+                    data: {
+                        userid: info.userid,
+                        newtag: value,
+                        scheid: scheID
+                    }
+                })
+                .then(res => {
+                    var resdata = (res as unknown) as updateTagResult;
+                    console.log(resdata.result);
+                    if (resdata.result.code === 200) {
+                        resdata.result.data.info.map(x => this.props.updateInfo(x));
+                        Taro.showToast({ title: "修改成功", icon: "success", duration: 2000 });
+                    } else {
+                        Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                    }
+                });
+        } else {
+            Taro.showToast({ title: "该tag已被使用啦，请换一个tag吧", icon: "none", duration: 2000 });
         }
-
     };
 
     updateTips = (banci: Banci, tips: string) => {
@@ -496,7 +492,7 @@ class JoinSchedule extends Component<Props, States> {
     };
 
     addattender(value) {
-      console.log(value)
+        console.log(value);
         this.setState({
             attenderlist: value
         });
@@ -527,43 +523,43 @@ class JoinSchedule extends Component<Props, States> {
         }
     }
 
-
-    pushattender (classid:string,attenderlist){
-      console.log(classid)
-      console.log(attenderlist)
-      this.setState({addattender:""})
-      let exist = false;
-      Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
-      attenderlist.map(item=>{
-        this.props.infos.map(x=>{
-          if(x.classid===classid&&item===x.userid){
-            exist = true;
-          }
-        })
-      })
-      if(exist){
-        Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
-      }else{
-        Taro.cloud.callFunction({
-          name:"addattender",
-          data:{
-            classid:classid,
-            attenderlist:attenderlist
-          }
-        }).then(res => {
-          var resdata = (res as unknown) as pushAttenderResult;
-          if(resdata.result.code===200){
-            Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
-            resdata.result.addlist.map(newinfo => {
-              this.props.updatenewInfo(newinfo);
+    pushattender(classid: string, attenderlist) {
+        console.log(classid);
+        console.log(attenderlist);
+        this.setState({ addattender: "" });
+        let exist = false;
+        Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
+        attenderlist.map(item => {
+            this.props.infos.map(x => {
+                if (x.classid === classid && item === x.userid) {
+                    exist = true;
+                }
             });
-            console.log(this.props.infos)
-            this.updateAttendersNumber();
-          }else{
-            Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
-          }
-        })
-      }
+        });
+        if (exist) {
+            Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
+        } else {
+            Taro.cloud
+                .callFunction({
+                    name: "addattender",
+                    data: {
+                        classid: classid,
+                        attenderlist: attenderlist
+                    }
+                })
+                .then(res => {
+                    var resdata = (res as unknown) as pushAttenderResult;
+                    if (resdata.result.code === 200) {
+                        Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
+                        resdata.result.addlist.map(newinfo => {
+                            this.props.updateInfo(newinfo);
+                        });
+                        this.updateAttendersNumber();
+                    } else {
+                        Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                    }
+                });
+        }
     }
 
     render() {
@@ -872,22 +868,22 @@ class JoinSchedule extends Component<Props, States> {
                                                 </AtModalAction>
                                             </AtModal>
 
-
-                                            <AtModal isOpened={this.state.addattender===item._id}>
-                                              <AtModalHeader>添加成员</AtModalHeader>
-                                                  <AtModalContent>
-                                                      <AtCheckbox
+                                            <AtModal isOpened={this.state.addattender === item._id}>
+                                                <AtModalHeader>添加成员</AtModalHeader>
+                                                <AtModalContent>
+                                                    <AtCheckbox
                                                         options={showattender}
                                                         selectedList={this.state.attenderlist}
                                                         onChange={this.addattender.bind(this)}
-                                                      />
-                                                  </AtModalContent>
-                                                  <AtModalAction>
-                                                      <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
-                                                      <Button onClick={ this.pushattender.bind(this,item._id,this.state.attenderlist)}>添加成员</Button>
-                                                  </AtModalAction>
-                                              </AtModal>
-
+                                                    />
+                                                </AtModalContent>
+                                                <AtModalAction>
+                                                    <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
+                                                    <Button onClick={this.pushattender.bind(this, item._id, this.state.attenderlist)}>
+                                                        添加成员
+                                                    </Button>
+                                                </AtModalAction>
+                                            </AtModal>
                                         </View>
                                     );
                                 })}
