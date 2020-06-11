@@ -1072,7 +1072,8 @@ class JoinSchedule extends Component<Props, States> {
                                 placeholder="输入一个方便辨认的代号"
                                 value={this.state.tag}
                                 onChange={value => {
-                                    this.setState({ tag: value.toString() });
+                                    if (showinfo.find(item => item.tag === value) === undefined) this.setState({ tag: value.toString() });
+                                    else Taro.showToast({ title: "这个代号有人使用啦！", icon: "none", duration: 2000 });
                                 }}
                             />
                         </AtModalContent>
