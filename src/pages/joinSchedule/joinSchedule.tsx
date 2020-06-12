@@ -224,15 +224,15 @@ class JoinSchedule extends Component<Props, States> {
             })
             .then(res => {
                 var resdata = (res as unknown) as publicscheResult;
-                console.log(resdata)
+                console.log(resdata);
                 if (resdata.result.code === 200) {
                     this.props.updateSchedule(resdata.result.schedule);
                     resdata.result.newinfo.map(newinfo => {
-                      this.props.updatenewInfo(newinfo);
+                        this.props.updatenewInfo(newinfo);
                     });
                 }
             });
-            console.log(this.props)
+        console.log(this.props);
         Taro.showToast({ title: "发布成功", icon: "success", duration: 2000 });
         Taro.redirectTo({
             url: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id
@@ -282,31 +282,31 @@ class JoinSchedule extends Component<Props, States> {
 
         /** 前端找不到班表，先下载请求的班表数据 */
         // if (sc === undefined) {
-            Taro.cloud
-                .callFunction({
-                    name: "getschedule",
-                    data: {
-                        scheid: scheID
-                    }
-                })
-                .then(res => {
-                    var resdata = (res as unknown) as getScheResult;
-                    console.log(resdata)
-                    if (resdata.result.code === 200) {
-                        this.props.updateSchedule(resdata.result.schedule);
-                        resdata.result.banci.map(banci => {
-                            this.props.updateBanci(banci);
-                        });
-                        resdata.result.info.map(info => {
-                            this.props.updateInfo(info);
-                        });
-                    } else {
-                        Taro.redirectTo({
-                            url: "../index/index"
-                        });
-                        Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
-                    }
-                });
+        Taro.cloud
+            .callFunction({
+                name: "getschedule",
+                data: {
+                    scheid: scheID
+                }
+            })
+            .then(res => {
+                var resdata = (res as unknown) as getScheResult;
+                console.log(resdata);
+                if (resdata.result.code === 200) {
+                    this.props.updateSchedule(resdata.result.schedule);
+                    resdata.result.banci.map(banci => {
+                        this.props.updateBanci(banci);
+                    });
+                    resdata.result.info.map(info => {
+                        this.props.updateInfo(info);
+                    });
+                } else {
+                    Taro.redirectTo({
+                        url: "../index/index"
+                    });
+                    Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
+                }
+            });
         // }
 
         /** 如果这个用户已经报名过这个班表，自动载入 tag */
@@ -435,12 +435,12 @@ class JoinSchedule extends Component<Props, States> {
     updateTag = (info: info, value: string) => {
         var scheID = info.scheid;
         let flag = true;
-        console.log(scheID)
+        console.log(scheID);
         this.props.infos.map(x => {
             if (x.tag === value) flag = false;
         });
         if (flag) {
-          Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
+            Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
             Taro.cloud
                 .callFunction({
                     name: "updateTag",
@@ -499,33 +499,29 @@ class JoinSchedule extends Component<Props, States> {
         });
     }
 
-    getbancis(infoid:string){
-      let info = this.props.infos.filter(x=>x._id===infoid)[0]
-      let allban = this.props.bancis
-      let allinfo = this.props.infos
-      let banci
-      let newban
-      const scheID = this.$router.params._id;
+    getbancis(infoid: string) {
+        let info = this.props.infos.filter(x => x._id === infoid)[0];
+        let allban = this.props.bancis;
+        let allinfo = this.props.infos;
+        let banci;
+        let newban;
+        const scheID = this.$router.params._id;
 
-      allinfo.map(x=>{
-        if(x.userid===info.userid&&x.scheid===scheID){
-          if(banci)
-            banci = [...banci,x.classid]
-          else
-            banci = [x.classid]
-        }
-      })
-      banci.map(item=>{
-        allban.map(x=>{
-          if(x._id===item){
-            if(newban)
-              newban = [...newban.filter(y=>y._id!=x._id),x]
-            else
-              newban = [x]
-          }
-        })
-      })
-      return newban
+        allinfo.map(x => {
+            if (x.userid === info.userid && x.scheid === scheID) {
+                if (banci) banci = [...banci, x.classid];
+                else banci = [x.classid];
+            }
+        });
+        banci.map(item => {
+            allban.map(x => {
+                if (x._id === item) {
+                    if (newban) newban = [...newban.filter(y => y._id != x._id), x];
+                    else newban = [x];
+                }
+            });
+        });
+        return newban;
     }
 
     deleteban(classid: string, ownerid: string, userid: string) {
@@ -553,62 +549,59 @@ class JoinSchedule extends Component<Props, States> {
     }
 
     pushattender(classid: string, attenderlist: string[]) {
-        const sc = this.$router.params
-        const scheID = sc._id
-        let owner = false
-        console.log(this.props.schedules)
-        var curSche = this.props.schedules.find(x=>x._id===scheID)
-        if(curSche)
-          if(curSche.ownerID=== this.props.user._id){
-            owner = true
-          }
-        else
-        Taro.showToast({ title: "班表丢失，发生错误", icon: "none", duration: 2000 });
-        if(owner){
+        const sc = this.$router.params;
+        const scheID = sc._id;
+        let owner = false;
+        console.log(this.props.schedules);
+        var curSche = this.props.schedules.find(x => x._id === scheID);
+        if (curSche)
+            if (curSche.ownerID === this.props.user._id) {
+                owner = true;
+            } else Taro.showToast({ title: "班表丢失，发生错误", icon: "none", duration: 2000 });
+        if (owner) {
             if (attenderlist === undefined || attenderlist.length === 0) {
-              Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
-              return;
-          }
+                Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
+                return;
+            }
 
-          this.setState({ addattender: "" });
-          let exist = false;
-          Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
-          attenderlist.map((item: string) => {
-              this.props.infos.map(x => {
-                  if (x.classid === classid && item === x.userid) {
-                      exist = true;
-                  }
-              });
-          });
-          if (exist) {
-              Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
-          } else {
-              Taro.cloud
-                  .callFunction({
-                      name: "addattender",
-                      data: {
-                          classid: classid,
-                          attenderlist: attenderlist,
-                          scheid:scheID
-                      }
-                  })
-                  .then(res => {
-                      var resdata = (res as unknown) as pushAttenderResult;
-                      if (resdata.result.code === 200) {
-                          resdata.result.addlist.map(newinfo => {
-                              this.props.updateInfo(newinfo);
-                          });
-                          this.updateAttendersNumber();
-                          Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
-                      } else {
-                          Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
-                      }
-                  });
-          }
-        }else if(curSche){
-          Taro.showToast({ title: "宁无权进行该操作噢", icon: "none", duration: 2000 });
+            this.setState({ addattender: "" });
+            let exist = false;
+            Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
+            attenderlist.map((item: string) => {
+                this.props.infos.map(x => {
+                    if (x.classid === classid && item === x.userid) {
+                        exist = true;
+                    }
+                });
+            });
+            if (exist) {
+                Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
+            } else {
+                Taro.cloud
+                    .callFunction({
+                        name: "addattender",
+                        data: {
+                            classid: classid,
+                            attenderlist: attenderlist,
+                            scheid: scheID
+                        }
+                    })
+                    .then(res => {
+                        var resdata = (res as unknown) as pushAttenderResult;
+                        if (resdata.result.code === 200) {
+                            resdata.result.addlist.map(newinfo => {
+                                this.props.updateInfo(newinfo);
+                            });
+                            this.updateAttendersNumber();
+                            Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
+                        } else {
+                            Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                        }
+                    });
+            }
+        } else if (curSche) {
+            Taro.showToast({ title: "宁无权进行该操作噢", icon: "none", duration: 2000 });
         }
-
     }
 
     render() {
@@ -646,8 +639,8 @@ class JoinSchedule extends Component<Props, States> {
                 }
             }
         });
-        for(let i in showinfo){
-          showinfo[i].newbanci = this.getbancis(showinfo[i]._id);
+        for (let i in showinfo) {
+            showinfo[i].newbanci = this.getbancis(showinfo[i]._id);
         }
         if (!showinfo) showinfo = [];
         var showattender: Array<{ value: string; label: string }>;
@@ -842,16 +835,22 @@ class JoinSchedule extends Component<Props, States> {
                                                                 />
                                                             )}
                                                         </View>
-                                                        <View className="at-col at-col-3">
-                                                            <AtBadge>
-                                                                <AtButton
-                                                                    size="small"
-                                                                    onClick={() => this.setState({ addattender: item._id, openmodal: "" })}
-                                                                >
-                                                                    添加
-                                                                </AtButton>
-                                                            </AtBadge>
-                                                        </View>
+                                                        {this.state.author ? (
+                                                            <View className="at-col at-col-3">
+                                                                <AtBadge>
+                                                                    <AtButton
+                                                                        size="small"
+                                                                        onClick={() =>
+                                                                            this.setState({ addattender: item._id, openmodal: "" })
+                                                                        }
+                                                                    >
+                                                                        添加
+                                                                    </AtButton>
+                                                                </AtBadge>
+                                                            </View>
+                                                        ) : (
+                                                            <View />
+                                                        )}
                                                     </View>
                                                     <AtDivider></AtDivider>
                                                     <View className="at-row">
@@ -945,7 +944,7 @@ class JoinSchedule extends Component<Props, States> {
                                 title="人员列表"
                             >
                                 {showinfo.map(item => {
-                                    console.log(this.getbancis(item._id))
+                                    console.log(this.getbancis(item._id));
                                     return (
                                         <View key={item._id}>
                                             <AtListItem
@@ -1003,28 +1002,28 @@ class JoinSchedule extends Component<Props, States> {
                                                         {/* {bancis.filter(x => x._id === item.classid).length === 0 ? (
                                                             <Text>没有加入任何班次</Text>
                                                         ) : ( */}
-                                                            <View>
-                                                                {/* {const temp = this.getbancis(item._id);} */}
-                                                                {item.newbanci.map(x => {
-                                                                    return (
-                                                                      <AtButton
-                                                                          className="btn"
-                                                                          key={x._id}
-                                                                          onClick={() => {
-                                                                              this.setState({
-                                                                                  openinfo: "",
-                                                                                  openmodal: x._id
-                                                                              });
-                                                                          }}
-                                                                      >
-                                                                          {getDateString(x.startTime, true) +
-                                                                              "" +
-                                                                              getTimeString(x.startTime, true) +
-                                                                              "开始的班次"}
-                                                                      </AtButton>
-                                                                    );
-                                                                 })}
-                                                            </View>
+                                                        <View>
+                                                            {/* {const temp = this.getbancis(item._id);} */}
+                                                            {item.newbanci.map(x => {
+                                                                return (
+                                                                    <AtButton
+                                                                        className="btn"
+                                                                        key={x._id}
+                                                                        onClick={() => {
+                                                                            this.setState({
+                                                                                openinfo: "",
+                                                                                openmodal: x._id
+                                                                            });
+                                                                        }}
+                                                                    >
+                                                                        {getDateString(x.startTime, true) +
+                                                                            "" +
+                                                                            getTimeString(x.startTime, true) +
+                                                                            "开始的班次"}
+                                                                    </AtButton>
+                                                                );
+                                                            })}
+                                                        </View>
                                                         {/* )} */}
                                                     </View>
                                                 </AtModalContent>
