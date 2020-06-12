@@ -14,7 +14,6 @@ exports.main = async event => {
     try {
         let b;
 
-        let newinfo;
         const wxContext = cloud.getWXContext();
         const { scheid } = event;
 
@@ -26,7 +25,6 @@ exports.main = async event => {
                 scheid: b._id
             })
             .get();
-        console.log(infoform)
         info = await infoform
           .where({
             scheid: b._id

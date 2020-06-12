@@ -1,4 +1,4 @@
-import { Button, Picker, Text, View } from "@tarojs/components";
+import { Button, Picker, Text, View,Block } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
 import {
@@ -199,49 +199,49 @@ class ScheduleDetail extends Component<Props, States> {
       var scheID = this.$router.params._id;
       var sc = this.props.schedules.find(sc => sc._id === scheID);
 
-      /** 前端找不到班表，先下载请求的班表数据 */
-      if (sc === undefined) {
-          Taro.cloud
-              .callFunction({
-                  name: "getschedule",
-                  data:{
-                    scheid:scheID
-                  }
-              })
-              .then(res => {
-                  var resdata = (res as unknown) as getScheResult;
-                  if (resdata.result.code === 200) {
-                      this.props.updateSchedule(resdata.result.schedule);
-                      resdata.result.info.map(info => {
-                          this.props.updateInfo(info);
-                      });
-                      resdata.result.banci.map(banci => {
-                          this.props.updateBanci(banci);
-                      });
-                  } else {
-                      Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
-                      Taro.redirectTo({
-                          url: "../index/index"
-                      });
-                  }
-              });
+
+      /** 先下载请求的班表数据 */
+      if(sc === undefined){
+        Taro.cloud
+        .callFunction({
+            name: "getschedule",
+            data:{
+              scheid:scheID
+            }
+        })
+        .then(res => {
+            var resdata = (res as unknown) as getScheResult;
+            console.log(resdata)
+            if (resdata.result.code === 200) {
+                this.props.updateSchedule(resdata.result.schedule);
+                resdata.result.newinfo.map(newinfo => {
+                    this.props.updatenewInfo(newinfo);
+                });
+                resdata.result.banci.map(banci => {
+                    this.props.updateBanci(banci);
+                });
+
+            } else {
+                Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                Taro.redirectTo({
+                    url: "../index/index"
+                });
+            }
+        });
       }
-         else {
-            this.setState({ schedule: sc });
-            var newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID);
-            this.setState({ newinfos: newinfo });
-            let infor = new Array<info>();
-            let ban = this.props.bancis.filter(banci => {
-                if (sc !== undefined && banci.scheid === sc._id) {
-                    infor = this.props.infos.filter(info => {
-                        return info.classid === banci._id;
-                    });
-                }
-                return sc === undefined ? "" : banci.scheid === sc._id;
-            });
-            this.setState({ bancis: ban });
-            this.setState({ infos: infor });
+
+      // console.log(this.props)
+        if(sc) {
+          this.setState({ schedule: sc });
+          let newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID);
+          console.log(newinfo)
+          this.setState({ newinfos: newinfo });
+          let ban = this.props.bancis.filter(banci =>banci.scheid===scheID);
+          this.setState({ bancis: ban });
+        }else{
+          Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
         }
+
         this.setState({ openbanci: true });
     }
 
@@ -314,25 +314,17 @@ class ScheduleDetail extends Component<Props, States> {
             });
     };
     render() {
-        const schedule = this.state.schedule;
-        // const { infos } = this.state;
-        const { newinfos } = this.state;
-        if (schedule === undefined) return <View>发生错误</View>;
-
-        let ban = this.props.bancis.filter(banci => banci.scheid === schedule._id);
+        const scheID = this.$router.params._id;
+        console.log(this.state)
+        var { schedule } = this.state
+        let ban = this.state.bancis
         // const bancis = ban;
-        let infor = this.props.newinfos.filter(newinfo => {
-            var bid = newinfo.classid;
-            var found = false;
-            ban.map(b => {
-                if (b._id === bid) found = true;
-            });
-            return found;
-        });
+
+        let newinfos = this.props.newinfos.filter(x=>x.scheid === scheID)
         let showinfo: newinfo[] = [];
-        infor.map(x => {
+        newinfos.map(x => {
             let exist: newinfo | undefined = undefined;
-            let selfdata = infor.find(x => x.userid === this.props.user._id);
+            let selfdata = newinfos.find(x => x.userid === this.props.user._id);
 
             if (showinfo === undefined) {
                 selfdata ? (showinfo = [selfdata]) : (showinfo = [x]);
@@ -355,6 +347,7 @@ class ScheduleDetail extends Component<Props, States> {
               showattender = [item]
           })
         }
+        if (schedule !== undefined)
         return (
             <View>
                 <AtList>
@@ -414,12 +407,16 @@ class ScheduleDetail extends Component<Props, States> {
                                                     ) : (
                                                         <View>
                                                             {newinfos.map(x => {
+                                                                let e1
                                                                 if (x.classid === item._id)
-                                                                    return (
+                                                                    e1 = (
                                                                         <AtBadge key={item._id}>
                                                                             <AtButton size="small">{x.tag}</AtButton>
                                                                         </AtBadge>
                                                                     );
+                                                                else
+                                                                    e1 = null
+                                                                return <Block key={x.classid}>{e1}</Block>;
                                                             })}
                                                         </View>
                                                     )}

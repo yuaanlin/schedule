@@ -11,13 +11,14 @@ const newinfoform = db.collection("newinfos");
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const {classid,attenderlist} = event
+  const {classid,attenderlist,scheid} = event
   try{
       var i = 0
       for(;i<attenderlist.length;i++){
       var target = await infoform
         .where({
-          userid:attenderlist[i]
+          userid:attenderlist[i],
+          scheid:scheid
         })
         .get()
       var addlist = []

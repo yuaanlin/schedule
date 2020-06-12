@@ -1,3 +1,5 @@
+import Banci from "./banci";
+
 /** 「用户」和「班次」的对应关系 info
  *
  * 对应数据库的 info 集合 */
@@ -8,6 +10,7 @@ export default class info {
     scheid: string;
     tag: string;
     tendency: string;
+    newbanci:Array<Banci>;
 
     constructor(data: info) {
         this._id = data._id;
@@ -17,5 +20,6 @@ export default class info {
         this.tag = data.tag;
         this.tendency = data.tendency;
         this.scheid = data.scheid;
+        this.newbanci = data.newbanci
     }
 }
