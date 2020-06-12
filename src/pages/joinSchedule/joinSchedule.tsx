@@ -499,6 +499,35 @@ class JoinSchedule extends Component<Props, States> {
         });
     }
 
+    getbancis(infoid:string){
+      let info = this.props.infos.filter(x=>x._id===infoid)[0]
+      let allban = this.props.bancis
+      let allinfo = this.props.infos
+      let banci
+      let newban
+      const scheID = this.$router.params._id;
+
+      allinfo.map(x=>{
+        if(x.userid===info.userid&&x.scheid===scheID){
+          if(banci)
+            banci = [...banci,x.classid]
+          else
+            banci = [x.classid]
+        }
+      })
+      banci.map(item=>{
+        allban.map(x=>{
+          if(x._id===item){
+            if(newban)
+              newban = [...newban.filter(y=>y._id!=x._id),x]
+            else
+              newban = [x]
+          }
+        })
+      })
+      return newban
+    }
+
     deleteban(classid: string, ownerid: string, userid: string) {
         Taro.showToast({ title: "移除中", icon: "loading", duration: 5000 });
         if (ownerid === userid) {
@@ -617,6 +646,9 @@ class JoinSchedule extends Component<Props, States> {
                 }
             }
         });
+        for(let i in showinfo){
+          showinfo[i].newbanci = this.getbancis(showinfo[i]._id);
+        }
         if (!showinfo) showinfo = [];
         var showattender: Array<{ value: string; label: string }>;
 
@@ -913,6 +945,7 @@ class JoinSchedule extends Component<Props, States> {
                                 title="人员列表"
                             >
                                 {showinfo.map(item => {
+                                    console.log(this.getbancis(item._id))
                                     return (
                                         <View key={item._id}>
                                             <AtListItem
@@ -967,38 +1000,32 @@ class JoinSchedule extends Component<Props, States> {
                                                     </View>
                                                     {/* 循环班次成员获取tag */}
                                                     <View>
-                                                        {bancis.filter(x => x._id === item.classid).length === 0 ? (
+                                                        {/* {bancis.filter(x => x._id === item.classid).length === 0 ? (
                                                             <Text>没有加入任何班次</Text>
-                                                        ) : (
+                                                        ) : ( */}
                                                             <View>
-                                                                {bancis.map(x => {
-                                                                    let e1;
-                                                                    console.log(x)
-                                                                    if (x._id === item.classid) {
-                                                                        e1 = (
-                                                                            <AtButton
-                                                                                className="btn"
-                                                                                key={x._id}
-                                                                                onClick={() => {
-                                                                                    this.setState({
-                                                                                        openinfo: "",
-                                                                                        openmodal: x._id
-                                                                                    });
-                                                                                }}
-                                                                            >
-                                                                                {getDateString(x.startTime, true) +
-                                                                                    "" +
-                                                                                    getTimeString(x.startTime, true) +
-                                                                                    "开始的班次"}
-                                                                            </AtButton>
-                                                                        );
-                                                                    } else {
-                                                                        e1 = null;
-                                                                    }
-                                                                    return <Block key={item.classid}>{e1}</Block>;
+                                                                {/* {const temp = this.getbancis(item._id);} */}
+                                                                {item.newbanci.map(x => {
+                                                                    return (
+                                                                      <AtButton
+                                                                          className="btn"
+                                                                          key={x._id}
+                                                                          onClick={() => {
+                                                                              this.setState({
+                                                                                  openinfo: "",
+                                                                                  openmodal: x._id
+                                                                              });
+                                                                          }}
+                                                                      >
+                                                                          {getDateString(x.startTime, true) +
+                                                                              "" +
+                                                                              getTimeString(x.startTime, true) +
+                                                                              "开始的班次"}
+                                                                      </AtButton>
+                                                                    );
                                                                  })}
                                                             </View>
-                                                        )}
+                                                        {/* )} */}
                                                     </View>
                                                 </AtModalContent>
                                                 <AtModalAction>
