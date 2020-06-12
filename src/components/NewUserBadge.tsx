@@ -16,14 +16,12 @@ interface Props {
 }
 
 export default class NewUserBadge extends Component<Props> {
-    Delete(info_id: string, user_id: string) {
+    Delete(info_id: string) {
         Taro.showToast({ title: "移除中", icon: "loading", duration: 2000 });
-
         if (this.props.user._id === this.props.schedule.ownerID) {
-            Taro.showToast({ title: '云函数 "DeleteNewInfo" 还没开发好 ', icon: "none", duration: 2000 });
-            /** Taro.cloud
+            Taro.cloud
                 .callFunction({
-                    name: "deleteinfo",
+                    name: "deletenewinfo",
                     data: {
                         infoid: info_id
                     }
@@ -35,7 +33,7 @@ export default class NewUserBadge extends Component<Props> {
                     }
                     this.props.deleteInfo(info_id);
                     this.props.updateAttendersNumber();
-                }); */
+                });
         } else {
             Taro.showToast({ title: "只有班表拥有者可以调整已发布的班表", icon: "none", duration: 2000 });
         }
