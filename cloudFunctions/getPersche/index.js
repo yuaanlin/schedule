@@ -59,8 +59,6 @@ exports.main = async (event, context) => {
             info = [...info.filter(x => x._id != y._id), y]
           })
         }
-        console.log(ban)
-        
       
         return {
             code: 200,
