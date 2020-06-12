@@ -1,6 +1,6 @@
 import { View } from "@tarojs/components";
 import Taro, { Component } from "@tarojs/taro";
-import { AtBadge, AtButton, AtListItem } from "taro-ui";
+import { AtListItem, AtList } from "taro-ui";
 import newinfo from "../classes/newinfo";
 import User from "../classes/User";
 import Schedule from "../classes/Schedule";
@@ -15,15 +15,13 @@ interface Props {
     updateAttendersNumber: () => void;
 }
 
-export default class UserBadge extends Component<Props> {
-    Delete(info_id: string, user_id: string) {
+export default class NewUserBadge extends Component<Props> {
+    Delete(info_id: string) {
         Taro.showToast({ title: "移除中", icon: "loading", duration: 2000 });
-        console.log(this.props.schedule)
-        console.log(user_id)
-        if (user_id === this.props.user._id || this.props.user._id === this.props.schedule.ownerID) {
+        if (this.props.user._id === this.props.schedule.ownerID) {
             Taro.cloud
                 .callFunction({
-                    name: "deleteinfo",
+                    name: "deletenewinfo",
                     data: {
                         infoid: info_id
                     }
@@ -37,29 +35,21 @@ export default class UserBadge extends Component<Props> {
                     this.props.updateAttendersNumber();
                 });
         } else {
-            Taro.showToast({ title: "您无权限编辑他人的班次选择噢", icon: "none", duration: 2000 });
+            Taro.showToast({ title: "只有班表拥有者可以调整已发布的班表", icon: "none", duration: 2000 });
         }
     }
 
     render() {
         if (this.props.newinfos === undefined) return <View />;
-        return (
-          this.props.newinfos?(
-            <View>
+        return this.props.newinfos ? (
+            <AtList>
                 {this.props.newinfos.map(x => {
                     if (x.classid === this.props.banciID)
-                        return (
-                            <AtListItem key={x._id} title={x.tag}>
-                                {/* <AtButton size="small" onClick={this.Delete.bind(this, x._id, x.userid)}>
-                                </AtButton> */}
-                            </AtListItem>
-                        );
+                        return <AtListItem key={x._id} title={x.tag} onClick={this.Delete.bind(this, x._id, x.userid)} />;
                 })}
-            </View>
-          ):(
-            <View></View>
-          )
-
+            </AtList>
+        ) : (
+            <View />
         );
     }
 }

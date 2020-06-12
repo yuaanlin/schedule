@@ -1,1 +1,2 @@
 export const UPDATE_NEWINFO = "UPDATE_NEWINFO";
+export const DELETE_NEWINFO = "DELETE_NEWINFO";
