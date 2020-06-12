@@ -34,11 +34,11 @@ exports.main = async (event, context) => {
         });
 
         if (!sche.attenders.includes(wxContext.OPENID)) {
-            var newsche = {};
-            Object.assign(newsche, sche);
-            newsche.attenders.push(wxContext.OPENID);
-            delete newsche._id;
-            scheduleCollection.doc(scheid).update({ data: newsche });
+            scheduleCollection.doc(scheid).update({
+                data: {
+                    attenders: [...sche.attenders, wxContext.OPENID]
+                }
+            });
         }
 
         return {
