@@ -27,10 +27,12 @@ import { updatenewInfo } from "../../redux/actions/newinfo";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import { updatescheResult, updateTagResult,updateTipsResult,loginResult,getScheResult } from "../../types";
+import { updatescheResult, updateTagResult,updateTipsResult,loginResult,getScheResult,pushAttenderResult } from "../../types";
 import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
 import getTimeString from "../../utils/getTimeString";
+
+import getAttendersNumber from "../../utils/getAttendersNumber";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -50,7 +52,11 @@ type States = {
     schedule: Schedule;
     bancis: Array<Banci>;
     infos: Array<info>;
-    newinfos: Array<newinfo>;
+    newinfo: Array<newinfo>;
+
+    //添加成员
+    addattender: string;
+    attenderlist: Array<string>;
 
     openbanci: boolean;
 
@@ -70,6 +76,10 @@ type States = {
 
     tag: string;
     tips: string;
+
+    // 班表当前人数
+    need_attenders_number: number;
+    joined_attenders_number: number;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -110,7 +120,7 @@ class ScheduleDetail extends Component<Props, States> {
             schedule: new Schedule(),
             bancis: new Array<Banci>(),
             infos: new Array<info>(),
-            newinfos: new Array<newinfo>(),
+            newinfo: new Array<newinfo>(),
             openbanci: false,
             openmodal: undefined,
             editing: undefined,
@@ -119,7 +129,13 @@ class ScheduleDetail extends Component<Props, States> {
             openattenders: true,
             openinfo: "",
             tag: "",
-            tips: ""
+            tips: "",
+            addattender: "",
+            attenderlist: [],
+
+
+            need_attenders_number: 0,
+            joined_attenders_number: 0
         };
     }
 
@@ -176,6 +192,12 @@ class ScheduleDetail extends Component<Props, States> {
         });
     };
 
+    /** 计算班表人数数据 */
+    updateAttendersNumber = () => {
+      var nums = getAttendersNumber(this.$router.params._id);
+      this.setState({ need_attenders_number: nums.need_num, joined_attenders_number: nums.joined_num });
+  };
+
     componentDidMount() {
         /** 通过分享链接进来的人要先登入 */
         if (this.props.user._id === "") {
@@ -201,7 +223,7 @@ class ScheduleDetail extends Component<Props, States> {
 
 
       /** 先下载请求的班表数据 */
-      if(sc === undefined){
+      // if(sc === undefined){
         Taro.cloud
         .callFunction({
             name: "getschedule",
@@ -228,14 +250,14 @@ class ScheduleDetail extends Component<Props, States> {
                 });
             }
         });
-      }
+      // }
 
       // console.log(this.props)
         if(sc) {
           this.setState({ schedule: sc });
           let newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID);
           console.log(newinfo)
-          this.setState({ newinfos: newinfo });
+          this.setState({ newinfo: newinfo });
           let ban = this.props.bancis.filter(banci =>banci.scheid===scheID);
           this.setState({ bancis: ban });
         }else{
@@ -263,14 +285,14 @@ class ScheduleDetail extends Component<Props, States> {
             }
         };
     }
-    updateTag = (info: info, value: string) => {
+    updateTag = (newinfo: newinfo, value: string) => {
         var scheID = this.$router.params._id;
         Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
         Taro.cloud
             .callFunction({
                 name: "updateTag",
                 data: {
-                    userid: info.userid,
+                    userid: newinfo.userid,
                     newtag: value,
                     scheid: scheID
                 }
@@ -313,6 +335,69 @@ class ScheduleDetail extends Component<Props, States> {
                 }
             });
     };
+    addattender(value: string[]) {
+      this.setState({
+          attenderlist: value
+      });
+    }
+    pushattender(classid: string, attenderlist: string[]) {
+        const sc = this.$router.params
+        const scheID = sc._id
+        let owner = false
+        console.log(this.props.schedules)
+        var curSche = this.props.schedules.find(x=>x._id===scheID)
+        if(curSche)
+          if(curSche.ownerID=== this.props.user._id){
+            owner = true
+          }
+        else
+        Taro.showToast({ title: "班表丢失，发生错误", icon: "none", duration: 2000 });
+        if(owner){
+            if (attenderlist === undefined || attenderlist.length === 0) {
+              Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
+              return;
+          }
+
+          this.setState({ addattender: "" });
+          let exist = false;
+          Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
+          attenderlist.map((item: string) => {
+              this.props.infos.map(x => {
+                  if (x.classid === classid && item === x.userid) {
+                      exist = true;
+                  }
+              });
+          });
+          if (exist) {
+              Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
+          } else {
+              Taro.cloud
+                  .callFunction({
+                      name: "addattender",
+                      data: {
+                          classid: classid,
+                          attenderlist: attenderlist,
+                          scheid:scheID
+                      }
+                  })
+                  .then(res => {
+                      var resdata = (res as unknown) as pushAttenderResult;
+                      if (resdata.result.code === 200) {
+                          resdata.result.addlist.map(newinfo => {
+                              this.props.updateInfo(newinfo);
+                          });
+                          this.updateAttendersNumber();
+                          Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
+                      } else {
+                          Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                      }
+                  });
+          }
+        }else if(curSche){
+          Taro.showToast({ title: "宁无权进行该操作噢", icon: "none", duration: 2000 });
+        }
+
+    }
     render() {
         const scheID = this.$router.params._id;
         console.log(this.state)
@@ -321,6 +406,7 @@ class ScheduleDetail extends Component<Props, States> {
         // const bancis = ban;
 
         let newinfos = this.props.newinfos.filter(x=>x.scheid === scheID)
+        console.log(newinfos,"newinfos")
         let showinfo: newinfo[] = [];
         newinfos.map(x => {
             let exist: newinfo | undefined = undefined;
@@ -401,25 +487,44 @@ class ScheduleDetail extends Component<Props, States> {
                                                     </View>
                                                 </View>
                                                 {/* 循环班次成员获取tag */}
-                                                <View>
-                                                    {newinfos.filter(info => info.classid === item._id).length === 0 ? (
-                                                        <Text>没有成员</Text>
-                                                    ) : (
-                                                        <View>
-                                                            {newinfos.map(x => {
-                                                                let e1
-                                                                if (x.classid === item._id)
-                                                                    e1 = (
-                                                                        <AtBadge key={item._id}>
-                                                                            <AtButton size="small">{x.tag}</AtButton>
-                                                                        </AtBadge>
-                                                                    );
-                                                                else
+                                                <View className="at-row">
+                                                  <View className="at-col at-col-9">
+                                                      {newinfos.filter(info => info.classid === item._id).length === 0 ? (
+                                                          <Text>没有成员</Text>
+                                                      ) : (
+                                                          <View>
+                                                              {newinfos.map(x => {
+                                                                  let e1
+                                                                  console.log(x,"x")
+                                                                  console.log(item,"item")
+                                                                  console.log(x.classid === item._id)
+                                                                  if (x.classid === item._id){
+                                                                    console.log("!")
+                                                                      e1 = (
+                                                                          <AtListItem key={item._id} title={x.tag}>
+                                                                          </AtListItem>
+                                                                      );
+                                                                      console.log(e1,"!")
+                                                                    }
+                                                                  else{
                                                                     e1 = null
-                                                                return <Block key={x.classid}>{e1}</Block>;
-                                                            })}
-                                                        </View>
-                                                    )}
+                                                                    // console.log(e1)
+                                                                  }
+                                                                  return <Block key={x.classid}>{e1}</Block>;
+                                                              })}
+                                                          </View>
+                                                      )}
+                                                    </View>
+                                                    <View className="at-col at-col-3">
+                                                        <AtBadge>
+                                                            <AtButton
+                                                                size="small"
+                                                                onClick={() => this.setState({ addattender: item._id, openmodal: "" })}
+                                                            >
+                                                                添加
+                                                            </AtButton>
+                                                        </AtBadge>
+                                                    </View>
                                                 </View>
                                                 <AtDivider></AtDivider>
                                                 <View className="at-row">

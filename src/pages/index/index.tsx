@@ -96,6 +96,7 @@ class Index extends Component<Props, States> {
             })
             .then(res => {
                 var resdata = (res as unknown) as loginResult;
+                console.log(resdata)
                 if (resdata.result.code === 200) {
                     this.props.setUserData(new User(resdata.result.user));
                     Taro.cloud
