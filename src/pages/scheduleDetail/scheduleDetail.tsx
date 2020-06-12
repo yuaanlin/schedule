@@ -1,4 +1,4 @@
-import { Button, Picker, Text, View, Block } from "@tarojs/components";
+import { Button, Picker, Text, View } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
 import {
@@ -23,7 +23,7 @@ import newinfo from "../../classes/newinfo";
 import { updateBanci } from "../../redux/actions/banci";
 import { updateInfo } from "../../redux/actions/info";
 import { updateSchedule } from "../../redux/actions/schedule";
-import { updatenewInfo } from "../../redux/actions/newinfo";
+import { updatenewInfo, deletenewInfo } from "../../redux/actions/newinfo";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
@@ -33,6 +33,7 @@ import getDateString from "../../utils/getDateString";
 import getTimeString from "../../utils/getTimeString";
 
 import getAttendersNumber from "../../utils/getAttendersNumber";
+import NewUserBadge from "../../components/NewUserBadge";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -46,6 +47,7 @@ type Props = {
     updateBanci: (banci: Banci) => void;
     updateInfo: (info: info) => void;
     updatenewInfo: (newinfo: newinfo) => void;
+    deletenewInfo: (id: string) => void;
 };
 
 type States = {
@@ -80,6 +82,9 @@ type States = {
     // 班表当前人数
     need_attenders_number: number;
     joined_attenders_number: number;
+
+    // author ?
+    author: boolean;
 };
 
 /** 把需要的 State 和 Action 从 Redux 注入 Props */
@@ -109,6 +114,9 @@ function mapDispatchToProps(dispatch: typeof store.dispatch) {
         },
         updatenewInfo: (newinfo: newinfo) => {
             dispatch(updatenewInfo(newinfo));
+        },
+        deletenewInfo: (id: string) => {
+            dispatch(deletenewInfo(id));
         }
     };
 }
@@ -132,28 +140,15 @@ class ScheduleDetail extends Component<Props, States> {
             tips: "",
             addattender: "",
             attenderlist: [],
-
             need_attenders_number: 0,
-            joined_attenders_number: 0
+            joined_attenders_number: 0,
+            author: false
         };
     }
 
     config: Config = {
         navigationBarTitleText: "班表详情"
     };
-
-    // tospeTime(date: Date) {
-    //     date = new Date(date);
-    //     var Month = date.getMonth() + 1;
-    //     var Day = date.getDate();
-    //     var Hour = date.getHours();
-    //     var min = date.getSeconds();
-    //     var M = Month < 10 ? "0" + Month + "." : Month + ".";
-    //     var D = Day + 1 < 10 ? "0" + Day + " " : Day + " ";
-    //     var H = Hour + 1 < 10 ? "0" + Hour + ":" : Hour + ":";
-    //     var Min = min + 1 < 10 ? "0" + min : min;
-    //     return M + D + H + Min;
-    // }
 
     updateSche = (key: string, value: string | Date) => {
         var newScheData = {};
@@ -251,16 +246,17 @@ class ScheduleDetail extends Component<Props, States> {
             this.setState({ newinfo: newinfo });
             let ban = this.props.bancis.filter(banci => banci.scheid === scheID);
             this.setState({ bancis: ban });
+            if (sc.ownerID === this.props.user._id) this.setState({ author: true });
         } else {
+            Taro.redirectTo({ url: "../index/index" });
             Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
         }
-
         this.setState({ openbanci: true });
     }
 
     onShareAppMessage() {
         return {
-            title: "班表详情",
+            title: "快来看看班表 " + this.state.schedule.title + " 的最新排班结果吧～ ",
             path: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id,
             success: res => {
                 if (res.errMsg === "shareAppMessage:ok") {
@@ -276,6 +272,7 @@ class ScheduleDetail extends Component<Props, States> {
             }
         };
     }
+
     updateTag = (newinfo: newinfo, value: string) => {
         var scheID = this.$router.params._id;
         Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
@@ -298,6 +295,7 @@ class ScheduleDetail extends Component<Props, States> {
                 }
             });
     };
+
     updateTips = (banci: Banci, tips: string) => {
         Taro.showToast({ title: "更新中...", icon: "loading", duration: 2000 });
 
@@ -326,11 +324,13 @@ class ScheduleDetail extends Component<Props, States> {
                 }
             });
     };
+
     addattender(value: string[]) {
         this.setState({
             attenderlist: value
         });
     }
+
     pushattender(classid: string, attenderlist: string[]) {
         const sc = this.$router.params;
         const scheID = sc._id;
@@ -385,11 +385,11 @@ class ScheduleDetail extends Component<Props, States> {
             Taro.showToast({ title: "宁无权进行该操作噢", icon: "none", duration: 2000 });
         }
     }
+
     render() {
         const scheID = this.$router.params._id;
         var { schedule } = this.state;
         let ban = this.state.bancis;
-
         let newinfos = this.props.newinfos.filter(x => x.scheid === scheID);
         let showinfo: newinfo[] = [];
         newinfos.map(x => {
@@ -484,29 +484,32 @@ class ScheduleDetail extends Component<Props, States> {
                                                             {newinfos.filter(info => info.classid === item._id).length === 0 ? (
                                                                 <Text>没有成员</Text>
                                                             ) : (
-                                                                <View>
-                                                                    {newinfos.map(x => {
-                                                                        let e1;
-                                                                        if (x.classid === item._id) {
-                                                                            e1 = <AtListItem key={item._id} title={x.tag}></AtListItem>;
-                                                                        } else {
-                                                                            e1 = null;
-                                                                        }
-                                                                        return <Block key={x.classid}>{e1}</Block>;
-                                                                    })}
-                                                                </View>
+                                                                <NewUserBadge
+                                                                    user={this.props.user}
+                                                                    newinfos={newinfos}
+                                                                    banciID={item._id}
+                                                                    schedule={schedule}
+                                                                    deleteInfo={this.props.deletenewInfo}
+                                                                    updateAttendersNumber={this.updateAttendersNumber}
+                                                                />
                                                             )}
                                                         </View>
-                                                        <View className="at-col at-col-3">
-                                                            <AtBadge>
-                                                                <AtButton
-                                                                    size="small"
-                                                                    onClick={() => this.setState({ addattender: item._id, openmodal: "" })}
-                                                                >
-                                                                    添加
-                                                                </AtButton>
-                                                            </AtBadge>
-                                                        </View>
+                                                        {this.state.author ? (
+                                                            <View className="at-col at-col-3">
+                                                                <AtBadge>
+                                                                    <AtButton
+                                                                        size="small"
+                                                                        onClick={() =>
+                                                                            this.setState({ addattender: item._id, openmodal: "" })
+                                                                        }
+                                                                    >
+                                                                        添加
+                                                                    </AtButton>
+                                                                </AtBadge>
+                                                            </View>
+                                                        ) : (
+                                                            <View />
+                                                        )}
                                                     </View>
                                                     <AtDivider></AtDivider>
                                                     <View className="at-row">

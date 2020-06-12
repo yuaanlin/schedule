@@ -821,16 +821,14 @@ class JoinSchedule extends Component<Props, States> {
                                                             {infos.filter(info => info.classid === item._id).length === 0 ? (
                                                                 <Text>没有成员</Text>
                                                             ) : (
-                                                                <View>
-                                                                    <UserBadge
-                                                                        user={this.props.user}
-                                                                        infos={infos}
-                                                                        banciID={item._id}
-                                                                        schedule={schedule}
-                                                                        deleteInfo={this.props.deleteInfo}
-                                                                        updateAttendersNumber={this.updateAttendersNumber}
-                                                                    />
-                                                                </View>
+                                                                <UserBadge
+                                                                    user={this.props.user}
+                                                                    infos={infos}
+                                                                    banciID={item._id}
+                                                                    schedule={schedule}
+                                                                    deleteInfo={this.props.deleteInfo}
+                                                                    updateAttendersNumber={this.updateAttendersNumber}
+                                                                />
                                                             )}
                                                         </View>
                                                         {this.state.author ? (
