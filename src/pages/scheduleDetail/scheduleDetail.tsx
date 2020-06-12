@@ -13,7 +13,8 @@ import {
     AtModal,
     AtModalAction,
     AtModalContent,
-    AtModalHeader
+    AtModalHeader,
+    AtFloatLayout
 } from "taro-ui";
 import Banci from "../../classes/banci";
 import info from "../../classes/info";
@@ -462,7 +463,7 @@ class ScheduleDetail extends Component<Props, States> {
                                                 }}
                                             />
                                             {/* 对应listitem生成对应的modal */}
-                                            <AtModal isOpened={this.state.openmodal === item._id}>
+                                            <AtFloatLayout isOpened={this.state.openmodal === item._id}>
                                                 <AtModalHeader>
                                                     {getDateString(item.startTime, true) +
                                                         "" +
@@ -578,7 +579,7 @@ class ScheduleDetail extends Component<Props, States> {
                                                         返回
                                                     </Button>
                                                 </AtModalAction>
-                                            </AtModal>
+                                            </AtFloatLayout>
                                         </View>
                                     );
                                 })}
@@ -600,7 +601,7 @@ class ScheduleDetail extends Component<Props, States> {
                                                 }}
                                             />
                                             {/* 对应listitem生成对应的modal */}
-                                            <AtModal isOpened={this.state.openinfo === item._id}>
+                                            <AtFloatLayout isOpened={this.state.openinfo === item._id}>
                                                 <AtModalHeader>{item.tag + " 的个人信息"} </AtModalHeader>
                                                 <AtModalContent>
                                                     <View className="at-row">
@@ -681,7 +682,7 @@ class ScheduleDetail extends Component<Props, States> {
                                                 <AtModalAction>
                                                     <Button onClick={() => this.setState({ openinfo: "" })}>关闭</Button>
                                                 </AtModalAction>
-                                            </AtModal>
+                                            </AtFloatLayout>
                                         </View>
                                     );
                                 })}
@@ -689,7 +690,7 @@ class ScheduleDetail extends Component<Props, States> {
                         </AtList>
                     </View>
 
-                    <AtModal isOpened={this.state.editing === "title"}>
+                    <AtFloatLayout isOpened={this.state.editing === "title"}>
                         <AtModalHeader>修改班表标题</AtModalHeader>
                         <AtModalContent>
                             <AtInput
@@ -702,9 +703,9 @@ class ScheduleDetail extends Component<Props, States> {
                             <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
                             <Button onClick={() => this.updateSche("title", this.state.inputingText)}>更新</Button>
                         </AtModalAction>
-                    </AtModal>
+                    </AtFloatLayout>
 
-                    <AtModal isOpened={this.state.editing === "description"}>
+                    <AtFloatLayout isOpened={this.state.editing === "description"}>
                         <AtModalHeader>修改班表描述</AtModalHeader>
                         <AtModalContent>
                             <AtInput
@@ -717,9 +718,9 @@ class ScheduleDetail extends Component<Props, States> {
                             <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
                             <Button onClick={() => this.updateSche("description", this.state.inputingText)}>更新</Button>
                         </AtModalAction>
-                    </AtModal>
+                    </AtFloatLayout>
 
-                    <AtModal isOpened={this.state.editing === "startact"}>
+                    <AtFloatLayout isOpened={this.state.editing === "startact"}>
                         <AtModalHeader>修改班表开始日期</AtModalHeader>
                         <AtModalContent>
                             <Picker
@@ -735,9 +736,9 @@ class ScheduleDetail extends Component<Props, States> {
                             <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
                             <Button onClick={() => this.updateSche("startact", this.state.inputingDate)}>更新</Button>
                         </AtModalAction>
-                    </AtModal>
+                    </AtFloatLayout>
 
-                    <AtModal isOpened={this.state.editing === "endact"}>
+                    <AtFloatLayout isOpened={this.state.editing === "endact"}>
                         <AtModalHeader>修改班表结束日期</AtModalHeader>
                         <AtModalContent>
                             <Picker
@@ -753,7 +754,7 @@ class ScheduleDetail extends Component<Props, States> {
                             <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
                             <Button onClick={() => this.updateSche("endact", this.state.inputingDate)}>更新</Button>
                         </AtModalAction>
-                    </AtModal>
+                    </AtFloatLayout>
                 </View>
             );
     }
