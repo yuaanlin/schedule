@@ -1,4 +1,4 @@
-import { Button, Picker, Text, View,Block } from "@tarojs/components";
+import { Button, Picker, Text, View, Block } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
 import {
@@ -27,7 +27,7 @@ import { updatenewInfo } from "../../redux/actions/newinfo";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import { updatescheResult, updateTagResult,updateTipsResult,loginResult,getScheResult,pushAttenderResult } from "../../types";
+import { updatescheResult, updateTagResult, updateTipsResult, loginResult, getScheResult, pushAttenderResult } from "../../types";
 import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
 import getTimeString from "../../utils/getTimeString";
@@ -96,7 +96,7 @@ function mapStateToProps(state: AppState) {
 function mapDispatchToProps(dispatch: typeof store.dispatch) {
     return {
         setUserData: (user: User) => {
-          dispatch(setUserData(user));
+            dispatch(setUserData(user));
         },
         updateSchedule: (schedule: Schedule) => {
             dispatch(updateSchedule(schedule));
@@ -132,7 +132,6 @@ class ScheduleDetail extends Component<Props, States> {
             tips: "",
             addattender: "",
             attenderlist: [],
-
 
             need_attenders_number: 0,
             joined_attenders_number: 0
@@ -194,74 +193,66 @@ class ScheduleDetail extends Component<Props, States> {
 
     /** 计算班表人数数据 */
     updateAttendersNumber = () => {
-      var nums = getAttendersNumber(this.$router.params._id);
-      this.setState({ need_attenders_number: nums.need_num, joined_attenders_number: nums.joined_num });
-  };
+        var nums = getAttendersNumber(this.$router.params._id);
+        this.setState({ need_attenders_number: nums.need_num, joined_attenders_number: nums.joined_num });
+    };
 
     componentDidMount() {
         /** 通过分享链接进来的人要先登入 */
         if (this.props.user._id === "") {
-          Taro.cloud
-              .callFunction({
-                  name: "login"
-              })
-              .then(res => {
-                  var resdata = (res as unknown) as loginResult;
-                  if (resdata.result.code === 200) {
-                      this.props.setUserData(resdata.result.user);
-                  } else {
-                      // 第一次进来，请先去 Index 做用户数据入库
-                      Taro.redirectTo({
-                          url: "../index/index"
-                      });
-                  }
-              });
-      }
+            Taro.cloud
+                .callFunction({
+                    name: "login"
+                })
+                .then(res => {
+                    var resdata = (res as unknown) as loginResult;
+                    if (resdata.result.code === 200) {
+                        this.props.setUserData(resdata.result.user);
+                    } else {
+                        // 第一次进来，请先去 Index 做用户数据入库
+                        Taro.redirectTo({
+                            url: "../index/index"
+                        });
+                    }
+                });
+        }
 
-      var scheID = this.$router.params._id;
-      var sc = this.props.schedules.find(sc => sc._id === scheID);
+        var scheID = this.$router.params._id;
+        var sc = this.props.schedules.find(sc => sc._id === scheID);
 
-
-      /** 先下载请求的班表数据 */
-      // if(sc === undefined){
         Taro.cloud
-        .callFunction({
-            name: "getschedule",
-            data:{
-              scheid:scheID
-            }
-        })
-        .then(res => {
-            var resdata = (res as unknown) as getScheResult;
-            console.log(resdata)
-            if (resdata.result.code === 200) {
-                this.props.updateSchedule(resdata.result.schedule);
-                resdata.result.newinfo.map(newinfo => {
-                    this.props.updatenewInfo(newinfo);
-                });
-                resdata.result.banci.map(banci => {
-                    this.props.updateBanci(banci);
-                });
+            .callFunction({
+                name: "getschedule",
+                data: {
+                    scheid: scheID
+                }
+            })
+            .then(res => {
+                var resdata = (res as unknown) as getScheResult;
+                if (resdata.result.code === 200) {
+                    this.props.updateSchedule(resdata.result.schedule);
+                    resdata.result.newinfo.map(newinfo => {
+                        this.props.updatenewInfo(newinfo);
+                    });
+                    resdata.result.banci.map(banci => {
+                        this.props.updateBanci(banci);
+                    });
+                } else {
+                    Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                    Taro.redirectTo({
+                        url: "../index/index"
+                    });
+                }
+            });
 
-            } else {
-                Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
-                Taro.redirectTo({
-                    url: "../index/index"
-                });
-            }
-        });
-      // }
-
-      // console.log(this.props)
-        if(sc) {
-          this.setState({ schedule: sc });
-          let newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID);
-          console.log(newinfo)
-          this.setState({ newinfo: newinfo });
-          let ban = this.props.bancis.filter(banci =>banci.scheid===scheID);
-          this.setState({ bancis: ban });
-        }else{
-          Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
+        if (sc) {
+            this.setState({ schedule: sc });
+            let newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID);
+            this.setState({ newinfo: newinfo });
+            let ban = this.props.bancis.filter(banci => banci.scheid === scheID);
+            this.setState({ bancis: ban });
+        } else {
+            Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
         }
 
         this.setState({ openbanci: true });
@@ -336,77 +327,70 @@ class ScheduleDetail extends Component<Props, States> {
             });
     };
     addattender(value: string[]) {
-      this.setState({
-          attenderlist: value
-      });
+        this.setState({
+            attenderlist: value
+        });
     }
     pushattender(classid: string, attenderlist: string[]) {
-        const sc = this.$router.params
-        const scheID = sc._id
-        let owner = false
-        console.log(this.props.schedules)
-        var curSche = this.props.schedules.find(x=>x._id===scheID)
-        if(curSche)
-          if(curSche.ownerID=== this.props.user._id){
-            owner = true
-          }
-        else
-        Taro.showToast({ title: "班表丢失，发生错误", icon: "none", duration: 2000 });
-        if(owner){
+        const sc = this.$router.params;
+        const scheID = sc._id;
+        let owner = false;
+        var curSche = this.props.schedules.find(x => x._id === scheID);
+        if (curSche)
+            if (curSche.ownerID === this.props.user._id) {
+                owner = true;
+            } else Taro.showToast({ title: "班表丢失，发生错误", icon: "none", duration: 2000 });
+        if (owner) {
             if (attenderlist === undefined || attenderlist.length === 0) {
-              Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
-              return;
-          }
+                Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
+                return;
+            }
 
-          this.setState({ addattender: "" });
-          let exist = false;
-          Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
-          attenderlist.map((item: string) => {
-              this.props.infos.map(x => {
-                  if (x.classid === classid && item === x.userid) {
-                      exist = true;
-                  }
-              });
-          });
-          if (exist) {
-              Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
-          } else {
-              Taro.cloud
-                  .callFunction({
-                      name: "addattender",
-                      data: {
-                          classid: classid,
-                          attenderlist: attenderlist,
-                          scheid:scheID
-                      }
-                  })
-                  .then(res => {
-                      var resdata = (res as unknown) as pushAttenderResult;
-                      if (resdata.result.code === 200) {
-                          resdata.result.addlist.map(newinfo => {
-                              this.props.updateInfo(newinfo);
-                          });
-                          this.updateAttendersNumber();
-                          Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
-                      } else {
-                          Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
-                      }
-                  });
-          }
-        }else if(curSche){
-          Taro.showToast({ title: "宁无权进行该操作噢", icon: "none", duration: 2000 });
+            this.setState({ addattender: "" });
+            let exist = false;
+            Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
+            attenderlist.map((item: string) => {
+                this.props.infos.map(x => {
+                    if (x.classid === classid && item === x.userid) {
+                        exist = true;
+                    }
+                });
+            });
+            if (exist) {
+                Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
+            } else {
+                Taro.cloud
+                    .callFunction({
+                        name: "addattender",
+                        data: {
+                            classid: classid,
+                            attenderlist: attenderlist,
+                            scheid: scheID
+                        }
+                    })
+                    .then(res => {
+                        var resdata = (res as unknown) as pushAttenderResult;
+                        if (resdata.result.code === 200) {
+                            resdata.result.addlist.map(newinfo => {
+                                this.props.updateInfo(newinfo);
+                            });
+                            this.updateAttendersNumber();
+                            Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
+                        } else {
+                            Taro.showToast({ title: "发生错误", icon: "none", duration: 2000 });
+                        }
+                    });
+            }
+        } else if (curSche) {
+            Taro.showToast({ title: "宁无权进行该操作噢", icon: "none", duration: 2000 });
         }
-
     }
     render() {
         const scheID = this.$router.params._id;
-        console.log(this.state)
-        var { schedule } = this.state
-        let ban = this.state.bancis
-        // const bancis = ban;
+        var { schedule } = this.state;
+        let ban = this.state.bancis;
 
-        let newinfos = this.props.newinfos.filter(x=>x.scheid === scheID)
-        console.log(newinfos,"newinfos")
+        let newinfos = this.props.newinfos.filter(x => x.scheid === scheID);
         let showinfo: newinfo[] = [];
         newinfos.map(x => {
             let exist: newinfo | undefined = undefined;
@@ -422,352 +406,353 @@ class ScheduleDetail extends Component<Props, States> {
             }
         });
         if (!showinfo) showinfo = [];
-        var showattender
+        var showattender;
 
-        if(showinfo){
-          showinfo.map(x=>{
-            let item = {value:x._id,label:x.tag}
-            if(showattender)
-              showattender=[...showattender,item]
-            else
-              showattender = [item]
-          })
+        if (showinfo) {
+            showinfo.map(x => {
+                let item = { value: x._id, label: x.tag };
+                if (showattender) showattender = [...showattender, item];
+                else showattender = [item];
+            });
         }
         if (schedule !== undefined)
-        return (
-            <View>
-                <AtList>
-                    <AtListItem title={schedule.title} onClick={() => this.setState({ editing: "title", inputingText: schedule.title })} />
-                    <AtListItem
-                        title={schedule.description}
-                        onClick={() => this.setState({ editing: "description", inputingText: schedule.description })}
-                    />
-                    <AtListItem
-                        title={getDateString(schedule.startact, true)}
-                        note="班表开始日期"
-                        onClick={() => this.setState({ editing: "startact", inputingDate: schedule.startact })}
-                    />
-                    <AtListItem
-                        title={getDateString(schedule.endact, true)}
-                        note="班表结束日期"
-                        onClick={() => this.setState({ editing: "endact", inputingDate: schedule.endact })}
-                    />
-                </AtList>
-                <View style={{ marginTop: "32px" }}>
+            return (
+                <View>
                     <AtList>
-                        <AtAccordion open={this.state.openbanci} onClick={value => this.setState({ openbanci: value })} title="班次列表">
-                            {/* 循环班次数据库取得所有班次信息 */}
-                            {this.state.bancis.map(item => {
-                                return (
-                                    <View key={item._id}>
-                                        <AtListItem
-                                            title={
-                                                getDateString(item.startTime, true) +
-                                                "" +
-                                                getTimeString(item.startTime, true) +
-                                                " 开始的班次"
-                                            }
-                                            note={"共需要" + item.count.toString() + "人"}
-                                            onClick={() => {
-                                                this.setState({ openmodal: item._id });
-                                            }}
-                                        />
-                                        {/* 对应listitem生成对应的modal */}
-                                        <AtModal isOpened={this.state.openmodal === item._id}>
-                                            <AtModalHeader>
-                                                {getDateString(item.startTime, true) + "" + getTimeString(item.startTime, true) + " 的班次"}
-                                            </AtModalHeader>
-                                            <AtModalContent>
-                                                <View className="at-row">
-                                                    <View className="at-col at-col-2">
-                                                        <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
-                                                    </View>
-                                                    <View className="at-col at-col-6">
-                                                        <Text>成员</Text>
-                                                    </View>
-                                                </View>
-                                                {/* 循环班次成员获取tag */}
-                                                <View className="at-row">
-                                                  <View className="at-col at-col-9">
-                                                      {newinfos.filter(info => info.classid === item._id).length === 0 ? (
-                                                          <Text>没有成员</Text>
-                                                      ) : (
-                                                          <View>
-                                                              {newinfos.map(x => {
-                                                                  let e1
-                                                                  console.log(x,"x")
-                                                                  console.log(item,"item")
-                                                                  console.log(x.classid === item._id)
-                                                                  if (x.classid === item._id){
-                                                                    console.log("!")
-                                                                      e1 = (
-                                                                          <AtListItem key={item._id} title={x.tag}>
-                                                                          </AtListItem>
-                                                                      );
-                                                                      console.log(e1,"!")
-                                                                    }
-                                                                  else{
-                                                                    e1 = null
-                                                                    // console.log(e1)
-                                                                  }
-                                                                  return <Block key={x.classid}>{e1}</Block>;
-                                                              })}
-                                                          </View>
-                                                      )}
-                                                    </View>
-                                                    <View className="at-col at-col-3">
-                                                        <AtBadge>
-                                                            <AtButton
-                                                                size="small"
-                                                                onClick={() => this.setState({ addattender: item._id, openmodal: "" })}
-                                                            >
-                                                                添加
-                                                            </AtButton>
-                                                        </AtBadge>
-                                                    </View>
-                                                </View>
-                                                <AtDivider></AtDivider>
-                                                <View className="at-row">
-                                                    <View className="at-col at-col-3">
-                                                        <AtIcon prefixClass="icon" value="clock"></AtIcon>
-                                                    </View>
-                                                    <View className="at-col at-col-6">
-                                                        <View className="at-row">
-                                                            {"启：" +
-                                                                getDateString(item.startTime, true) +
-                                                                "" +
-                                                                getTimeString(item.startTime, true)}
+                        <AtListItem
+                            title={schedule.title}
+                            onClick={() => this.setState({ editing: "title", inputingText: schedule.title })}
+                        />
+                        <AtListItem
+                            title={schedule.description}
+                            onClick={() => this.setState({ editing: "description", inputingText: schedule.description })}
+                        />
+                        <AtListItem
+                            title={getDateString(schedule.startact, true)}
+                            note="班表开始日期"
+                            onClick={() => this.setState({ editing: "startact", inputingDate: schedule.startact })}
+                        />
+                        <AtListItem
+                            title={getDateString(schedule.endact, true)}
+                            note="班表结束日期"
+                            onClick={() => this.setState({ editing: "endact", inputingDate: schedule.endact })}
+                        />
+                    </AtList>
+                    <View style={{ marginTop: "32px" }}>
+                        <AtList>
+                            <AtAccordion
+                                open={this.state.openbanci}
+                                onClick={value => this.setState({ openbanci: value })}
+                                title="班次列表"
+                            >
+                                {/* 循环班次数据库取得所有班次信息 */}
+                                {this.state.bancis.map(item => {
+                                    return (
+                                        <View key={item._id}>
+                                            <AtListItem
+                                                title={
+                                                    getDateString(item.startTime, true) +
+                                                    "" +
+                                                    getTimeString(item.startTime, true) +
+                                                    " 开始的班次"
+                                                }
+                                                note={"共需要" + item.count.toString() + "人"}
+                                                onClick={() => {
+                                                    this.setState({ openmodal: item._id });
+                                                }}
+                                            />
+                                            {/* 对应listitem生成对应的modal */}
+                                            <AtModal isOpened={this.state.openmodal === item._id}>
+                                                <AtModalHeader>
+                                                    {getDateString(item.startTime, true) +
+                                                        "" +
+                                                        getTimeString(item.startTime, true) +
+                                                        " 的班次"}
+                                                </AtModalHeader>
+                                                <AtModalContent>
+                                                    <View className="at-row">
+                                                        <View className="at-col at-col-2">
+                                                            <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
                                                         </View>
-
-                                                        <View className="at-row">
-                                                            {"止：" +
-                                                                getDateString(item.endTime, true) +
-                                                                "" +
-                                                                getTimeString(item.endTime, true)}
+                                                        <View className="at-col at-col-6">
+                                                            <Text>成员</Text>
                                                         </View>
                                                     </View>
-                                                </View>
-                                                <AtDivider></AtDivider>
-                                                <View className="at-row">
-                                                    <View className="at-col at-col-1">
-                                                        <AtIcon prefixClass="icon" value="suggest"></AtIcon>
-                                                    </View>
-                                                    <View className="at-col at-col-8">
-                                                        <AtInput
-                                                            name="tips"
-                                                            maxLength={10}
-                                                            placeholder="班次共享备注"
-                                                            value={this.state.tips}
-                                                            onChange={v => {
-                                                                this.setState({ tips: v.toString() });
-                                                            }}
-                                                        ></AtInput>
-                                                        <AtList>
-                                                            {item.tips ? (
-                                                                item.tips.map((x, index) => {
-                                                                    return <AtListItem key={"tips"+index} title={x}/>;
-                                                                })
+                                                    {/* 循环班次成员获取tag */}
+                                                    <View className="at-row">
+                                                        <View className="at-col at-col-9">
+                                                            {newinfos.filter(info => info.classid === item._id).length === 0 ? (
+                                                                <Text>没有成员</Text>
                                                             ) : (
-                                                                <View />
+                                                                <View>
+                                                                    {newinfos.map(x => {
+                                                                        let e1;
+                                                                        if (x.classid === item._id) {
+                                                                            e1 = <AtListItem key={item._id} title={x.tag}></AtListItem>;
+                                                                        } else {
+                                                                            e1 = null;
+                                                                        }
+                                                                        return <Block key={x.classid}>{e1}</Block>;
+                                                                    })}
+                                                                </View>
                                                             )}
-                                                        </AtList>
-                                                    </View>
-                                                    <View className="at-col at-col-3">
-                                                        <AtBadge>
-                                                            <AtButton size="small" onClick={() => this.updateTips(item, this.state.tips)}>
-                                                                添加
-                                                            </AtButton>
-                                                        </AtBadge>
-                                                    </View>
-                                                </View>
-                                            </AtModalContent>
-                                            <AtModalAction>
-                                                <Button
-                                                    onClick={() => {
-                                                        this.setState({ openmodal: undefined });
-                                                    }}
-                                                >
-                                                    返回
-                                                </Button>
-                                            </AtModalAction>
-                                        </AtModal>
-                                    </View>
-                                );
-                            })}
-                        </AtAccordion>
-                    </AtList>
-                    <AtList>
-                        <AtAccordion
-                            open={this.state.openattenders}
-                            onClick={value => this.setState({ openattenders: value })}
-                            title="人员列表"
-                        >
-                            {showinfo.map(item => {
-                                return (
-                                    <View key={item._id}>
-                                        <AtListItem
-                                            title={item.tag}
-                                            onClick={() => {
-                                                this.setState({ openinfo: item._id });
-                                            }}
-                                        />
-                                        {/* 对应listitem生成对应的modal */}
-                                        <AtModal isOpened={this.state.openinfo === item._id}>
-                                            <AtModalHeader>{item.tag + " 的个人信息"} </AtModalHeader>
-                                            <AtModalContent>
-                                                <View className="at-row">
-                                                    <View className="at-col at-col-3">
-                                                        <AtIcon prefixClass="icon" value="editor"></AtIcon>
-                                                    </View>
-                                                    <View className="at-col at-col-6">
-                                                        <Text>修改tag</Text>
-                                                    </View>
-                                                </View>
-                                                <View className="at-row">
-                                                    <View className="at-col at-col-9">
-                                                        <AtInput
-                                                            name="tag"
-                                                            editable={
-                                                                item.userid === this.props.user._id ||
-                                                                this.props.user._id === schedule.ownerID
-                                                                    ? true
-                                                                    : false
-                                                            }
-                                                            value={this.state.tag}
-                                                            onChange={v => {
-                                                                this.setState({ tag: v.toString() });
-                                                            }}
-                                                        ></AtInput>
-                                                    </View>
-                                                    <View className="at-col at-col-3">
-                                                        <AtBadge>
-                                                            <AtButton size="small" onClick={() => this.updateTag(item, this.state.tag)}>
-                                                                确认
-                                                            </AtButton>
-                                                        </AtBadge>
-                                                    </View>
-                                                </View>
-                                                <View className="at-row">
-                                                    <View className="at-col at-col-3">
-                                                        <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
-                                                    </View>
-                                                    <View className="at-col at-col-6">
-                                                        <Text>参与班次</Text>
-                                                    </View>
-                                                </View>
-                                                {/* 循环班次成员获取tag */}
-                                                <View>
-                                                    {ban.filter(x => x._id === item.classid).length === 0 ? (
-                                                        <Text>没有加入任何班次</Text>
-                                                    ) : (
-                                                        <View>
-                                                            {ban.map(x => {
-                                                                let e1: {} | null;
-                                                                if (x._id === item.classid) {
-                                                                    e1 = (
-                                                                        <AtButton
-                                                                            className="btn"
-                                                                            key={x._id}
-                                                                            onClick={() => {
-                                                                                this.setState({
-                                                                                    openinfo: "",
-                                                                                    openmodal: x._id
-                                                                                });
-                                                                            }}
-                                                                        >
-                                                                            {getDateString(x.startTime, true) +
-                                                                                "" +
-                                                                                getTimeString(x.startTime, true) +
-                                                                                "开始的班次"}
-                                                                        </AtButton>
-                                                                    );
-                                                                } else {
-                                                                    e1 = null;
-                                                                }
-                                                                return <View key={item.classid}>{e1}</View>;
-                                                            })}
                                                         </View>
-                                                    )}
-                                                </View>
-                                            </AtModalContent>
-                                            <AtModalAction>
-                                                <Button onClick={() => this.setState({ openinfo: "" })}>关闭</Button>
-                                            </AtModalAction>
-                                        </AtModal>
-                                    </View>
-                                );
-                            })}
-                        </AtAccordion>
-                    </AtList>
+                                                        <View className="at-col at-col-3">
+                                                            <AtBadge>
+                                                                <AtButton
+                                                                    size="small"
+                                                                    onClick={() => this.setState({ addattender: item._id, openmodal: "" })}
+                                                                >
+                                                                    添加
+                                                                </AtButton>
+                                                            </AtBadge>
+                                                        </View>
+                                                    </View>
+                                                    <AtDivider></AtDivider>
+                                                    <View className="at-row">
+                                                        <View className="at-col at-col-3">
+                                                            <AtIcon prefixClass="icon" value="clock"></AtIcon>
+                                                        </View>
+                                                        <View className="at-col at-col-6">
+                                                            <View className="at-row">
+                                                                {"启：" +
+                                                                    getDateString(item.startTime, true) +
+                                                                    "" +
+                                                                    getTimeString(item.startTime, true)}
+                                                            </View>
+
+                                                            <View className="at-row">
+                                                                {"止：" +
+                                                                    getDateString(item.endTime, true) +
+                                                                    "" +
+                                                                    getTimeString(item.endTime, true)}
+                                                            </View>
+                                                        </View>
+                                                    </View>
+                                                    <AtDivider></AtDivider>
+                                                    <View className="at-row">
+                                                        <View className="at-col at-col-1">
+                                                            <AtIcon prefixClass="icon" value="suggest"></AtIcon>
+                                                        </View>
+                                                        <View className="at-col at-col-8">
+                                                            <AtInput
+                                                                name="tips"
+                                                                maxLength={10}
+                                                                placeholder="班次共享备注"
+                                                                value={this.state.tips}
+                                                                onChange={v => {
+                                                                    this.setState({ tips: v.toString() });
+                                                                }}
+                                                            ></AtInput>
+                                                            <AtList>
+                                                                {item.tips ? (
+                                                                    item.tips.map((x, index) => {
+                                                                        return <AtListItem key={"tips" + index} title={x} />;
+                                                                    })
+                                                                ) : (
+                                                                    <View />
+                                                                )}
+                                                            </AtList>
+                                                        </View>
+                                                        <View className="at-col at-col-3">
+                                                            <AtBadge>
+                                                                <AtButton
+                                                                    size="small"
+                                                                    onClick={() => this.updateTips(item, this.state.tips)}
+                                                                >
+                                                                    添加
+                                                                </AtButton>
+                                                            </AtBadge>
+                                                        </View>
+                                                    </View>
+                                                </AtModalContent>
+                                                <AtModalAction>
+                                                    <Button
+                                                        onClick={() => {
+                                                            this.setState({ openmodal: undefined });
+                                                        }}
+                                                    >
+                                                        返回
+                                                    </Button>
+                                                </AtModalAction>
+                                            </AtModal>
+                                        </View>
+                                    );
+                                })}
+                            </AtAccordion>
+                        </AtList>
+                        <AtList>
+                            <AtAccordion
+                                open={this.state.openattenders}
+                                onClick={value => this.setState({ openattenders: value })}
+                                title="人员列表"
+                            >
+                                {showinfo.map(item => {
+                                    return (
+                                        <View key={item._id}>
+                                            <AtListItem
+                                                title={item.tag}
+                                                onClick={() => {
+                                                    this.setState({ openinfo: item._id });
+                                                }}
+                                            />
+                                            {/* 对应listitem生成对应的modal */}
+                                            <AtModal isOpened={this.state.openinfo === item._id}>
+                                                <AtModalHeader>{item.tag + " 的个人信息"} </AtModalHeader>
+                                                <AtModalContent>
+                                                    <View className="at-row">
+                                                        <View className="at-col at-col-3">
+                                                            <AtIcon prefixClass="icon" value="editor"></AtIcon>
+                                                        </View>
+                                                        <View className="at-col at-col-6">
+                                                            <Text>修改tag</Text>
+                                                        </View>
+                                                    </View>
+                                                    <View className="at-row">
+                                                        <View className="at-col at-col-9">
+                                                            <AtInput
+                                                                name="tag"
+                                                                editable={
+                                                                    item.userid === this.props.user._id ||
+                                                                    this.props.user._id === schedule.ownerID
+                                                                        ? true
+                                                                        : false
+                                                                }
+                                                                value={this.state.tag}
+                                                                onChange={v => {
+                                                                    this.setState({ tag: v.toString() });
+                                                                }}
+                                                            ></AtInput>
+                                                        </View>
+                                                        <View className="at-col at-col-3">
+                                                            <AtBadge>
+                                                                <AtButton size="small" onClick={() => this.updateTag(item, this.state.tag)}>
+                                                                    确认
+                                                                </AtButton>
+                                                            </AtBadge>
+                                                        </View>
+                                                    </View>
+                                                    <View className="at-row">
+                                                        <View className="at-col at-col-3">
+                                                            <AtIcon prefixClass="icon" value="Customermanagement"></AtIcon>
+                                                        </View>
+                                                        <View className="at-col at-col-6">
+                                                            <Text>参与班次</Text>
+                                                        </View>
+                                                    </View>
+                                                    {/* 循环班次成员获取tag */}
+                                                    <View>
+                                                        {ban.filter(x => x._id === item.classid).length === 0 ? (
+                                                            <Text>没有加入任何班次</Text>
+                                                        ) : (
+                                                            <View>
+                                                                {ban.map(x => {
+                                                                    let e1: {} | null;
+                                                                    if (x._id === item.classid) {
+                                                                        e1 = (
+                                                                            <AtButton
+                                                                                className="btn"
+                                                                                key={x._id}
+                                                                                onClick={() => {
+                                                                                    this.setState({
+                                                                                        openinfo: "",
+                                                                                        openmodal: x._id
+                                                                                    });
+                                                                                }}
+                                                                            >
+                                                                                {getDateString(x.startTime, true) +
+                                                                                    "" +
+                                                                                    getTimeString(x.startTime, true) +
+                                                                                    "开始的班次"}
+                                                                            </AtButton>
+                                                                        );
+                                                                    } else {
+                                                                        e1 = null;
+                                                                    }
+                                                                    return <View key={item.classid}>{e1}</View>;
+                                                                })}
+                                                            </View>
+                                                        )}
+                                                    </View>
+                                                </AtModalContent>
+                                                <AtModalAction>
+                                                    <Button onClick={() => this.setState({ openinfo: "" })}>关闭</Button>
+                                                </AtModalAction>
+                                            </AtModal>
+                                        </View>
+                                    );
+                                })}
+                            </AtAccordion>
+                        </AtList>
+                    </View>
+
+                    <AtModal isOpened={this.state.editing === "title"}>
+                        <AtModalHeader>修改班表标题</AtModalHeader>
+                        <AtModalContent>
+                            <AtInput
+                                name="title"
+                                value={this.state.inputingText}
+                                onChange={v => this.setState({ inputingText: v.toString() })}
+                            ></AtInput>
+                        </AtModalContent>
+                        <AtModalAction>
+                            <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
+                            <Button onClick={() => this.updateSche("title", this.state.inputingText)}>更新</Button>
+                        </AtModalAction>
+                    </AtModal>
+
+                    <AtModal isOpened={this.state.editing === "description"}>
+                        <AtModalHeader>修改班表描述</AtModalHeader>
+                        <AtModalContent>
+                            <AtInput
+                                name="description"
+                                value={this.state.inputingText}
+                                onChange={v => this.setState({ inputingText: v.toString() })}
+                            ></AtInput>
+                        </AtModalContent>
+                        <AtModalAction>
+                            <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
+                            <Button onClick={() => this.updateSche("description", this.state.inputingText)}>更新</Button>
+                        </AtModalAction>
+                    </AtModal>
+
+                    <AtModal isOpened={this.state.editing === "startact"}>
+                        <AtModalHeader>修改班表开始日期</AtModalHeader>
+                        <AtModalContent>
+                            <Picker
+                                style={{ margin: "12px" }}
+                                value={getDateString(this.state.inputingDate, false)}
+                                mode="date"
+                                onChange={v => this.setState({ inputingDate: getDateFromString(v.detail.value) })}
+                            >
+                                <View className="picker form-value">{getDateString(this.state.inputingDate, true)}</View>
+                            </Picker>
+                        </AtModalContent>
+                        <AtModalAction>
+                            <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
+                            <Button onClick={() => this.updateSche("startact", this.state.inputingDate)}>更新</Button>
+                        </AtModalAction>
+                    </AtModal>
+
+                    <AtModal isOpened={this.state.editing === "endact"}>
+                        <AtModalHeader>修改班表结束日期</AtModalHeader>
+                        <AtModalContent>
+                            <Picker
+                                style={{ margin: "12px" }}
+                                value={getDateString(this.state.inputingDate, false)}
+                                mode="date"
+                                onChange={v => this.setState({ inputingDate: getDateFromString(v.detail.value) })}
+                            >
+                                <View className="picker form-value">{getDateString(this.state.inputingDate, true)}</View>
+                            </Picker>
+                        </AtModalContent>
+                        <AtModalAction>
+                            <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
+                            <Button onClick={() => this.updateSche("endact", this.state.inputingDate)}>更新</Button>
+                        </AtModalAction>
+                    </AtModal>
                 </View>
-
-                <AtModal isOpened={this.state.editing === "title"}>
-                    <AtModalHeader>修改班表标题</AtModalHeader>
-                    <AtModalContent>
-                        <AtInput
-                            name="title"
-                            value={this.state.inputingText}
-                            onChange={v => this.setState({ inputingText: v.toString() })}
-                        ></AtInput>
-                    </AtModalContent>
-                    <AtModalAction>
-                        <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
-                        <Button onClick={() => this.updateSche("title", this.state.inputingText)}>更新</Button>
-                    </AtModalAction>
-                </AtModal>
-
-                <AtModal isOpened={this.state.editing === "description"}>
-                    <AtModalHeader>修改班表描述</AtModalHeader>
-                    <AtModalContent>
-                        <AtInput
-                            name="description"
-                            value={this.state.inputingText}
-                            onChange={v => this.setState({ inputingText: v.toString() })}
-                        ></AtInput>
-                    </AtModalContent>
-                    <AtModalAction>
-                        <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
-                        <Button onClick={() => this.updateSche("description", this.state.inputingText)}>更新</Button>
-                    </AtModalAction>
-                </AtModal>
-
-                <AtModal isOpened={this.state.editing === "startact"}>
-                    <AtModalHeader>修改班表开始日期</AtModalHeader>
-                    <AtModalContent>
-                        <Picker
-                            style={{ margin: "12px" }}
-                            value={getDateString(this.state.inputingDate, false)}
-                            mode="date"
-                            onChange={v => this.setState({ inputingDate: getDateFromString(v.detail.value) })}
-                        >
-                            <View className="picker form-value">{getDateString(this.state.inputingDate, true)}</View>
-                        </Picker>
-                    </AtModalContent>
-                    <AtModalAction>
-                        <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
-                        <Button onClick={() => this.updateSche("startact", this.state.inputingDate)}>更新</Button>
-                    </AtModalAction>
-                </AtModal>
-
-                <AtModal isOpened={this.state.editing === "endact"}>
-                    <AtModalHeader>修改班表结束日期</AtModalHeader>
-                    <AtModalContent>
-                        <Picker
-                            style={{ margin: "12px" }}
-                            value={getDateString(this.state.inputingDate, false)}
-                            mode="date"
-                            onChange={v => this.setState({ inputingDate: getDateFromString(v.detail.value) })}
-                        >
-                            <View className="picker form-value">{getDateString(this.state.inputingDate, true)}</View>
-                        </Picker>
-                    </AtModalContent>
-                    <AtModalAction>
-                        <Button onClick={() => this.setState({ editing: undefined })}>返回</Button>
-                        <Button onClick={() => this.updateSche("endact", this.state.inputingDate)}>更新</Button>
-                    </AtModalAction>
-                </AtModal>
-            </View>
-        );
+            );
     }
 }
 

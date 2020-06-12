@@ -224,7 +224,6 @@ class JoinSchedule extends Component<Props, States> {
             })
             .then(res => {
                 var resdata = (res as unknown) as publicscheResult;
-                console.log(resdata);
                 if (resdata.result.code === 200) {
                     this.props.updateSchedule(resdata.result.schedule);
                     resdata.result.newinfo.map(newinfo => {
@@ -232,7 +231,6 @@ class JoinSchedule extends Component<Props, States> {
                     });
                 }
             });
-        console.log(this.props);
         Taro.showToast({ title: "发布成功", icon: "success", duration: 2000 });
         Taro.redirectTo({
             url: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id
@@ -291,7 +289,6 @@ class JoinSchedule extends Component<Props, States> {
             })
             .then(res => {
                 var resdata = (res as unknown) as getScheResult;
-                console.log(resdata);
                 if (resdata.result.code === 200) {
                     this.props.updateSchedule(resdata.result.schedule);
                     resdata.result.banci.map(banci => {
@@ -435,7 +432,7 @@ class JoinSchedule extends Component<Props, States> {
     updateTag = (info: info, value: string) => {
         var scheID = info.scheid;
         let flag = true;
-        console.log(scheID);
+
         this.props.infos.map(x => {
             if (x.tag === value) flag = false;
         });
@@ -493,7 +490,6 @@ class JoinSchedule extends Component<Props, States> {
             });
     };
 
-
     getbancis(infoid: string) {
         let info = this.props.infos.filter(x => x._id === infoid)[0];
         let allban = this.props.bancis;
@@ -544,15 +540,15 @@ class JoinSchedule extends Component<Props, States> {
     }
 
     addattender(value: string[]) {
-      this.setState({
-          attenderlist: value
-      });
+        this.setState({
+            attenderlist: value
+        });
     }
     pushattender(classid: string, attenderlist: string[]) {
         const sc = this.$router.params;
         const scheID = sc._id;
         let owner = false;
-        console.log(this.props.schedules);
+
         var curSche = this.props.schedules.find(x => x._id === scheID);
         if (curSche)
             if (curSche.ownerID === this.props.user._id) {
@@ -825,15 +821,15 @@ class JoinSchedule extends Component<Props, States> {
                                                             {infos.filter(info => info.classid === item._id).length === 0 ? (
                                                                 <Text>没有成员</Text>
                                                             ) : (
-                                                              <View>
-                                                                <UserBadge
-                                                                    user={this.props.user}
-                                                                    infos={infos}
-                                                                    banciID={item._id}
-                                                                    schedule={schedule}
-                                                                    deleteInfo={this.props.deleteInfo}
-                                                                    updateAttendersNumber={this.updateAttendersNumber}
-                                                                />
+                                                                <View>
+                                                                    <UserBadge
+                                                                        user={this.props.user}
+                                                                        infos={infos}
+                                                                        banciID={item._id}
+                                                                        schedule={schedule}
+                                                                        deleteInfo={this.props.deleteInfo}
+                                                                        updateAttendersNumber={this.updateAttendersNumber}
+                                                                    />
                                                                 </View>
                                                             )}
                                                         </View>
@@ -946,7 +942,6 @@ class JoinSchedule extends Component<Props, States> {
                                 title="人员列表"
                             >
                                 {showinfo.map(item => {
-                                    console.log(this.getbancis(item._id));
                                     return (
                                         <View key={item._id}>
                                             <AtListItem

@@ -18,8 +18,7 @@ interface Props {
 export default class UserBadge extends Component<Props> {
     Delete(info_id: string, user_id: string) {
         Taro.showToast({ title: "移除中", icon: "loading", duration: 2000 });
-        console.log(this.props.schedule)
-        console.log(user_id)
+
         if (user_id === this.props.user._id || this.props.user._id === this.props.schedule.ownerID) {
             Taro.cloud
                 .callFunction({
@@ -43,8 +42,7 @@ export default class UserBadge extends Component<Props> {
 
     render() {
         if (this.props.newinfos === undefined) return <View />;
-        return (
-          this.props.newinfos?(
+        return this.props.newinfos ? (
             <View>
                 {this.props.newinfos.map(x => {
                     if (x.classid === this.props.banciID)
@@ -56,10 +54,8 @@ export default class UserBadge extends Component<Props> {
                         );
                 })}
             </View>
-          ):(
+        ) : (
             <View></View>
-          )
-
         );
     }
 }
