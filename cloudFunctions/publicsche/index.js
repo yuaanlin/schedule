@@ -12,22 +12,42 @@ exports.main = async (event, context) => {
     const wxContext = cloud.getWXContext();
     const { schedule, newinfo } = event;
     try {
+      var result = []
         await scheCollection.doc(schedule._id).update({
             data: {
                 complete: true
             }
         });
-
+        console.log(newinfo)
         await newinfo.map(x => {
             delete x["_id"];
         });
-        await newinfoCollection.add({
-            data: newinfo
-        });
+        console.log(newinfo)
+        for(var i = 0;i < newinfo.length;i++){
+          await newinfoCollection.add({
+            data:{
+              classid: newinfo[i].classid,
+              scheid: newinfo[i].scheid,
+              tag: newinfo[i].tag,
+              tendency: newinfo[i].tendency,
+              userid: newinfo[i].userid
+            }
+          })
+            .then(res => {
+              console.log(res)
+              result.push(res._id)
+            })
+        }
+        var final = []
+        for(var i = 0;i < result.length;i++){
+          let tmp = await newinfoCollection.doc(result[i]).get()
+          final =[ ...final,tmp.data]
+        }
+        
         return {
             code: 200,
             schedule: schedule,
-            newinfo: newinfo
+            newinfo: final
         };
     } catch (e) {
         return {

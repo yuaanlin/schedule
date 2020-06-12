@@ -224,9 +224,11 @@ class JoinSchedule extends Component<Props, States> {
             })
             .then(res => {
                 var resdata = (res as unknown) as publicscheResult;
+                console.log(resdata)
                 if (resdata.result.code === 200) {
+                    this.props.updateSchedule(resdata.result.schedule);
                     resdata.result.newinfo.map(newinfo => {
-                        this.props.updatenewInfo(newinfo);
+                      this.props.updatenewInfo(newinfo);
                     });
                 }
             });
@@ -524,10 +526,13 @@ class JoinSchedule extends Component<Props, States> {
         const scheID = sc._id
         let owner = false
         console.log(this.props.schedules)
-        var curSche = this.props.schedules.filter(x=>x._id===scheID)
-        if(curSche[0].ownerID=== this.props.user._id){
-          owner = true
-        }
+        var curSche = this.props.schedules.find(x=>x._id===scheID)
+        if(curSche)
+          if(curSche.ownerID=== this.props.user._id){
+            owner = true
+          }
+        else
+        Taro.showToast({ title: "班表丢失，发生错误", icon: "none", duration: 2000 });
         if(owner){
             if (attenderlist === undefined || attenderlist.length === 0) {
               Taro.showToast({ title: "没有选择成员", icon: "none", duration: 2000 });
@@ -569,7 +574,7 @@ class JoinSchedule extends Component<Props, States> {
                       }
                   });
           }
-        }else{
+        }else if(curSche){
           Taro.showToast({ title: "宁无权进行该操作噢", icon: "none", duration: 2000 });
         }
 
