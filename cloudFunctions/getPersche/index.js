@@ -5,90 +5,66 @@ cloud.init();
 const db = cloud.database();
 const scheduleform = db.collection("schedules");
 const newinfoform = db.collection("newinfos");
+const banciform = db.collection("bancis")
+const infoform = db.collection("infos")
+const userCollection = db.collection("users")
 // 云函数入口函数
 exports.main = async (event, context) => {
     try {
-        let sche;
-        let sche_ban;
-        let tmp;
-        let ban = [];
-        let info;
-        let inform;
-        let newinfo;
-        let i, j;
+        var i = 0,j=0;
         const wxContext = cloud.getWXContext();
         const open_id = wxContext.OPENID;
-        sche = await db
-            .collection("schedules")
+        sche = await scheduleform
             .where({
                 ownerID: open_id
             })
             .get();
+        sche = sche.data
 
         newinfo = await newinfoform
             .where({
                 userid: open_id
             })
             .get();
+        newinfo = newinfo.data
 
-        inform = await db
-            .collection("infos")
+        info = await infoform
             .where({
                 userid: open_id
             })
             .get();
-        for (i = 0; i < sche.data.length; i++) {
-            for (j = 0; j < sche.data[i].bancis.length; j++) {
-                tmp = await db
-                    .collection("bancis")
-                    .where({
-                        _id: sche.data[i].bancis[j]
-                    })
-                    .get();
-                ban.push(tmp);
-            }
+        info = info.data
+        
+        var ban = []
+        var schedule = []
+        for(;i<info.length;i++){
+          let tmpban = await banciform.doc(info[i].classid).get()
+          tmpban = tmpban.data
+          ban = [...ban.filter(x=>x._id!=info[i].classid),tmpban]
+          let tmpsche = await scheduleform.doc(info[i].scheid).get()
+          tmpsche = tmpsche.data
+          schedule = [...schedule.filter(x => x._id != info[i].scheid), tmpsche]
         }
-        tmp = ban;
-        ban = [];
-        for (i = 0; i < tmp.length; i++) ban = ban.concat(tmp[i].data);
-        await db
-            .collection("infos")
-            .aggregate()
-            .match({
-                userid: open_id
-            })
-            .lookup({
-                from: "bancis",
-                localField: "classid",
-                foreignField: "_id",
-                as: "bancilist"
-            })
-            .end()
-            .then(res => {
-                info = res;
-            });
-        sche = sche.data;
-        for (i = 0; i < info.list.length; i++) {
-            ban = ban.concat(info.list[i].bancilist);
+        console.log(ban)
+        schedule = schedule.concat(sche)
+        for(i = 0;i < schedule.length;i++){
+          console.log(schedule[i].bancis)
+          for(j=0;j < schedule[i].bancis.length;j++){
+            let tmpban = await banciform.doc(schedule[i].bancis[j]).get()
+            tmpban = tmpban.data
+            console.log(tmpban)
+            ban = [...ban.filter(x => x._id != schedule[i].bancis[j]), tmpban]
+          }
         }
-        for (i = 0; i < ban.length; i++) {
-            const [scheinfo] = sche.filter(v => v._id === ban[i].scheid);
-            if (!scheinfo) {
-                tmp = await scheduleform
-                    .where({
-                        _id: ban[i].scheid
-                    })
-                    .get();
-                sche.push(tmp.data[0]);
-            }
-        }
-        info = info.list;
+        console.log(ban)
+        
+      
         return {
             code: 200,
-            schedules: sche,
-            infos: inform.data,
+            schedules: schedule,
+            infos: info,
             bancis: ban,
-            newinfos: newinfo.data
+            newinfos: newinfo
         };
     } catch (e) {
         return {

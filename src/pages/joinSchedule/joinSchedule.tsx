@@ -232,6 +232,7 @@ class JoinSchedule extends Component<Props, States> {
                     });
                 }
             });
+            console.log(this.props)
         Taro.showToast({ title: "发布成功", icon: "success", duration: 2000 });
         Taro.redirectTo({
             url: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id
@@ -280,7 +281,7 @@ class JoinSchedule extends Component<Props, States> {
         var sc = this.props.schedules.find(sc => sc._id === scheID);
 
         /** 前端找不到班表，先下载请求的班表数据 */
-        if (sc === undefined) {
+        // if (sc === undefined) {
             Taro.cloud
                 .callFunction({
                     name: "getschedule",
@@ -290,6 +291,7 @@ class JoinSchedule extends Component<Props, States> {
                 })
                 .then(res => {
                     var resdata = (res as unknown) as getScheResult;
+                    console.log(resdata)
                     if (resdata.result.code === 200) {
                         this.props.updateSchedule(resdata.result.schedule);
                         resdata.result.banci.map(banci => {
@@ -305,7 +307,7 @@ class JoinSchedule extends Component<Props, States> {
                         Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
                     }
                 });
-        }
+        // }
 
         /** 如果这个用户已经报名过这个班表，自动载入 tag */
         var exsistTag: string | undefined = undefined;

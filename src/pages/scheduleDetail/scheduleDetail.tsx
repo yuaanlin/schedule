@@ -231,10 +231,10 @@ class ScheduleDetail extends Component<Props, States> {
       }
 
       // console.log(this.props)
-        console.log(this.props)
         if(sc) {
           this.setState({ schedule: sc });
           let newinfo = this.props.newinfos.filter(newinfo => newinfo.scheid === scheID);
+          console.log(newinfo)
           this.setState({ newinfos: newinfo });
           let ban = this.props.bancis.filter(banci =>banci.scheid===scheID);
           this.setState({ bancis: ban });
@@ -314,11 +314,13 @@ class ScheduleDetail extends Component<Props, States> {
             });
     };
     render() {
+        const scheID = this.$router.params._id;
         console.log(this.state)
         var { schedule } = this.state
         let ban = this.state.bancis
         // const bancis = ban;
-        let {newinfos} = this.state
+
+        let newinfos = this.props.newinfos.filter(x=>x.scheid === scheID)
         let showinfo: newinfo[] = [];
         newinfos.map(x => {
             let exist: newinfo | undefined = undefined;
