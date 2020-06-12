@@ -493,11 +493,6 @@ class JoinSchedule extends Component<Props, States> {
             });
     };
 
-    addattender(value: string[]) {
-        this.setState({
-            attenderlist: value
-        });
-    }
 
     getbancis(infoid: string) {
         let info = this.props.infos.filter(x => x._id === infoid)[0];
@@ -548,6 +543,11 @@ class JoinSchedule extends Component<Props, States> {
         }
     }
 
+    addattender(value: string[]) {
+      this.setState({
+          attenderlist: value
+      });
+    }
     pushattender(classid: string, attenderlist: string[]) {
         const sc = this.$router.params;
         const scheID = sc._id;
@@ -825,6 +825,7 @@ class JoinSchedule extends Component<Props, States> {
                                                             {infos.filter(info => info.classid === item._id).length === 0 ? (
                                                                 <Text>没有成员</Text>
                                                             ) : (
+                                                              <View>
                                                                 <UserBadge
                                                                     user={this.props.user}
                                                                     infos={infos}
@@ -833,6 +834,7 @@ class JoinSchedule extends Component<Props, States> {
                                                                     deleteInfo={this.props.deleteInfo}
                                                                     updateAttendersNumber={this.updateAttendersNumber}
                                                                 />
+                                                                </View>
                                                             )}
                                                         </View>
                                                         {this.state.author ? (

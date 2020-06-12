@@ -18,6 +18,8 @@ exports.main = async (event, context) => {
                 complete: true
             }
         });
+        schedule.complete = true
+        console.log(schedule)
         console.log(newinfo)
         await newinfo.map(x => {
             delete x["_id"];

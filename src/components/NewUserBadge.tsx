@@ -1,14 +1,14 @@
 import { View } from "@tarojs/components";
 import Taro, { Component } from "@tarojs/taro";
 import { AtBadge, AtButton, AtListItem } from "taro-ui";
-import info from "../classes/info";
+import newinfo from "../classes/newinfo";
 import User from "../classes/User";
 import Schedule from "../classes/Schedule";
 import { deleteinfoResult } from "../types";
 
 interface Props {
     user: User;
-    infos: Array<info>;
+    newinfos: Array<newinfo>;
     banciID: string;
     schedule: Schedule;
     deleteInfo: (id: string) => void;
@@ -42,14 +42,14 @@ export default class UserBadge extends Component<Props> {
     }
 
     render() {
-        if (this.props.infos === undefined) return <View />;
+        if (this.props.newinfos === undefined) return <View />;
         return (
-          this.props.infos?(
+          this.props.newinfos?(
             <View>
-                {this.props.infos.map(x => {
+                {this.props.newinfos.map(x => {
                     if (x.classid === this.props.banciID)
                         return (
-                            <AtListItem key={x._id} title={x.tag} onClick={this.Delete.bind(this, x._id, x.userid)}>
+                            <AtListItem key={x._id} title={x.tag}>
                                 {/* <AtButton size="small" onClick={this.Delete.bind(this, x._id, x.userid)}>
                                 </AtButton> */}
                             </AtListItem>
