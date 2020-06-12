@@ -97,11 +97,12 @@ exports.main = async (event, context) => {
             failinfo.push(x);
         }
     });
+    
 
     var failnum = 0;
     var leftban = [];
-    for (var index = 0; index < ban.length; index++) {
-        for (var i = 0; i < newinfo.length; i++) {
+    for (let index in ban) {
+        for (let i in newinfo) {
             if (newinfo[i].classid === ban[index]._id) {
                 failnum++;
             }
@@ -111,6 +112,32 @@ exports.main = async (event, context) => {
         }
         failnum = 0;
     }
+
+    for (let index in leftban) {
+      for (let i in failinfo) {
+        if (failinfo[i].classid === leftban[index]._id) {
+          failinfo[i].tendency = false
+          newinfo.push(failinfo[i])
+          failinfo = [...failinfo.filter(x=>x._id!=failinfo[i]._id)]
+
+        }
+      }
+    }
+
+    failnum = 0;
+    leftban = [];
+    for (let index in ban) {
+      for (let i in newinfo) {
+        if (newinfo[i].classid === ban[index]._id) {
+          failnum++;
+        }
+      }
+    if (failnum < ban[index].count) {
+      leftban.push(ban[index]);
+    }
+    failnum = 0;
+  }
+
     var leftmen = [];
     var tag = false;
     for (var index = 0; index < users.length; index++) {
@@ -125,6 +152,8 @@ exports.main = async (event, context) => {
         }
         tag = false;
     }
+
+
     return {
         code: 200,
         infos: newinfo,
