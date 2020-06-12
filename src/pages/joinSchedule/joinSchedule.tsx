@@ -973,6 +973,7 @@ class JoinSchedule extends Component<Props, States> {
                                                             <View>
                                                                 {bancis.map(x => {
                                                                     let e1;
+                                                                    console.log(x)
                                                                     if (x._id === item.classid) {
                                                                         e1 = (
                                                                             <AtButton
@@ -995,7 +996,7 @@ class JoinSchedule extends Component<Props, States> {
                                                                         e1 = null;
                                                                     }
                                                                     return <Block key={item.classid}>{e1}</Block>;
-                                                                })}
+                                                                 })}
                                                             </View>
                                                         )}
                                                     </View>

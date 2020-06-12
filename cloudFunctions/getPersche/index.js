@@ -43,18 +43,21 @@ exports.main = async (event, context) => {
           ban = [...ban.filter(x=>x._id!=info[i].classid),tmpban]
           let tmpsche = await scheduleform.doc(info[i].scheid).get()
           tmpsche = tmpsche.data
-          schedule = [...schedule.filter(x => x._id != info[i].scheid), tmpsche]
+          schedule = [...schedule.filter(x => x._id != tmpsche._id), tmpsche]
         }
-        console.log(ban)
         schedule = schedule.concat(sche)
         for(i = 0;i < schedule.length;i++){
-          console.log(schedule[i].bancis)
           for(j=0;j < schedule[i].bancis.length;j++){
             let tmpban = await banciform.doc(schedule[i].bancis[j]).get()
             tmpban = tmpban.data
-            console.log(tmpban)
-            ban = [...ban.filter(x => x._id != schedule[i].bancis[j]), tmpban]
+            ban = [...ban.filter(x => x._id != tmpban._id), tmpban]
           }
+          let tmpinfo = await infoform.where({scheid:schedule[i]._id}).get()
+          tmpinfo = tmpinfo.data
+          console.log(tmpinfo)
+          tmpinfo.map(y=>{
+            info = [...info.filter(x => x._id != y._id), y]
+          })
         }
         console.log(ban)
         
