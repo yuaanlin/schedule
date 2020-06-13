@@ -34,16 +34,21 @@ exports.main = async (event, context) => {
         });
 
         if (!sche.attenders.includes(wxContext.OPENID)) {
-            scheduleCollection.doc(scheid).update({
+            await scheduleCollection.doc(scheid).update({
                 data: {
                     attenders: [...sche.attenders, wxContext.OPENID]
                 }
             });
         }
 
+        let sch = await scheduleCollection.doc(scheid).get()
+        sch = sch.data
+        console.log(sch)
+
         return {
             code: 200,
-            data: newinfo
+            data: newinfo,
+            schedule:sch
         };
     } catch (e) {
         return {

@@ -152,8 +152,14 @@ exports.main = async (event, context) => {
         }
         tag = false;
     }
-
-
+    let tmpfinal =[]
+    leftmen.map(y=>{
+      failinfo.map(x => {
+        if(x.userid === y._id){
+          tmpfinal.push(x)
+        }})
+    })
+    failinfo = tmpfinal
     return {
         code: 200,
         infos: newinfo,

@@ -1,3 +1,4 @@
+import Banci from "./banci";
 /** info完成排班之后生成 newinfo
  *
  * 对应数据库的 newinfo 集合 */
@@ -8,6 +9,7 @@ export default class newinfo {
   scheid: string;
   tag: string;
   tendency: string;
+  newbanci: Array<Banci>;
 
   constructor(data: newinfo) {
       this._id = data._id;
@@ -17,5 +19,6 @@ export default class newinfo {
       this.tag = data.tag;
       this.tendency = data.tendency;
       this.scheid = data.scheid;
+      this.newbanci = data.newbanci;
   }
 }

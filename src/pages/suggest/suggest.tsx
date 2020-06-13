@@ -34,7 +34,14 @@ class ScheduleDetail extends Component<Props, States> {
     navigationBarTitleText: "意见反馈"
   };
 
-  onSubmit() {}
+  onSubmit() {
+    this.setState({
+      suggest: "",
+      files: [],
+      contact: ""
+    })
+    Taro.showToast({ title: "提交成功！", icon: "success", duration: 2000 });
+  }
   componentDidMount() {}
 
   render() {
