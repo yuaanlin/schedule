@@ -1,3 +1,4 @@
+import Banci from "./banci";
 /** info完成排班之后生成 newinfo
  *
  * 对应数据库的 newinfo 集合 */
