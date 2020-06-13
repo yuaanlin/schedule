@@ -352,11 +352,14 @@ class ScheduleDetail extends Component<Props, States> {
             Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
             console.log(attenderlist)
             attenderlist.map((item: string) => {
+                let tmp = this.props.newinfos.filter(i=>i._id===item)
+                if(tmp)
                 this.props.newinfos.map(x => {
-                    if (x.classid === classid && item === x.userid) {
+                    if (x.classid === classid && tmp[0].userid === x.userid) {
                         exist = true;
                     }
                 });
+                else Taro.showToast({ title: "没有找到该参与者信息", icon: "none", duration: 5000 });
             });
             if (exist) {
                 Taro.showToast({ title: "添加失败，有人已存在于目标班次", icon: "none", duration: 2000 });
