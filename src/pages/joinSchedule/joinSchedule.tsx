@@ -196,6 +196,11 @@ class JoinSchedule extends Component<Props, States> {
             });
             return;
         }
+        let cursche = this.props.schedules.filter(x=>x._id===scheID)
+        if(cursche[0].complete===true){
+          Taro.showToast({ title: "报名已停止！", icon: "none", duration: 2000 });
+          return;
+        }
         Taro.showToast({ title: "报名中", icon: "loading", duration: 2000 });
 
         Taro.cloud

@@ -648,6 +648,7 @@ class ScheduleDetail extends Component<Props, States> {
                                 title="人员列表"
                             >
                                 {showinfo.map(item => {
+                                  console.log(item)
                                     return (
                                         <View key={item._id}>
                                             <AtListItem
@@ -705,37 +706,27 @@ class ScheduleDetail extends Component<Props, States> {
                                                     </View>
                                                     {/* 循环班次成员获取tag */}
                                                     <View>
-                                                        {ban.filter(x => x._id === item.classid).length === 0 ? (
-                                                            <Text>没有加入任何班次</Text>
-                                                        ) : (
-                                                            <View>
-                                                                {ban.map(x => {
-                                                                    let e1: {} | null;
-                                                                    if (x._id === item.classid) {
-                                                                        e1 = (
-                                                                            <AtButton
-                                                                                className="btn"
-                                                                                key={x._id}
-                                                                                onClick={() => {
-                                                                                    this.setState({
-                                                                                        openinfo: "",
-                                                                                        openmodal: x._id
-                                                                                    });
-                                                                                }}
-                                                                            >
-                                                                                {getDateString(x.startTime, true) +
-                                                                                    "" +
-                                                                                    getTimeString(x.startTime, true) +
-                                                                                    "开始的班次"}
-                                                                            </AtButton>
-                                                                        );
-                                                                    } else {
-                                                                        e1 = null;
-                                                                    }
-                                                                    return <View key={item.classid}>{e1}</View>;
-                                                                })}
-                                                            </View>
-                                                        )}
+                                                        <View>
+                                                            {item.newbanci.map(x => {
+                                                                return(
+                                                                  <AtButton
+                                                                      className="btn"
+                                                                      key={x._id}
+                                                                      onClick={() => {
+                                                                          this.setState({
+                                                                              openinfo: "",
+                                                                              openmodal: x._id
+                                                                          });
+                                                                      }}
+                                                                  >
+                                                                      {getDateString(x.startTime, true) +
+                                                                          "" +
+                                                                          getTimeString(x.startTime, true) +
+                                                                          "开始的班次"}
+                                                                  </AtButton>
+                                                                )
+                                                            })}
+                                                        </View>
                                                     </View>
                                                 </AtModalContent>
                                                 <AtModalAction>
@@ -750,7 +741,7 @@ class ScheduleDetail extends Component<Props, States> {
                     </View>
 
                     <AtFloatLayout isOpened={this.state.editing === "title"} onClose={() => this.setState({ editing: "" })}>
-                        ><AtModalHeader>修改班表标题</AtModalHeader>
+                        <AtModalHeader>修改班表标题</AtModalHeader>
                         <AtModalContent>
                             <AtInput
                                 name="title"
@@ -765,7 +756,7 @@ class ScheduleDetail extends Component<Props, States> {
                     </AtFloatLayout>
 
                     <AtFloatLayout isOpened={this.state.editing === "description"} onClose={() => this.setState({ editing: "" })}>
-                        ><AtModalHeader>修改班表描述</AtModalHeader>
+                        <AtModalHeader>修改班表描述</AtModalHeader>
                         <AtModalContent>
                             <AtInput
                                 name="description"
