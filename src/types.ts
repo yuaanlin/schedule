@@ -171,3 +171,12 @@ export interface pushAttenderResult {
   }
 }
 
+
+export interface pushNewAttenderResult {
+  errMsg: string;
+  requestID: string;
+  result:{
+    code: number;
+    addlist:Array<newinfo>;
+  }
+}

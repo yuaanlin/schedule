@@ -10,7 +10,7 @@ import {
     AtInput,
     AtList,
     AtListItem,
-    AtModal,
+    AtCheckbox,
     AtModalAction,
     AtModalContent,
     AtModalHeader,
@@ -28,7 +28,7 @@ import { updatenewInfo, deletenewInfo } from "../../redux/actions/newinfo";
 import { setUserData } from "../../redux/actions/user";
 import store from "../../redux/store";
 import { AppState } from "../../redux/types";
-import { updatescheResult, updateTagResult, updateTipsResult, loginResult, getScheResult, pushAttenderResult } from "../../types";
+import { updatescheResult, updateTagResult, updateTipsResult, loginResult, getScheResult, pushNewAttenderResult } from "../../types";
 import getDateFromString from "../../utils/getDateFromString";
 import getDateString from "../../utils/getDateString";
 import getTimeString from "../../utils/getTimeString";
@@ -350,6 +350,7 @@ class ScheduleDetail extends Component<Props, States> {
             this.setState({ addattender: "" });
             let exist = false;
             Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
+            console.log(attenderlist)
             attenderlist.map((item: string) => {
                 this.props.infos.map(x => {
                     if (x.classid === classid && item === x.userid) {
@@ -362,7 +363,7 @@ class ScheduleDetail extends Component<Props, States> {
             } else {
                 Taro.cloud
                     .callFunction({
-                        name: "addattender",
+                        name: "addnewattener",
                         data: {
                             classid: classid,
                             attenderlist: attenderlist,
@@ -370,10 +371,11 @@ class ScheduleDetail extends Component<Props, States> {
                         }
                     })
                     .then(res => {
-                        var resdata = (res as unknown) as pushAttenderResult;
+                        var resdata = (res as unknown) as pushNewAttenderResult;
+                        console.log(resdata)
                         if (resdata.result.code === 200) {
                             resdata.result.addlist.map(newinfo => {
-                                this.props.updateInfo(newinfo);
+                                this.props.updatenewInfo(newinfo);
                             });
                             this.updateAttendersNumber();
                             Taro.showToast({ title: "添加成功", icon: "success", duration: 2000 });
@@ -386,6 +388,30 @@ class ScheduleDetail extends Component<Props, States> {
             Taro.showToast({ title: "宁无权进行该操作噢", icon: "none", duration: 2000 });
         }
     }
+    getbancis(infoid: string) {
+      let info = this.props.newinfos.filter(x => x._id === infoid)[0];
+      let allban = this.props.bancis;
+      let allinfo = this.props.newinfos;
+      let banci;
+      let newban;
+      const scheID = this.$router.params._id;
+
+      allinfo.map(x => {
+          if (x.userid === info.userid && x.scheid === scheID) {
+              if (banci) banci = [...banci, x.classid];
+              else banci = [x.classid];
+          }
+      });
+      banci.map(item => {
+          allban.map(x => {
+              if (x._id === item) {
+                  if (newban) newban = [...newban.filter(y => y._id != x._id), x];
+                  else newban = [x];
+              }
+          });
+      });
+      return newban;
+  }
 
     render() {
         const scheID = this.$router.params._id;
@@ -406,6 +432,9 @@ class ScheduleDetail extends Component<Props, States> {
                 }
             }
         });
+        for (let i in showinfo) {
+            showinfo[i].newbanci = this.getbancis(showinfo[i]._id);
+        }
         if (!showinfo) showinfo = [];
         var showattender;
 
@@ -577,6 +606,23 @@ class ScheduleDetail extends Component<Props, States> {
                                                         }}
                                                     >
                                                         返回
+                                                    </Button>
+                                                </AtModalAction>
+                                            </AtFloatLayout>
+
+                                            <AtFloatLayout isOpened={this.state.addattender === item._id}>
+                                                <AtModalHeader>添加成员</AtModalHeader>
+                                                <AtModalContent>
+                                                    <AtCheckbox
+                                                        options={showattender}
+                                                        selectedList={this.state.attenderlist}
+                                                        onChange={this.addattender.bind(this)}
+                                                    />
+                                                </AtModalContent>
+                                                <AtModalAction>
+                                                    <Button onClick={() => this.setState({ addattender: "" })}>返回</Button>
+                                                    <Button onClick={this.pushattender.bind(this, item._id, this.state.attenderlist)}>
+                                                        添加成员
                                                     </Button>
                                                 </AtModalAction>
                                             </AtFloatLayout>
