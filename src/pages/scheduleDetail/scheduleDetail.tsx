@@ -35,6 +35,7 @@ import getTimeString from "../../utils/getTimeString";
 
 import getAttendersNumber from "../../utils/getAttendersNumber";
 import NewUserBadge from "../../components/NewUserBadge";
+import { CheckboxOption } from "taro-ui/types/checkbox";
 
 /** 定义这个页面的 Props 和 States */
 type Props = {
@@ -259,12 +260,12 @@ class ScheduleDetail extends Component<Props, States> {
         return {
             title: "快来看看班表 " + this.state.schedule.title + " 的最新排班结果吧～ ",
             path: "/pages/scheduleDetail/scheduleDetail?_id=" + this.$router.params._id,
-            success: res => {
+            success: (res: any) => {
                 if (res.errMsg === "shareAppMessage:ok") {
                     Taro.showToast({ title: "分享成功", icon: "success", duration: 2000 });
                 }
             },
-            fail: res => {
+            fail: (res: any) => {
                 if (res.errMsg == "shareAppMessage:fail cancel") {
                     Taro.showToast({ title: "取消分享", icon: "none", duration: 2000 });
                 } else if (res.errMsg == "shareAppMessage:fail") {
@@ -350,15 +351,15 @@ class ScheduleDetail extends Component<Props, States> {
             this.setState({ addattender: "" });
             let exist = false;
             Taro.showToast({ title: "添加中", icon: "loading", duration: 5000 });
-            console.log(attenderlist)
+
             attenderlist.map((item: string) => {
-                let tmp = this.props.newinfos.filter(i=>i._id===item)
-                if(tmp)
-                this.props.newinfos.map(x => {
-                    if (x.classid === classid && tmp[0].userid === x.userid) {
-                        exist = true;
-                    }
-                });
+                let tmp = this.props.newinfos.filter(i => i._id === item);
+                if (tmp)
+                    this.props.newinfos.map(x => {
+                        if (x.classid === classid && tmp[0].userid === x.userid) {
+                            exist = true;
+                        }
+                    });
                 else Taro.showToast({ title: "没有找到该参与者信息", icon: "none", duration: 5000 });
             });
             if (exist) {
@@ -375,7 +376,7 @@ class ScheduleDetail extends Component<Props, States> {
                     })
                     .then(res => {
                         var resdata = (res as unknown) as pushNewAttenderResult;
-                        console.log(resdata)
+
                         if (resdata.result.code === 200) {
                             resdata.result.addlist.map(newinfo => {
                                 this.props.updatenewInfo(newinfo);
@@ -392,29 +393,29 @@ class ScheduleDetail extends Component<Props, States> {
         }
     }
     getbancis(infoid: string) {
-      let info = this.props.newinfos.filter(x => x._id === infoid)[0];
-      let allban = this.props.bancis;
-      let allinfo = this.props.newinfos;
-      let banci;
-      let newban;
-      const scheID = this.$router.params._id;
+        let info = this.props.newinfos.filter(x => x._id === infoid)[0];
+        let allban = this.props.bancis;
+        let allinfo = this.props.newinfos;
+        let banci: string[] = [];
+        let newban: Banci[] = [];
+        const scheID = this.$router.params._id;
 
-      allinfo.map(x => {
-          if (x.userid === info.userid && x.scheid === scheID) {
-              if (banci) banci = [...banci, x.classid];
-              else banci = [x.classid];
-          }
-      });
-      banci.map(item => {
-          allban.map(x => {
-              if (x._id === item) {
-                  if (newban) newban = [...newban.filter(y => y._id != x._id), x];
-                  else newban = [x];
-              }
-          });
-      });
-      return newban;
-  }
+        allinfo.map(x => {
+            if (x.userid === info.userid && x.scheid === scheID) {
+                if (banci) banci = [...banci, x.classid];
+                else banci = [x.classid];
+            }
+        });
+        banci.map(item => {
+            allban.map(x => {
+                if (x._id === item) {
+                    if (newban) newban = [...newban.filter(y => y._id != x._id), x];
+                    else newban = [x];
+                }
+            });
+        });
+        return newban;
+    }
 
     render() {
         const scheID = this.$router.params._id;
@@ -439,7 +440,7 @@ class ScheduleDetail extends Component<Props, States> {
             showinfo[i].newbanci = this.getbancis(showinfo[i]._id);
         }
         if (!showinfo) showinfo = [];
-        var showattender;
+        var showattender: CheckboxOption<any>[];
 
         if (showinfo) {
             showinfo.map(x => {

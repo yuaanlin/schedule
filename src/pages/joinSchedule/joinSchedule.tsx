@@ -1,4 +1,4 @@
-import { Button, Picker, Text, View, Block } from "@tarojs/components";
+import { Button, Picker, Text, View } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import Taro, { Component, Config } from "@tarojs/taro";
 import {
@@ -10,7 +10,6 @@ import {
     AtInput,
     AtList,
     AtListItem,
-    AtModal,
     AtModalAction,
     AtModalContent,
     AtModalHeader,
@@ -280,7 +279,6 @@ class JoinSchedule extends Component<Props, States> {
         var sc = this.props.schedules.find(sc => sc._id === scheID);
 
         /** 前端找不到班表，先下载请求的班表数据 */
-        // if (sc === undefined) {
         Taro.cloud
             .callFunction({
                 name: "getschedule",
@@ -305,7 +303,6 @@ class JoinSchedule extends Component<Props, States> {
                     Taro.showToast({ title: "班表不存在", icon: "none", duration: 2000 });
                 }
             });
-        // }
 
         /** 如果这个用户已经报名过这个班表，自动载入 tag */
         var exsistTag: string | undefined = undefined;
@@ -495,8 +492,8 @@ class JoinSchedule extends Component<Props, States> {
         let info = this.props.infos.filter(x => x._id === infoid)[0];
         let allban = this.props.bancis;
         let allinfo = this.props.infos;
-        let banci;
-        let newban;
+        let banci: string[] = [];
+        let newban: Banci[] = [];
         const scheID = this.$router.params._id;
 
         allinfo.map(x => {
@@ -505,6 +502,7 @@ class JoinSchedule extends Component<Props, States> {
                 else banci = [x.classid];
             }
         });
+
         banci.map(item => {
             allban.map(x => {
                 if (x._id === item) {
@@ -513,6 +511,7 @@ class JoinSchedule extends Component<Props, States> {
                 }
             });
         });
+
         return newban;
     }
 
@@ -995,11 +994,7 @@ class JoinSchedule extends Component<Props, States> {
                                                     </View>
                                                     {/* 循环班次成员获取tag */}
                                                     <View>
-                                                        {/* {bancis.filter(x => x._id === item.classid).length === 0 ? (
-                                                            <Text>没有加入任何班次</Text>
-                                                        ) : ( */}
                                                         <View>
-                                                            {/* {const temp = this.getbancis(item._id);} */}
                                                             {item.newbanci.map(x => {
                                                                 return (
                                                                     <AtButton
@@ -1020,7 +1015,6 @@ class JoinSchedule extends Component<Props, States> {
                                                                 );
                                                             })}
                                                         </View>
-                                                        {/* )} */}
                                                     </View>
                                                 </AtModalContent>
                                                 <AtModalAction>
