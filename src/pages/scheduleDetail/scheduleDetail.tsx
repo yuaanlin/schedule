@@ -496,7 +496,10 @@ class ScheduleDetail extends Component<Props, States> {
                                                 }}
                                             />
                                             {/* 对应listitem生成对应的modal */}
-                                            <AtFloatLayout isOpened={this.state.openmodal === item._id}>
+                                            <AtFloatLayout
+                                                isOpened={this.state.openmodal === item._id}
+                                                onClose={() => this.setState({ openmodal: "" })}
+                                            >
                                                 <AtModalHeader>
                                                     {getDateString(item.startTime, true) +
                                                         "" +
@@ -614,7 +617,10 @@ class ScheduleDetail extends Component<Props, States> {
                                                 </AtModalAction>
                                             </AtFloatLayout>
 
-                                            <AtFloatLayout isOpened={this.state.addattender === item._id}>
+                                            <AtFloatLayout
+                                                isOpened={this.state.addattender === item._id}
+                                                onClose={() => this.setState({ addattender: "" })}
+                                            >
                                                 <AtModalHeader>添加成员</AtModalHeader>
                                                 <AtModalContent>
                                                     <AtCheckbox
@@ -651,7 +657,10 @@ class ScheduleDetail extends Component<Props, States> {
                                                 }}
                                             />
                                             {/* 对应listitem生成对应的modal */}
-                                            <AtFloatLayout isOpened={this.state.openinfo === item._id}>
+                                            <AtFloatLayout
+                                                isOpened={this.state.openinfo === item._id}
+                                                onClose={() => this.setState({ openinfo: "" })}
+                                            >
                                                 <AtModalHeader>{item.tag + " 的个人信息"} </AtModalHeader>
                                                 <AtModalContent>
                                                     <View className="at-row">
@@ -740,8 +749,8 @@ class ScheduleDetail extends Component<Props, States> {
                         </AtList>
                     </View>
 
-                    <AtFloatLayout isOpened={this.state.editing === "title"}>
-                        <AtModalHeader>修改班表标题</AtModalHeader>
+                    <AtFloatLayout isOpened={this.state.editing === "title"} onClose={() => this.setState({ editing: "" })}>
+                        ><AtModalHeader>修改班表标题</AtModalHeader>
                         <AtModalContent>
                             <AtInput
                                 name="title"
@@ -755,8 +764,8 @@ class ScheduleDetail extends Component<Props, States> {
                         </AtModalAction>
                     </AtFloatLayout>
 
-                    <AtFloatLayout isOpened={this.state.editing === "description"}>
-                        <AtModalHeader>修改班表描述</AtModalHeader>
+                    <AtFloatLayout isOpened={this.state.editing === "description"} onClose={() => this.setState({ editing: "" })}>
+                        ><AtModalHeader>修改班表描述</AtModalHeader>
                         <AtModalContent>
                             <AtInput
                                 name="description"
@@ -770,7 +779,7 @@ class ScheduleDetail extends Component<Props, States> {
                         </AtModalAction>
                     </AtFloatLayout>
 
-                    <AtFloatLayout isOpened={this.state.editing === "startact"}>
+                    <AtFloatLayout isOpened={this.state.editing === "startact"} onClose={() => this.setState({ editing: "" })}>
                         <AtModalHeader>修改班表开始日期</AtModalHeader>
                         <AtModalContent>
                             <Picker
@@ -788,7 +797,7 @@ class ScheduleDetail extends Component<Props, States> {
                         </AtModalAction>
                     </AtFloatLayout>
 
-                    <AtFloatLayout isOpened={this.state.editing === "endact"}>
+                    <AtFloatLayout isOpened={this.state.editing === "endact"} onClose={() => this.setState({ editing: "" })}>
                         <AtModalHeader>修改班表结束日期</AtModalHeader>
                         <AtModalContent>
                             <Picker

@@ -69,16 +69,11 @@ class Individual extends Component<Props, States> {
                         </AtButton>
                     )}
                 </View>
-                <View className="myteam">
-                    <AtList>
-                        <AtListItem iconInfo={{ prefixClass: "icon", value: "Customermanagement" }} title="我的团队" arrow="right" />
-                    </AtList>
-                </View>
                 <View className="relevant">
                     <AtList>
                         <AtListItem
                             iconInfo={{ prefixClass: "icon", value: "add-account" }}
-                            title="关于我们"
+                            title="关于开发团队"
                             arrow="right"
                             onClick={() => {
                                 Taro.navigateTo({ url: "../aboutus/aboutus" });

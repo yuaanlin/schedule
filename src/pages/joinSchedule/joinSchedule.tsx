@@ -656,7 +656,7 @@ class JoinSchedule extends Component<Props, States> {
         if (schedule !== undefined)
             return (
                 <View>
-                    <AtFloatLayout isOpened={this.state.showresult}>
+                    <AtFloatLayout isOpened={this.state.showresult} onClose={() => this.setState({ showresult: false })}>
                         <AtModalHeader>匹配结果</AtModalHeader>
                         <AtModalContent>
                             <View className="at-row">
@@ -799,7 +799,10 @@ class JoinSchedule extends Component<Props, States> {
                                                 />
                                             </AtSwipeAction>
                                             {/* 对应listitem生成对应的modal */}
-                                            <AtFloatLayout isOpened={this.state.openmodal === item._id}>
+                                            <AtFloatLayout
+                                                isOpened={this.state.openmodal === item._id}
+                                                onClose={() => this.setState({ openmodal: "" })}
+                                            >
                                                 <AtModalHeader>
                                                     {getDateString(item.startTime, true) +
                                                         "" +
@@ -912,7 +915,10 @@ class JoinSchedule extends Component<Props, States> {
                                                 </AtModalAction>
                                             </AtFloatLayout>
 
-                                            <AtFloatLayout isOpened={this.state.addattender === item._id}>
+                                            <AtFloatLayout
+                                                isOpened={this.state.addattender === item._id}
+                                                onClose={() => this.setState({ addattender: "" })}
+                                            >
                                                 <AtModalHeader>添加成员</AtModalHeader>
                                                 <AtModalContent>
                                                     <AtCheckbox
@@ -949,7 +955,10 @@ class JoinSchedule extends Component<Props, States> {
                                                 }}
                                             />
                                             {/* 对应listitem生成对应的modal */}
-                                            <AtFloatLayout isOpened={this.state.openinfo === item._id}>
+                                            <AtFloatLayout
+                                                isOpened={this.state.openinfo === item._id}
+                                                onClose={() => this.setState({ openinfo: "" })}
+                                            >
                                                 <AtModalHeader>{item.tag + " 的个人信息"} </AtModalHeader>
                                                 <AtModalContent>
                                                     <View className="at-row">
@@ -1037,7 +1046,7 @@ class JoinSchedule extends Component<Props, States> {
                         </View>
                     </View>
 
-                    <AtFloatLayout isOpened={this.state.editing === "title"}>
+                    <AtFloatLayout isOpened={this.state.editing === "title"} onClose={() => this.setState({ editing: "" })}>
                         <AtModalHeader>修改班表标题</AtModalHeader>
                         <AtModalContent>
                             <AtInput
@@ -1052,7 +1061,7 @@ class JoinSchedule extends Component<Props, States> {
                         </AtModalAction>
                     </AtFloatLayout>
 
-                    <AtFloatLayout isOpened={this.state.editing === "description"}>
+                    <AtFloatLayout isOpened={this.state.editing === "description"} onClose={() => this.setState({ editing: "" })}>
                         <AtModalHeader>修改班表描述</AtModalHeader>
                         <AtModalContent>
                             <AtInput
@@ -1067,7 +1076,7 @@ class JoinSchedule extends Component<Props, States> {
                         </AtModalAction>
                     </AtFloatLayout>
 
-                    <AtFloatLayout isOpened={this.state.editing === "startact"}>
+                    <AtFloatLayout isOpened={this.state.editing === "startact"} onClose={() => this.setState({ editing: "" })}>
                         <AtModalHeader>修改班表开始日期</AtModalHeader>
                         <AtModalContent>
                             <Picker
@@ -1085,7 +1094,7 @@ class JoinSchedule extends Component<Props, States> {
                         </AtModalAction>
                     </AtFloatLayout>
 
-                    <AtFloatLayout isOpened={this.state.editing === "endact"}>
+                    <AtFloatLayout isOpened={this.state.editing === "endact"} onClose={() => this.setState({ editing: "" })}>
                         <AtModalHeader>修改班表结束日期</AtModalHeader>
                         <AtModalContent>
                             <Picker
@@ -1102,7 +1111,7 @@ class JoinSchedule extends Component<Props, States> {
                             <Button onClick={() => this.updateSche(schedule, "endact", this.state.inputingDate)}>更新</Button>
                         </AtModalAction>
                     </AtFloatLayout>
-                    <AtFloatLayout isOpened={this.state.gettag}>
+                    <AtFloatLayout isOpened={this.state.gettag} onClose={() => this.setState({ gettag: false })}>
                         <AtModalHeader>请先填写个人信息</AtModalHeader>
                         <AtModalContent>
                             <AtInput
