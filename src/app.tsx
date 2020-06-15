@@ -20,7 +20,7 @@ class App extends Component {
         window: {
           backgroundTextStyle: "light",
           navigationBarBackgroundColor: "#ABCFD0",
-          navigationBarTitleText: "排了个班",
+          navigationBarTitleText: "轻排班",
           enablePullDownRefresh:true
           // navigationBarTextStyle: "black",
         },
